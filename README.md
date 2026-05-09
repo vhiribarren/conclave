@@ -51,3 +51,7 @@ npx wrangler deploy
 - **Frontend**: Single Page Application (SPA) using React 18 and Vite. Styled with a clean lite-mode aesthetic.
 - **Backend**: Cloudflare Workers with Durable Objects. Durable Objects act as the single source of truth for each room, handling real-time WebSocket communication.
 - **Real-time Sync**: Uses WebSockets for zero-latency voting and state updates.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

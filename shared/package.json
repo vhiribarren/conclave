@@ -1,6 +1,8 @@
 {
   "name": "@conclave/shared",
   "version": "1.0.0",
+  "author": "Vincent Hiribarren",
+  "license": "MIT",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "private": true

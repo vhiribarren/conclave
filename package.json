@@ -12,5 +12,7 @@
     "dev:server": "npm run dev -w server",
     "build:client": "npm run build -w client",
     "deploy:server": "npm run deploy -w server"
-  }
+  },
+  "author": "Vincent Hiribarren",
+  "license": "MIT"
 }
