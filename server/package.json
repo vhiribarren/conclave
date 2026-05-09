@@ -9,6 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@conclave/shared": "*"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260509.1",
     "typescript": "^6.0.3",

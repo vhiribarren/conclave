@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Share2, LogOut, Crown, Check, Eye, RotateCcw, User } from 'lucide-react';
 
-import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave-socket';
+import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';
 
 const CARDS = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
 

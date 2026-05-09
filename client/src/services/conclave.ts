@@ -1,21 +1,6 @@
-export type RoomState = {
-  participants: Array<{
-    id: string;
-    name: string;
-    vote: string | null;
-    isAdmin: boolean;
-    isSpectator: boolean;
-  }>;
-  revealed: boolean;
-  currentTask: string;
-};
+import type { RoomState, SocketMessage } from "@conclave/shared";
 
-export type SocketMessage =
-  | { type: 'JOIN'; name: string }
-  | { type: 'VOTE'; vote: string | null }
-  | { type: 'REVEAL' }
-  | { type: 'RESET' }
-  | { type: 'SET_TASK'; task: string };
+export type { RoomState, SocketMessage };
 
 export interface ConclaveActions {
   vote: (vote: string | null) => void;

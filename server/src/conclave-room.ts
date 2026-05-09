@@ -1,18 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-
-interface Participant {
-  id: string;
-  name: string;
-  vote: string | null;
-  isAdmin: boolean;
-  isSpectator: boolean;
-}
-
-interface RoomState {
-  participants: Participant[];
-  revealed: boolean;
-  currentTask: string;
-}
+import type { RoomState } from "@conclave/shared";
 
 export class ConclaveRoom extends DurableObject {
   private state: RoomState = {
