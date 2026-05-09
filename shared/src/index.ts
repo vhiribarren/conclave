@@ -45,6 +45,7 @@ export const DEFAULT_DECK = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕
 
 export interface RoomState {
   created?: boolean;
+  name?: string;
   participants: Participant[];
   tasks: Task[];
   currentTaskId: string | null;

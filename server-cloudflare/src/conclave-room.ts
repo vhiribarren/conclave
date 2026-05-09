@@ -49,7 +49,9 @@ export class ConclaveRoom extends DurableObject {
     const url = new URL(request.url);
     
     if (request.method === "POST" && url.pathname === "/init") {
+      const data = await request.json() as { name?: string };
       this.state.created = true;
+      this.state.name = data.name;
       await this.ctx.storage.put("state", this.state);
       this.updateAlarm();
       return new Response("OK");

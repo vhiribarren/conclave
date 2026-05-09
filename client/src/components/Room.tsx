@@ -171,7 +171,7 @@ const Room = () => {
         <div className="header-left">
           <div className="header-logo">C</div>
           <div>
-            <h1 className="header-title">{roomId}</h1>
+            <h1 className="header-title">{state.name || roomId}</h1>
             <div className="header-subtitle">
               <span className="header-dot"></span>
               {state.participants.length} online

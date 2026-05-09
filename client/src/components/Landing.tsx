@@ -28,7 +28,9 @@ import { getUserName, setUserName } from '../services/user';
 
 const Landing = () => {
   const [roomName, setRoomName] = useState('');
+  const [roomTitle, setRoomTitle] = useState('');
   const [userName, setUserNameInput] = useState(getUserName());
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +44,8 @@ const Landing = () => {
       const host = import.meta.env.PROD ? '' : `http://${window.location.hostname}:8787`;
       const res = await fetch(`${host}/api/rooms/create`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: roomTitle }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -99,7 +103,7 @@ const Landing = () => {
             <div className="landing-divider-line"></div>
           </div>
 
-          <button onClick={createRoom} disabled={isLoading} className="premium-button">
+          <button onClick={() => setShowCreateModal(true)} disabled={isLoading} className="premium-button">
             <Plus size={18} />
             {isLoading ? 'Creating...' : 'Create New Room'}
           </button>
@@ -126,6 +130,35 @@ const Landing = () => {
           </form>
         </div>
       </div>
+
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+            <h2 className="modal-title">Create New Room</h2>
+            <p className="modal-subtitle">Give your room a title (optional).</p>
+            <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="landing-form">
+              <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                Room Title
+              </div>
+              <input
+                type="text"
+                placeholder="e.g. Sprint Planning #42"
+                className="premium-input"
+                value={roomTitle}
+                onChange={(e) => setRoomTitle(e.target.value)}
+                style={{ textAlign: 'center' }}
+                autoFocus
+              />
+              <button type="submit" disabled={isLoading} className="premium-button">
+                {isLoading ? 'Creating...' : 'Confirm & Create'}
+              </button>
+              <button type="button" onClick={() => setShowCreateModal(false)} className="premium-button secondary">
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
       
       <div className="landing-footer">
         <span>No auth</span>

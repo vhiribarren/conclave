@@ -44,12 +44,17 @@ export default {
     }
 
     if (request.method === "POST" && url.pathname === "/api/rooms/create") {
+      const { name } = await request.json() as { name?: string };
       const roomId = generateRoomId();
       const scopedDurableObject = env.CONCLAVE_ROOM;//.jurisdiction("eu");
       const id = scopedDurableObject.idFromName(roomId);
       const obj = scopedDurableObject.get(id);
 
-      await obj.fetch(new Request("http://do/init", { method: "POST" }));
+      await obj.fetch(new Request("http://do/init", { 
+        method: "POST",
+        body: JSON.stringify({ name }),
+        headers: { "Content-Type": "application/json" }
+      }));
 
       return new Response(JSON.stringify({ roomId }), {
         headers: {
