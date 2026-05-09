@@ -1,0 +1,11 @@
+name = "conclave-server"
+main = "src/index.ts"
+compatibility_date = "2024-04-03"
+
+[[durable_objects.bindings]]
+name = "CONCLAVE_ROOM"
+class_name = "ConclaveRoom"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["ConclaveRoom"]
