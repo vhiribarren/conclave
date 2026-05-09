@@ -43,7 +43,8 @@ export class ConclaveSocket {
     roomId: string,
     userId: string,
     name: string,
-    onStateUpdate: (state: RoomState) => void
+    onStateUpdate: (state: RoomState) => void,
+    onError: (error: string) => void
   ): ConclaveActions {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.hostname;
@@ -62,8 +63,28 @@ export class ConclaveSocket {
       }
     };
 
+    let connected = false;
+    let errorDispatched = false;
+
+    const handleError = (msg: string) => {
+      if (!connected && !errorDispatched) {
+        errorDispatched = true;
+        onError(msg);
+      }
+    };
+
     ws.onopen = () => {
+      connected = true;
       send({ type: 'JOIN', userId, name });
+    };
+
+    ws.onerror = (event) => {
+      console.error('WebSocket error', event);
+      handleError('Room does not exist or connection failed');
+    };
+
+    ws.onclose = () => {
+      handleError('Room does not exist or connection failed');
     };
 
     ws.onmessage = (event) => {

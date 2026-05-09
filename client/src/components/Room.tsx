@@ -68,6 +68,7 @@ const Room = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showRoomSettings, setShowRoomSettings] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [newTaskName, setNewTaskName] = useState('');
   const actionsRef = useRef<ConclaveActions | null>(null);
 
@@ -75,6 +76,9 @@ const Room = () => {
     if (isJoined && roomId && !linkUserId) {
       const actions = ConclaveSocket.connect(roomId, userId, name, (newState) => {
         setState(newState);
+        setConnectionError(null);
+      }, (error) => {
+        setConnectionError(error);
       });
       
       actionsRef.current = actions;
@@ -143,6 +147,20 @@ const Room = () => {
       </div>
     </div>
   );
+
+  if (connectionError) {
+    return (
+      <div className="page-container animate-fade-in">
+        <div className="landing-card glass" style={{ textAlign: 'center' }}>
+          <h2 className="modal-title" style={{ color: 'var(--danger-color)' }}>Room Not Found</h2>
+          <p className="modal-subtitle">{connectionError}</p>
+          <button onClick={() => navigate('/')} className="premium-button">
+            Return Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
