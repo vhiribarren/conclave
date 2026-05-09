@@ -29,7 +29,11 @@ export interface ConclaveActions {
   vote: (vote: string | null) => void;
   reveal: () => void;
   reset: () => void;
-  setTask: (task: string) => void;
+  addTask: (name: string) => void;
+  setTask: (taskId: string) => void;
+  setDeck: (deck: string[]) => void;
+  setTimer: (durationMs: number | null) => void;
+  transferAdmin: (targetUserId: string) => void;
   disconnect: () => void;
 }
 
@@ -37,6 +41,7 @@ export interface ConclaveActions {
 export class ConclaveSocket {
   static connect(
     roomId: string,
+    userId: string,
     name: string,
     onStateUpdate: (state: RoomState) => void
   ): ConclaveActions {
@@ -58,7 +63,7 @@ export class ConclaveSocket {
     };
 
     ws.onopen = () => {
-      send({ type: 'JOIN', name });
+      send({ type: 'JOIN', userId, name });
     };
 
     ws.onmessage = (event) => {
@@ -72,7 +77,11 @@ export class ConclaveSocket {
       vote: (vote) => send({ type: 'VOTE', vote }),
       reveal: () => send({ type: 'REVEAL' }),
       reset: () => send({ type: 'RESET' }),
-      setTask: (task) => send({ type: 'SET_TASK', task }),
+      addTask: (name) => send({ type: 'ADD_TASK', name }),
+      setTask: (taskId) => send({ type: 'SET_TASK', taskId }),
+      setDeck: (deck) => send({ type: 'SET_DECK', deck }),
+      setTimer: (durationMs) => send({ type: 'SET_TIMER', durationMs }),
+      transferAdmin: (targetUserId) => send({ type: 'TRANSFER_ADMIN', targetUserId }),
       disconnect: () => ws.close(),
     };
   }

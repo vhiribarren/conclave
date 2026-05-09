@@ -14,5 +14,8 @@
     "deploy:server": "npm run deploy -w server-cloudflare"
   },
   "author": "Vincent Hiribarren",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "nanoid": "^5.1.11"
+  }
 }

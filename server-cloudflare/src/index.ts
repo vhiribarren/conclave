@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 export { ConclaveRoom } from "./conclave-room";
+import { generateRoomId } from "@conclave/shared";
 
 export interface Env {
   CONCLAVE_ROOM: DurableObjectNamespace;
@@ -30,13 +31,41 @@ export interface Env {
 export default {
   async fetch(request: Request, env: Env) {
     const url = new URL(request.url);
+
+    // Handle CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+      });
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/rooms/create") {
+      const roomId = generateRoomId();
+      const scopedDurableObject = env.CONCLAVE_ROOM;//.jurisdiction("eu");
+      const id = scopedDurableObject.idFromName(roomId);
+      const obj = scopedDurableObject.get(id);
+
+      await obj.fetch(new Request("http://do/init", { method: "POST" }));
+
+      return new Response(JSON.stringify({ roomId }), {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }
+
     const roomId = url.searchParams.get("roomId");
 
     if (!roomId) {
       return new Response("Missing roomId", { status: 400 });
     }
 
-    const scopedDurableObject = env.CONCLAVE_ROOM.jurisdiction("eu");
+    const scopedDurableObject = env.CONCLAVE_ROOM;
     const id = scopedDurableObject.idFromName(roomId);
     const obj = scopedDurableObject.get(id);
 

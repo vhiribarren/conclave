@@ -29,9 +29,24 @@ const Landing = () => {
   const [roomName, setRoomName] = useState('');
   const navigate = useNavigate();
 
-  const createRoom = () => {
-    const roomId = Math.random().toString(36).substring(2, 10);
-    navigate(`/room/${roomId}`);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const createRoom = async () => {
+    try {
+      setIsLoading(true);
+      const host = import.meta.env.PROD ? '' : `http://${window.location.hostname}:8787`;
+      const res = await fetch(`${host}/api/rooms/create`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        navigate(`/room/${data.roomId}`);
+      }
+    } catch (err) {
+      console.error('Failed to create room', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const joinRoom = (e: React.FormEvent) => {
@@ -42,33 +57,36 @@ const Landing = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-6 animate-fade-in">
-      <div className="max-w-md w-full glass p-8 text-center flex flex-col gap-6">
-        <div className="flex flex-col items-center gap-3">
-          <div className="p-3 rounded-xl bg-indigo-600 shadow-lg shadow-indigo-200">
+    <div className="page-container animate-fade-in">
+      <div className="landing-card glass">
+        <div className="landing-glow-1"></div>
+        <div className="landing-glow-2"></div>
+        
+        <div className="landing-header">
+          <div className="landing-icon-wrapper">
             <Users size={32} color="white" />
           </div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+          <h1 className="landing-title">
             Conclave
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
+          <p className="landing-subtitle">
             Clean poker planning for remote teams.
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <button onClick={createRoom} className="premium-button flex items-center justify-center gap-2">
+        <div className="landing-form">
+          <button onClick={createRoom} disabled={isLoading} className="premium-button">
             <Plus size={18} />
-            Create New Room
+            {isLoading ? 'Creating...' : 'Create New Room'}
           </button>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-secondary)', margin: '0.25rem 0' }}>
-            <div style={{ flex: 1, height: '1px', background: 'var(--surface-border)' }}></div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>OR JOIN EXISTING</span>
-            <div style={{ flex: 1, height: '1px', background: 'var(--surface-border)' }}></div>
+          <div className="landing-divider">
+            <div className="landing-divider-line"></div>
+            <span className="landing-divider-text">or join existing</span>
+            <div className="landing-divider-line"></div>
           </div>
 
-          <form onSubmit={joinRoom} className="flex flex-col gap-3">
+          <form onSubmit={joinRoom} className="landing-form">
             <input
               type="text"
               placeholder="Enter Room ID"
@@ -76,7 +94,7 @@ const Landing = () => {
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
             />
-            <button type="submit" className="premium-button flex items-center justify-center gap-2" style={{ background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--surface-border)', boxShadow: 'none' }}>
+            <button type="submit" className="premium-button secondary">
               Join Room
               <ArrowRight size={18} />
             </button>
@@ -84,7 +102,7 @@ const Landing = () => {
         </div>
       </div>
       
-      <div style={{ marginTop: '2rem', color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', gap: '1.5rem' }}>
+      <div className="landing-footer">
         <span>No auth</span>
         <span>•</span>
         <span>Real-time</span>

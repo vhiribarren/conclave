@@ -29,15 +29,38 @@ export interface Participant {
   isSpectator: boolean;
 }
 
-export interface RoomState {
-  participants: Participant[];
+export interface Round {
+  id: string;
+  votes: Record<string, string>; // participant.id -> vote
   revealed: boolean;
-  currentTask: string;
+}
+
+export interface Task {
+  id: string;
+  name: string;
+  rounds: Round[];
+}
+
+export const DEFAULT_DECK = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
+
+export interface RoomState {
+  created?: boolean;
+  participants: Participant[];
+  tasks: Task[];
+  currentTaskId: string | null;
+  deck: string[];
+  timerEndAt: number | null;
 }
 
 export type SocketMessage = 
-  | { type: 'JOIN'; name: string; isSpectator?: boolean }
+  | { type: 'JOIN'; userId: string; name: string; isSpectator?: boolean }
   | { type: 'VOTE'; vote: string | null }
   | { type: 'REVEAL' }
   | { type: 'RESET' }
-  | { type: 'SET_TASK'; task: string };
+  | { type: 'SET_TASK'; taskId: string }
+  | { type: 'ADD_TASK'; name: string }
+  | { type: 'SET_DECK'; deck: string[] }
+  | { type: 'SET_TIMER'; durationMs: number | null }
+  | { type: 'TRANSFER_ADMIN'; targetUserId: string };
+
+export * from './id';

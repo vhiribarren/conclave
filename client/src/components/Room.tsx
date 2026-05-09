@@ -23,24 +23,56 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Crown, Check, Eye, RotateCcw, User } from 'lucide-react';
+import { Share2, LogOut, Eye, RotateCcw, Smartphone, List, Plus, UserCog, Settings } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';
+import { getUserId, getUserName, setUserName } from '../services/user';
+import { ParticipantsBoard } from './ParticipantsBoard';
+import { AggregationResult } from './AggregationResult';
+import { TimerDisplay } from './TimerDisplay';
+import { AdminRemote } from './AdminRemote';
 
-const CARDS = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
 
 const Room = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const [name, setName] = useState(localStorage.getItem('conclave_name') || '');
+  const searchParams = new URLSearchParams(window.location.search);
+  const isRemoteView = searchParams.get('remote') === 'true';
+  const linkUserId = searchParams.get('linkUserId');
+  const linkName = searchParams.get('name');
+
+  useEffect(() => {
+    if (linkUserId && linkName) {
+      localStorage.setItem('conclave_user_id', linkUserId);
+      localStorage.setItem('conclave_name', linkName);
+      // Clean up URL to prevent sharing identity further
+      window.history.replaceState({}, document.title, window.location.pathname + (isRemoteView ? '?remote=true' : ''));
+      window.location.reload(); // Reload to pick up new ID from services
+    }
+  }, [linkUserId, linkName, isRemoteView]);
+
+  const [name, setName] = useState(getUserName());
   const [isJoined, setIsJoined] = useState(false);
-  const [state, setState] = useState<RoomState>({ participants: [], revealed: false, currentTask: '' });
+  const userId = getUserId();
+  const [state, setState] = useState<RoomState>({ 
+    participants: [], 
+    tasks: [],
+    currentTaskId: null,
+    deck: [],
+    timerEndAt: null
+  });
   const [myVote, setMyVote] = useState<string | null>(null);
+  const [showQR, setShowQR] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showRoomSettings, setShowRoomSettings] = useState(false);
+  const [showUserSettings, setShowUserSettings] = useState(false);
+  const [newTaskName, setNewTaskName] = useState('');
   const actionsRef = useRef<ConclaveActions | null>(null);
 
   useEffect(() => {
-    if (isJoined && roomId) {
-      const actions = ConclaveSocket.connect(roomId, name, (newState) => {
+    if (isJoined && roomId && !linkUserId) {
+      const actions = ConclaveSocket.connect(roomId, userId, name, (newState) => {
         setState(newState);
       });
       
@@ -55,7 +87,7 @@ const Room = () => {
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      localStorage.setItem('conclave_name', name.trim());
+      setUserName(name);
       setIsJoined(true);
     }
   };
@@ -71,6 +103,14 @@ const Room = () => {
     setMyVote(null);
     actionsRef.current?.reset();
   };
+
+  const handleAddTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newTaskName.trim() && actionsRef.current) {
+      actionsRef.current.addTask(newTaskName.trim());
+      setNewTaskName('');
+    }
+  };
   
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -79,113 +119,233 @@ const Room = () => {
 
   const isAdmin = state.participants.find(p => p.isAdmin && p.name === name);
 
-  if (!isJoined) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-6 animate-fade-in">
-        <div className="max-w-md w-full glass p-8 text-center flex flex-col gap-6">
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 700 }}>Join Room</h2>
-          <p style={{ color: 'var(--text-secondary)' }}>Enter your name to start voting.</p>
-          <form onSubmit={handleJoin} className="flex flex-col gap-4">
-            <input
-              type="text"
-              placeholder="Your Name"
-              className="premium-input w-full"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoFocus
-            />
-            <button type="submit" className="premium-button">Enter Room</button>
-          </form>
-        </div>
+  const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
+  const currentRound = currentTask?.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null;
+  const isRevealed = currentRound?.revealed || false;
+
+  const renderOnboardingModal = () => (
+    <div className="modal-overlay">
+      <div className="modal-content glass animate-fade-in">
+        <h2 className="modal-title">Join Room</h2>
+        <p className="modal-subtitle">Enter your name to start voting.</p>
+        <form onSubmit={handleJoin} className="landing-form">
+          <input
+            type="text"
+            placeholder="Your Name"
+            className="premium-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+          />
+          <button type="submit" className="premium-button">Enter Room</button>
+        </form>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="flex-1 flex flex-col h-screen overflow-hidden">
+    <>
+      {!isJoined && renderOnboardingModal()}
+      <div className={`room-container ${!isJoined ? 'blurred' : ''}`}>
       {/* Header */}
-      <header className="glass m-4 p-4 flex items-center justify-between border-none rounded-2xl">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-sm">
-            C
-          </div>
+      <header className="header glass">
+        <div className="header-left">
+          <div className="header-logo">C</div>
           <div>
-            <h1 style={{ fontSize: '0.9rem', fontWeight: 700 }}>{roomId}</h1>
-            <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{state.participants.length} online</p>
+            <h1 className="header-title">{roomId}</h1>
+            <div className="header-subtitle">
+              <span className="header-dot"></span>
+              {state.participants.length} online
+            </div>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <button onClick={handleCopyLink} className="p-2 rounded-lg hover:bg-black/5 transition-colors" title="Copy Link">
+        <div className="header-actions">
+          <button onClick={() => setShowUserSettings(true)} className="icon-button" title="User Settings">
+            <UserCog size={18} />
+          </button>
+          {isAdmin && !isRemoteView && (
+            <button onClick={() => setShowQR(true)} className="icon-button accent" title="Remote Control">
+              <Smartphone size={18} />
+            </button>
+          )}
+          <button onClick={handleCopyLink} className="icon-button" title="Copy Link">
             <Share2 size={18} />
           </button>
-          <button onClick={() => navigate('/')} className="p-2 rounded-lg hover:bg-black/5 transition-colors text-red-500" title="Leave">
+          <button onClick={() => navigate('/')} className="icon-button danger" title="Leave">
             <LogOut size={18} />
           </button>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col p-4 md:p-6 gap-6 md:gap-8 overflow-y-auto">
-        {/* Task Section */}
-        <div className="w-full max-w-2xl mx-auto text-center flex flex-col gap-2">
-          <h2 style={{ color: 'var(--text-secondary)', textTransform: 'uppercase', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.5px' }}>Current Task</h2>
-          <div className="glass p-5 text-lg font-medium">
-            {state.currentTask || "Waiting for a task..."}
-          </div>
-        </div>
-
-        {/* Participants Grid */}
-        <div className="flex-1 w-full max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 content-start">
-          {state.participants.map((p) => (
-            <div key={p.id} className={`glass p-4 flex flex-col items-center gap-3 relative transition-all duration-300 ${p.vote ? 'border-indigo-200' : ''}`}>
-              {p.isAdmin && <Crown size={12} className="absolute top-2 right-2 text-amber-500" />}
-              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center">
-                <User size={20} color={p.vote ? 'var(--accent-color)' : 'var(--text-secondary)'} />
-              </div>
-              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{p.name} {p.name === name ? '(You)' : ''}</span>
-              
-              <div className={`w-12 h-16 rounded-lg border flex items-center justify-center text-lg font-bold transition-all duration-300 ${
-                p.vote 
-                  ? 'border-indigo-100 bg-indigo-50/50 text-indigo-600' 
-                  : 'border-slate-100 bg-slate-50/30 text-transparent'
-              }`}>
-                {state.revealed ? p.vote : (p.vote ? <Check size={20} /> : '')}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Voting Section */}
-        {!state.revealed && (
-          <div className="glass p-5 w-full sm:w-fit mx-auto flex flex-col gap-4 items-center mb-4 sticky bottom-4 shadow-lg">
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 700, textTransform: 'uppercase' }}>Pick a card</span>
-            <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-              {CARDS.map((card) => (
-                <div
-                  key={card}
-                  onClick={() => handleVote(card)}
-                  className={`poker-card ${myVote === card ? 'selected' : ''}`}
-                >
-                  {card}
-                </div>
-              ))}
-            </div>
+      <main className="main-content">
+        {/* Timer Section */}
+        {state.timerEndAt && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+            <TimerDisplay timerEndAt={state.timerEndAt} />
           </div>
         )}
 
-        {/* Admin Controls */}
-        {isAdmin && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-3 p-2 bg-white/80 backdrop-blur-md border border-slate-200 shadow-xl rounded-xl">
-            <button onClick={handleReveal} className="premium-button flex items-center gap-2">
-              <Eye size={16} /> Reveal
+        {/* Task Section */}
+        <div className="task-section">
+          <h2 className="task-title">Current Task</h2>
+          <div className="task-box glass">
+            {currentTask?.name || "Waiting for a task..."}
+          </div>
+        </div>
+
+        {isRemoteView && isAdmin && actionsRef.current ? (
+          <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} />
+        ) : (
+          <>
+            <ParticipantsBoard 
+              participants={state.participants} 
+              isRevealed={isRevealed} 
+              currentTaskName={currentTask?.name || ''} 
+              myName={name} 
+            />
+
+            {isRevealed && <AggregationResult participants={state.participants} />}
+
+            {!isRevealed && currentTask && (
+              <div className="voting-section glass">
+                <span className="voting-title">Pick a card</span>
+                <div className="voting-cards">
+                  {(state.deck || []).map((card) => (
+                    <div
+                      key={card}
+                      onClick={() => handleVote(card)}
+                      className={`poker-card ${myVote === card ? 'selected' : ''}`}
+                    >
+                      {card}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Admin Controls on Desktop */}
+        {isAdmin && !isRemoteView && (
+          <div className="admin-controls glass">
+            <button onClick={() => setShowTaskModal(true)} className="premium-button secondary">
+              <List size={18} /> Tasks
             </button>
-            <button onClick={handleReset} className="premium-button flex items-center gap-2" style={{ background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--surface-border)', boxShadow: 'none' }}>
-              <RotateCcw size={16} /> Reset
+            <button onClick={() => setShowRoomSettings(true)} className="premium-button secondary">
+              <Settings size={18} /> Settings
+            </button>
+            <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
+              <Eye size={18} /> Reveal
+            </button>
+            <button onClick={handleReset} className="premium-button secondary">
+              <RotateCcw size={18} /> Reset
             </button>
           </div>
         )}
       </main>
     </div>
+
+    {showTaskModal && (
+      <div className="modal-overlay" onClick={() => setShowTaskModal(false)}>
+        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <h3 className="modal-title">Manage Tasks</h3>
+          <form onSubmit={handleAddTask} className="remote-form">
+            <input 
+              type="text" 
+              value={newTaskName} 
+              onChange={(e) => setNewTaskName(e.target.value)} 
+              placeholder="Enter a new task..." 
+              className="premium-input"
+              autoFocus
+            />
+            <button type="submit" className="premium-button">
+              <Plus size={18} /> Add
+            </button>
+          </form>
+
+          <div className="task-list" style={{ textAlign: 'left' }}>
+            {state.tasks.map(task => (
+              <div 
+                key={task.id} 
+                onClick={() => actionsRef.current?.setTask(task.id)}
+                className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
+              >
+                {task.name}
+              </div>
+            ))}
+            {state.tasks.length === 0 && (
+              <p className="modal-subtitle" style={{textAlign: 'center', marginTop: '1rem'}}>No tasks yet.</p>
+            )}
+          </div>
+          
+          <button onClick={() => setShowTaskModal(false)} className="premium-button secondary">Close</button>
+        </div>
+      </div>
+    )}
+
+    {showRoomSettings && actionsRef.current && (
+      <div className="modal-overlay" onClick={() => setShowRoomSettings(false)}>
+        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <h3 className="modal-title">Room Settings</h3>
+          
+          <div className="remote-box" style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}>
+            <h3 className="remote-section-title" style={{ textAlign: 'center' }}>Timer</h3>
+            <div className="remote-actions" style={{ justifyContent: 'center' }}>
+               <button onClick={() => { actionsRef.current?.setTimer(60000); setShowRoomSettings(false); }} className="premium-button secondary" style={{padding: '0.5rem', fontSize: '0.8rem'}}>1m</button>
+               <button onClick={() => { actionsRef.current?.setTimer(120000); setShowRoomSettings(false); }} className="premium-button secondary" style={{padding: '0.5rem', fontSize: '0.8rem'}}>2m</button>
+               <button onClick={() => { actionsRef.current?.setTimer(300000); setShowRoomSettings(false); }} className="premium-button secondary" style={{padding: '0.5rem', fontSize: '0.8rem'}}>5m</button>
+               <button onClick={() => { actionsRef.current?.setTimer(null); setShowRoomSettings(false); }} className="premium-button danger" style={{padding: '0.5rem', fontSize: '0.8rem'}}>Stop</button>
+            </div>
+          </div>
+
+          <div className="remote-box" style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}>
+            <h3 className="remote-section-title" style={{ textAlign: 'center' }}>Deck Configuration</h3>
+            <div className="remote-actions" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
+               <button onClick={() => { actionsRef.current?.setDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕']); setShowRoomSettings(false); }} className="premium-button secondary" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Standard</button>
+               <button onClick={() => { actionsRef.current?.setDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89']); setShowRoomSettings(false); }} className="premium-button secondary" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Fibonacci</button>
+               <button onClick={() => { actionsRef.current?.setDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?']); setShowRoomSettings(false); }} className="premium-button secondary" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>T-Shirt</button>
+            </div>
+          </div>
+
+          <button onClick={() => setShowRoomSettings(false)} className="premium-button secondary" style={{ marginTop: '1rem' }}>Close</button>
+        </div>
+      </div>
+    )}
+
+    {showUserSettings && (
+      <div className="modal-overlay" onClick={() => setShowUserSettings(false)}>
+        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <h3 className="modal-title">User Settings</h3>
+          <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }} className="landing-form">
+            <input
+              type="text"
+              placeholder="Your Name"
+              className="premium-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+            />
+            <button type="submit" className="premium-button">Update Name</button>
+          </form>
+          <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">Cancel</button>
+        </div>
+      </div>
+    )}
+
+    {showQR && (
+      <div className="modal-overlay" onClick={() => setShowQR(false)}>
+        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <h3 className="modal-title">Admin Remote Control</h3>
+          <p className="modal-subtitle">Scan this code with your phone to control the board and vote secretly.</p>
+          <div style={{background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center'}}>
+            <QRCodeSVG value={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
+          </div>
+          <button onClick={() => setShowQR(false)} className="premium-button secondary">Close</button>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
