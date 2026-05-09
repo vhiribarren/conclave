@@ -23,7 +23,7 @@
  */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
+import { Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
 import { getUserName, setUserName } from '../services/user';
 import { getHistory, type HistoryEntry } from '../services/history';
 
@@ -77,9 +77,6 @@ const Landing = () => {
         <div className="landing-glow-2"></div>
         
         <div className="landing-header">
-          <div className="landing-icon-wrapper">
-            <Users size={32} color="white" />
-          </div>
           <h1 className="landing-title">
             Conclave
           </h1>
@@ -105,17 +102,6 @@ const Landing = () => {
             <div className="landing-divider-line"></div>
           </div>
 
-          <button onClick={() => setShowCreateModal(true)} disabled={isLoading} className="premium-button">
-            <Plus size={18} />
-            {isLoading ? 'Creating...' : 'Create New Room'}
-          </button>
-          
-          <div className="landing-divider">
-            <div className="landing-divider-line"></div>
-            <span className="landing-divider-text">or join existing</span>
-            <div className="landing-divider-line"></div>
-          </div>
-
           <form onSubmit={joinRoom} className="landing-form">
             <input
               type="text"
@@ -125,11 +111,22 @@ const Landing = () => {
               onChange={(e) => setRoomName(e.target.value)}
               style={{ textAlign: 'center' }}
             />
-            <button type="submit" className="premium-button secondary">
+            <button type="submit" className="premium-button" disabled={!roomName.trim()}>
               Join Room
               <ArrowRight size={18} />
             </button>
           </form>
+          
+          <div className="landing-divider">
+            <div className="landing-divider-line"></div>
+            <span className="landing-divider-text">or</span>
+            <div className="landing-divider-line"></div>
+          </div>
+
+          <button onClick={() => setShowCreateModal(true)} disabled={isLoading} className="premium-button secondary">
+            <Plus size={18} />
+            {isLoading ? 'Creating...' : 'Create New Room'}
+          </button>
         </div>
 
         {history.length > 0 && (
@@ -191,14 +188,6 @@ const Landing = () => {
           </div>
         </div>
       )}
-      
-      <div className="landing-footer">
-        <span>No auth</span>
-        <span>•</span>
-        <span>Real-time</span>
-        <span>•</span>
-        <span>Free</span>
-      </div>
     </div>
   );
 };
