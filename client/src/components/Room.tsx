@@ -25,9 +25,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Share2, LogOut, Eye, RotateCcw, Smartphone, List, Plus, UserCog, Settings } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';
-import { getUserId, getUserName, setUserName } from '../services/user';
+import { getUserId, getUserName, setUserName, getUserEmoji, setUserEmoji } from '../services/user';
 import { addToHistory } from '../services/history';
 import { ParticipantsBoard } from './ParticipantsBoard';
 import { AggregationResult } from './AggregationResult';
@@ -54,6 +55,7 @@ const Room = () => {
   }, [linkUserId, linkName, isRemoteView]);
 
   const [name, setName] = useState(getUserName());
+  const [mood, setMood] = useState(getUserEmoji());
   const [isJoined, setIsJoined] = useState(!!getUserName());
   const userId = getUserId();
   const [state, setState] = useState<RoomState>({ 
@@ -71,11 +73,13 @@ const Room = () => {
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [newTaskName, setNewTaskName] = useState('');
+  const [showEmojiPickerJoin, setShowEmojiPickerJoin] = useState(false);
+  const [showEmojiPickerSettings, setShowEmojiPickerSettings] = useState(false);
   const actionsRef = useRef<ConclaveActions | null>(null);
 
   useEffect(() => {
     if (isJoined && roomId && !linkUserId) {
-      const actions = ConclaveSocket.connect(roomId, userId, name, (newState) => {
+      const actions = ConclaveSocket.connect(roomId, userId, name, mood, (newState) => {
         setState(newState);
         setConnectionError(null);
         if (roomId) {
@@ -98,6 +102,10 @@ const Room = () => {
     e.preventDefault();
     if (name.trim()) {
       setUserName(name);
+      setUserEmoji(mood);
+      if (actionsRef.current) {
+        actionsRef.current.updateUser(name, mood);
+      }
       setIsJoined(true);
     }
   };
@@ -147,6 +155,36 @@ const Room = () => {
             onChange={(e) => setName(e.target.value)}
             autoFocus
           />
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Choose your avatar</span>
+            <button 
+              type="button" 
+              className="icon-button" 
+              style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+              onClick={() => setShowEmojiPickerJoin(!showEmojiPickerJoin)}
+            >
+              {mood}
+            </button>
+            
+            {showEmojiPickerJoin && (
+              <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                <EmojiPicker 
+                  onEmojiClick={(emojiData) => {
+                    setMood(emojiData.emoji);
+                    setShowEmojiPickerJoin(false);
+                  }}
+                  theme={Theme.LIGHT}
+                  lazyLoadEmojis={true}
+                  searchDisabled={false}
+                  skinTonesDisabled={true}
+                  height={450}
+                  width={350}
+                />
+              </div>
+            )}
+          </div>
+
           <button type="submit" className="premium-button">Enter Room</button>
         </form>
       </div>
@@ -350,7 +388,35 @@ const Room = () => {
               onChange={(e) => setName(e.target.value)}
               autoFocus
             />
-            <button type="submit" className="premium-button">Update Name</button>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Change your avatar</span>
+              <button 
+                type="button" 
+                className="icon-button" 
+                style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+                onClick={() => setShowEmojiPickerSettings(!showEmojiPickerSettings)}
+              >
+                {mood}
+              </button>
+              
+              {showEmojiPickerSettings && (
+                <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <EmojiPicker 
+                    onEmojiClick={(emojiData) => {
+                      setMood(emojiData.emoji);
+                      setShowEmojiPickerSettings(false);
+                    }}
+                    theme={Theme.LIGHT}
+                    lazyLoadEmojis={true}
+                    height={450}
+                    width={350}
+                  />
+                </div>
+              )}
+            </div>
+
+            <button type="submit" className="premium-button">Update Profile</button>
           </form>
           <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">Cancel</button>
         </div>

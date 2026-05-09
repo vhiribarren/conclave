@@ -130,11 +130,21 @@ export class ConclaveRoom extends DurableObject {
         this.state.participants.push({
           id: sessionId,
           name: data.name || "Anonymous",
+          mood: data.mood || "🦊",
           vote: null,
           isAdmin: isFirst,
           isSpectator: data.isSpectator || false,
         });
         this.broadcastState();
+        break;
+
+      case "UPDATE_USER":
+        const p = this.state.participants.find((p) => p.id === attachment.sessionId);
+        if (p) {
+          p.name = data.name || p.name;
+          p.mood = data.mood || p.mood;
+          this.broadcastState();
+        }
         break;
 
       case "VOTE":

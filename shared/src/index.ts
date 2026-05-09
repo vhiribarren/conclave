@@ -24,6 +24,7 @@
 export interface Participant {
   id: string;
   name: string;
+  mood: string;
   vote: string | null;
   isAdmin: boolean;
   isSpectator: boolean;
@@ -54,7 +55,8 @@ export interface RoomState {
 }
 
 export type SocketMessage = 
-  | { type: 'JOIN'; userId: string; name: string; isSpectator?: boolean }
+  | { type: 'JOIN'; userId: string; name: string; mood: string; isSpectator?: boolean }
+  | { type: 'UPDATE_USER'; name: string; mood: string }
   | { type: 'VOTE'; vote: string | null }
   | { type: 'REVEAL' }
   | { type: 'RESET' }

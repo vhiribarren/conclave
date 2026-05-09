@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@conclave/shared": "*",
+    "emoji-picker-react": "^4.19.1",
     "lucide-react": "^1.14.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.5",

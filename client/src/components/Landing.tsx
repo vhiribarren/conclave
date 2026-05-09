@@ -24,14 +24,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
-import { getUserName, setUserName } from '../services/user';
+import EmojiPicker, { Theme } from 'emoji-picker-react';
+import { getUserName, setUserName, getUserEmoji, setUserEmoji } from '../services/user';
 import { getHistory, type HistoryEntry } from '../services/history';
 
 const Landing = () => {
   const [roomName, setRoomName] = useState('');
   const [roomTitle, setRoomTitle] = useState('');
   const [userName, setUserNameInput] = useState(getUserName());
+  const [mood, setMood] = useState(getUserEmoji());
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [history] = useState<HistoryEntry[]>(getHistory());
   const navigate = useNavigate();
 
@@ -87,16 +90,46 @@ const Landing = () => {
 
         <div className="landing-form">
           <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-            Your Profile Name
+            Your Profile
           </div>
-          <input
-            type="text"
-            placeholder="e.g. Alice"
-            className="premium-input"
-            value={userName}
-            onChange={(e) => setUserNameInput(e.target.value)}
-            style={{ textAlign: 'center', fontWeight: 'bold' }}
-          />
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <button 
+              type="button" 
+              className="icon-button" 
+              style={{ fontSize: '2rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            >
+              {mood}
+            </button>
+            <input
+              type="text"
+              placeholder="e.g. Alice"
+              className="premium-input"
+              value={userName}
+              onChange={(e) => {
+                const newName = e.target.value;
+                setUserNameInput(newName);
+                setUserName(newName);
+              }}
+              style={{ textAlign: 'center', fontWeight: 'bold', flex: 1 }}
+            />
+          </div>
+
+          {showEmojiPicker && (
+            <div style={{ position: 'absolute', zIndex: 100, top: '220px', left: '50%', transform: 'translateX(-50%)' }}>
+              <EmojiPicker 
+                onEmojiClick={(emojiData) => {
+                  setMood(emojiData.emoji);
+                  setUserEmoji(emojiData.emoji);
+                  setShowEmojiPicker(false);
+                }}
+                theme={Theme.LIGHT}
+                lazyLoadEmojis={true}
+                height={400}
+                width={300}
+              />
+            </div>
+          )}
 
           <div className="landing-divider" style={{ margin: '0.5rem 0' }}>
             <div className="landing-divider-line"></div>

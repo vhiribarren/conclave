@@ -34,6 +34,7 @@ export interface ConclaveActions {
   setDeck: (deck: string[]) => void;
   setTimer: (durationMs: number | null) => void;
   transferAdmin: (targetUserId: string) => void;
+  updateUser: (name: string, mood: string) => void;
   disconnect: () => void;
 }
 
@@ -43,6 +44,7 @@ export class ConclaveSocket {
     roomId: string,
     userId: string,
     name: string,
+    mood: string,
     onStateUpdate: (state: RoomState) => void,
     onError: (error: string) => void
   ): ConclaveActions {
@@ -75,7 +77,7 @@ export class ConclaveSocket {
 
     ws.onopen = () => {
       connected = true;
-      send({ type: 'JOIN', userId, name });
+      send({ type: 'JOIN', userId, name, mood });
     };
 
     ws.onerror = (event) => {
@@ -103,6 +105,7 @@ export class ConclaveSocket {
       setDeck: (deck) => send({ type: 'SET_DECK', deck }),
       setTimer: (durationMs) => send({ type: 'SET_TIMER', durationMs }),
       transferAdmin: (targetUserId) => send({ type: 'TRANSFER_ADMIN', targetUserId }),
+      updateUser: (name, mood) => send({ type: 'UPDATE_USER', name, mood }),
       disconnect: () => ws.close(),
     };
   }

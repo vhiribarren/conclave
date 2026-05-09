@@ -1,5 +1,5 @@
 import React from 'react';
-import { Crown, User, Check } from 'lucide-react';
+import { Crown, Check } from 'lucide-react';
 import type { Participant } from '@conclave/shared';
 
 interface Props {
@@ -60,8 +60,8 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
 const ParticipantCard = ({ participant: p, isRevealed, myName }: { participant: Participant & { vote: string | null }, isRevealed: boolean, myName: string }) => (
   <div className={`participant-card glass ${p.vote ? 'has-voted' : ''}`}>
     {p.isAdmin && <Crown size={14} className="participant-admin-icon" />}
-    <div className="participant-avatar">
-      <User size={16} color={p.vote ? 'var(--accent-color)' : 'var(--text-secondary)'} />
+    <div className="participant-avatar" style={{ fontSize: '1.8rem' }}>
+      {p.mood || '🦊'}
     </div>
     <span className="participant-name" title={p.name}>
       {p.name} {p.name === myName ? '(You)' : ''}
