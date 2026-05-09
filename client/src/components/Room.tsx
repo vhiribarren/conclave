@@ -23,7 +23,7 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Eye, RotateCcw, Smartphone, List, Plus, UserCog, Settings } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronLeft } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
@@ -34,6 +34,7 @@ import { ParticipantsBoard } from './ParticipantsBoard';
 import { AggregationResult } from './AggregationResult';
 import { TimerDisplay } from './TimerDisplay';
 import { AdminRemote } from './AdminRemote';
+import { SidebarPanel } from './SidebarPanel';
 
 
 const Room = () => {
@@ -68,13 +69,11 @@ const Room = () => {
   const [myVote, setMyVote] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [isQRVisible, setIsQRVisible] = useState(false);
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showRoomSettings, setShowRoomSettings] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
-  const [newTaskName, setNewTaskName] = useState('');
   const [showEmojiPickerJoin, setShowEmojiPickerJoin] = useState(false);
   const [showEmojiPickerSettings, setShowEmojiPickerSettings] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const actionsRef = useRef<ConclaveActions | null>(null);
 
   useEffect(() => {
@@ -122,13 +121,7 @@ const Room = () => {
     actionsRef.current?.reset();
   };
 
-  const handleAddTask = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newTaskName.trim() && actionsRef.current) {
-      actionsRef.current.addTask(newTaskName.trim());
-      setNewTaskName('');
-    }
-  };
+
   
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -240,140 +233,98 @@ const Room = () => {
         </div>
       </header>
 
-      <main className="main-content">
-        {/* Timer Section */}
-        {state.timerEndAt && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
-            <TimerDisplay timerEndAt={state.timerEndAt} />
-          </div>
-        )}
-
-        {/* Task Section */}
-        <div className="task-section">
-          <h2 className="task-title">Current Task</h2>
-          <div className="task-box glass">
-            {currentTask?.name || "Waiting for a task..."}
-          </div>
-        </div>
-
+      <div className="room-layout">
         {isRemoteView && isAdmin && actionsRef.current ? (
-          <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} />
+          // ── Remote / mobile admin view ───────────────────────────────
+          <main className="room-main">
+            <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} />
+          </main>
         ) : (
           <>
-            <ParticipantsBoard 
-              participants={state.participants} 
-              isRevealed={isRevealed} 
-              currentTaskName={currentTask?.name || ''} 
-              myName={name} 
-            />
+            {/* ── Left column: participants ──────────────────────────── */}
+            <main className="room-main">
+              {state.timerEndAt && (
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <TimerDisplay timerEndAt={state.timerEndAt} />
+                </div>
+              )}
 
-            {isRevealed && <AggregationResult participants={state.participants} />}
-
-            {!isRevealed && currentTask && (
-              <div className="voting-section glass">
-                <span className="voting-title">Pick a card</span>
-                <div className="voting-cards">
-                  {(state.deck || []).map((card) => (
-                    <div
-                      key={card}
-                      onClick={() => handleVote(card)}
-                      className={`poker-card ${myVote === card ? 'selected' : ''}`}
-                    >
-                      {card}
-                    </div>
-                  ))}
+              <div className="task-section">
+                <h2 className="task-title">Current Task</h2>
+                <div className="task-box glass">
+                  {currentTask?.name || 'Waiting for a task…'}
                 </div>
               </div>
-            )}
+
+              <ParticipantsBoard
+                participants={state.participants}
+                isRevealed={isRevealed}
+                currentTaskName={currentTask?.name || ''}
+                myName={name}
+              />
+
+              {/* Mobile-only: aggregation result below participants */}
+              {isRevealed && (
+                <div className="aggregation-mobile">
+                  <AggregationResult participants={state.participants} />
+                </div>
+              )}
+
+              {/* Mobile-only: voting cards sticky bottom */}
+              {!isRevealed && currentTask && (
+                <div className="voting-section glass mobile-voting">
+                  <span className="voting-title">Pick a card</span>
+                  <div className="voting-cards">
+                    {(state.deck || []).map((card) => (
+                      <div
+                        key={card}
+                        onClick={() => handleVote(card)}
+                        className={`poker-card ${myVote === card ? 'selected' : ''}`}
+                      >
+                        {card}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile-only: admin controls fixed bottom */}
+              {isAdmin && (
+                <div className="admin-controls glass mobile-admin">
+                  <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
+                    Reveal
+                  </button>
+                  <button onClick={handleReset} className="premium-button secondary">
+                    Reset
+                  </button>
+                </div>
+              )}
+            </main>
+
+            {/* ── Right column: sidebar ──────────────────────────────── */}
+            <aside className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+              <button
+                className="sidebar-toggle-btn"
+                onClick={() => setSidebarCollapsed((c) => !c)}
+                title={sidebarCollapsed ? 'Expand panel' : 'Collapse panel'}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <SidebarPanel
+                state={state}
+                actions={actionsRef.current}
+                isAdmin={!!isAdmin}
+                myVote={myVote}
+                onVote={handleVote}
+                isRevealed={isRevealed}
+                hasCurrentTask={!!currentTask}
+              />
+            </aside>
           </>
         )}
-
-        {/* Admin Controls on Desktop */}
-        {isAdmin && !isRemoteView && (
-          <div className="admin-controls glass">
-            <button onClick={() => setShowTaskModal(true)} className="premium-button secondary">
-              <List size={18} /> Tasks
-            </button>
-            <button onClick={() => setShowRoomSettings(true)} className="premium-button secondary">
-              <Settings size={18} /> Settings
-            </button>
-            <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
-              <Eye size={18} /> Reveal
-            </button>
-            <button onClick={handleReset} className="premium-button secondary">
-              <RotateCcw size={18} /> Reset
-            </button>
-          </div>
-        )}
-      </main>
+      </div>
     </div>
 
-    {showTaskModal && (
-      <div className="modal-overlay" onClick={() => setShowTaskModal(false)}>
-        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-          <h3 className="modal-title">Manage Tasks</h3>
-          <form onSubmit={handleAddTask} className="remote-form">
-            <input 
-              type="text" 
-              value={newTaskName} 
-              onChange={(e) => setNewTaskName(e.target.value)} 
-              placeholder="Enter a new task..." 
-              className="premium-input"
-              autoFocus
-            />
-            <button type="submit" className="premium-button">
-              <Plus size={18} /> Add
-            </button>
-          </form>
-
-          <div className="task-list" style={{ textAlign: 'left' }}>
-            {state.tasks.map(task => (
-              <div 
-                key={task.id} 
-                onClick={() => actionsRef.current?.setTask(task.id)}
-                className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
-              >
-                {task.name}
-              </div>
-            ))}
-            {state.tasks.length === 0 && (
-              <p className="modal-subtitle" style={{textAlign: 'center', marginTop: '1rem'}}>No tasks yet.</p>
-            )}
-          </div>
-          
-          <button onClick={() => setShowTaskModal(false)} className="premium-button secondary">Close</button>
-        </div>
-      </div>
-    )}
-
-    {showRoomSettings && actionsRef.current && (
-      <div className="modal-overlay" onClick={() => setShowRoomSettings(false)}>
-        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-          <h3 className="modal-title">Room Settings</h3>
-          
-          <div className="remote-box" style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}>
-            <h3 className="remote-section-title" style={{ textAlign: 'center' }}>Timer</h3>
-            <div className="remote-actions" style={{ justifyContent: 'center' }}>
-               <button onClick={() => { actionsRef.current?.setTimer(60000); setShowRoomSettings(false); }} className="premium-button secondary" style={{padding: '0.5rem', fontSize: '0.8rem'}}>1m</button>
-               <button onClick={() => { actionsRef.current?.setTimer(120000); setShowRoomSettings(false); }} className="premium-button secondary" style={{padding: '0.5rem', fontSize: '0.8rem'}}>2m</button>
-               <button onClick={() => { actionsRef.current?.setTimer(300000); setShowRoomSettings(false); }} className="premium-button secondary" style={{padding: '0.5rem', fontSize: '0.8rem'}}>5m</button>
-               <button onClick={() => { actionsRef.current?.setTimer(null); setShowRoomSettings(false); }} className="premium-button danger" style={{padding: '0.5rem', fontSize: '0.8rem'}}>Stop</button>
-            </div>
-          </div>
-
-          <div className="remote-box" style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}>
-            <h3 className="remote-section-title" style={{ textAlign: 'center' }}>Deck Configuration</h3>
-            <div className="remote-actions" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
-               <button onClick={() => { actionsRef.current?.setDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕']); setShowRoomSettings(false); }} className="premium-button secondary" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Standard</button>
-               <button onClick={() => { actionsRef.current?.setDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89']); setShowRoomSettings(false); }} className="premium-button secondary" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Fibonacci</button>
-               <button onClick={() => { actionsRef.current?.setDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?']); setShowRoomSettings(false); }} className="premium-button secondary" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>T-Shirt</button>
-            </div>
-          </div>
-
-          <button onClick={() => setShowRoomSettings(false)} className="premium-button secondary" style={{ marginTop: '1rem' }}>Close</button>
-        </div>
-      </div>
-    )}
 
     {showUserSettings && (
       <div className="modal-overlay" onClick={() => setShowUserSettings(false)}>
