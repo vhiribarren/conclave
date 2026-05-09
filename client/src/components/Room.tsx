@@ -28,6 +28,7 @@ import { QRCodeSVG } from 'qrcode.react';
 
 import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';
 import { getUserId, getUserName, setUserName } from '../services/user';
+import { addToHistory } from '../services/history';
 import { ParticipantsBoard } from './ParticipantsBoard';
 import { AggregationResult } from './AggregationResult';
 import { TimerDisplay } from './TimerDisplay';
@@ -77,6 +78,10 @@ const Room = () => {
       const actions = ConclaveSocket.connect(roomId, userId, name, (newState) => {
         setState(newState);
         setConnectionError(null);
+        if (roomId) {
+          const isUserAdmin = newState.participants.find(p => p.id === userId)?.isAdmin;
+          addToHistory(roomId, newState.name, isUserAdmin);
+        }
       }, (error) => {
         setConnectionError(error);
       });

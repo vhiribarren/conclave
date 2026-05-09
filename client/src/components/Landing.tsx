@@ -23,14 +23,16 @@
  */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, ArrowRight } from 'lucide-react';
+import { Users, Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
 import { getUserName, setUserName } from '../services/user';
+import { getHistory, type HistoryEntry } from '../services/history';
 
 const Landing = () => {
   const [roomName, setRoomName] = useState('');
   const [roomTitle, setRoomTitle] = useState('');
   const [userName, setUserNameInput] = useState(getUserName());
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [history] = useState<HistoryEntry[]>(getHistory());
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -129,6 +131,36 @@ const Landing = () => {
             </button>
           </form>
         </div>
+
+        {history.length > 0 && (
+          <div className="landing-history glass">
+            <div className="history-header">
+              <History size={16} />
+              <span>Recent Rooms</span>
+            </div>
+            <div className="history-list">
+              {history.map(entry => (
+                <div 
+                  key={entry.id} 
+                  className="history-item"
+                  onClick={() => navigate(`/room/${entry.id}`)}
+                >
+                  <div className="history-info">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span className="history-name">{entry.name || entry.id}</span>
+                      {entry.isAdmin && <Crown size={14} color="#f59e0b" fill="#f59e0b" style={{ opacity: 0.8 }} />}
+                    </div>
+                    <span className="history-id">{entry.id}</span>
+                  </div>
+                  <div className="history-meta">
+                    <Clock size={12} />
+                    <span>{new Date(entry.visitedAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {showCreateModal && (
