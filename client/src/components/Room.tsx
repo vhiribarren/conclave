@@ -64,6 +64,7 @@ const Room = () => {
   });
   const [myVote, setMyVote] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
+  const [isQRVisible, setIsQRVisible] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showRoomSettings, setShowRoomSettings] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
@@ -334,14 +335,38 @@ const Room = () => {
     )}
 
     {showQR && (
-      <div className="modal-overlay" onClick={() => setShowQR(false)}>
+      <div className="modal-overlay" onClick={() => {setShowQR(false); setIsQRVisible(false);}}>
         <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
           <h3 className="modal-title">Admin Remote Control</h3>
-          <p className="modal-subtitle">Scan this code with your phone to control the board and vote secretly.</p>
-          <div style={{background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center'}}>
-            <QRCodeSVG value={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
+          <p className="modal-subtitle">Open the remote control in a new window, or scan the QR code with your phone.</p>
+          
+          <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0'}}>
+            <a 
+              href={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="premium-button" 
+              style={{textDecoration: 'none'}}
+            >
+              <Smartphone size={18} /> Open Remote in New Tab
+            </a>
+            
+            <button 
+              onClick={() => setIsQRVisible(!isQRVisible)} 
+              className="premium-button secondary" 
+              style={{fontSize: '0.8rem', padding: '0.5rem 1rem'}}
+            >
+              {isQRVisible ? 'Hide QR Code' : 'Show QR Code'}
+            </button>
+            
+            {isQRVisible && (
+              <div style={{background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center'}} className="animate-fade-in">
+                <QRCodeSVG value={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
+              </div>
+            )}
           </div>
-          <button onClick={() => setShowQR(false)} className="premium-button secondary">Close</button>
+          
+          <button onClick={() => {setShowQR(false); setIsQRVisible(false);}} className="premium-button secondary">Close</button>
         </div>
       </div>
     )}
