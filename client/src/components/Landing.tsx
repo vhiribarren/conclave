@@ -24,14 +24,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Plus, ArrowRight } from 'lucide-react';
+import { getUserName, setUserName } from '../services/user';
 
 const Landing = () => {
   const [roomName, setRoomName] = useState('');
+  const [userName, setUserNameInput] = useState(getUserName());
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const createRoom = async () => {
+    if (userName.trim()) {
+      setUserName(userName.trim());
+    }
     try {
       setIsLoading(true);
       const host = import.meta.env.PROD ? '' : `http://${window.location.hostname}:8787`;
@@ -51,6 +56,9 @@ const Landing = () => {
 
   const joinRoom = (e: React.FormEvent) => {
     e.preventDefault();
+    if (userName.trim()) {
+      setUserName(userName.trim());
+    }
     if (roomName.trim()) {
       navigate(`/room/${roomName.trim()}`);
     }
@@ -75,6 +83,22 @@ const Landing = () => {
         </div>
 
         <div className="landing-form">
+          <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            Your Profile Name
+          </div>
+          <input
+            type="text"
+            placeholder="e.g. Alice"
+            className="premium-input"
+            value={userName}
+            onChange={(e) => setUserNameInput(e.target.value)}
+            style={{ textAlign: 'center', fontWeight: 'bold' }}
+          />
+
+          <div className="landing-divider" style={{ margin: '0.5rem 0' }}>
+            <div className="landing-divider-line"></div>
+          </div>
+
           <button onClick={createRoom} disabled={isLoading} className="premium-button">
             <Plus size={18} />
             {isLoading ? 'Creating...' : 'Create New Room'}
@@ -93,6 +117,7 @@ const Landing = () => {
               className="premium-input"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
+              style={{ textAlign: 'center' }}
             />
             <button type="submit" className="premium-button secondary">
               Join Room
