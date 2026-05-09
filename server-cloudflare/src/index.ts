@@ -36,8 +36,9 @@ export default {
       return new Response("Missing roomId", { status: 400 });
     }
 
-    const id = env.CONCLAVE_ROOM.idFromName(roomId);
-    const obj = env.CONCLAVE_ROOM.get(id);
+    const scopedDurableObject = env.CONCLAVE_ROOM.jurisdiction("eu");
+    const id = scopedDurableObject.idFromName(roomId);
+    const obj = scopedDurableObject.get(id);
 
     return obj.fetch(request);
   },
