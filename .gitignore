@@ -3,7 +3,6 @@ node_modules/
 
 # Build outputs
 dist/
-dist-server/
 .tmp/
 *.tsbuildinfo
 
@@ -33,4 +32,4 @@ Thumbs.db
 
 # Project specific
 client/dist/
-server/dist/
+server-cloudflare/dist/

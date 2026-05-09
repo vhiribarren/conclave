@@ -17,7 +17,7 @@ npm install
 ```
 
 ### 2. Local Development
-Run the client and server in separate terminals using workspace commands:
+Run the client and server-cloudflare in separate terminals using workspace commands:
 
 **Start the Backend:**
 ```bash
@@ -42,7 +42,7 @@ The output will be in `client/dist`.
 #### Backend
 Deploy your worker and Durable Objects to Cloudflare:
 ```bash
-cd server
+cd server-cloudflare
 npx wrangler deploy
 ```
 

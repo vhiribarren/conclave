@@ -1,4 +1,4 @@
-name = "conclave-server"
+name = "conclave-backend"
 main = "src/index.ts"
 compatibility_date = "2024-04-03"
 

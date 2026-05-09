@@ -4,14 +4,14 @@
   "private": true,
   "workspaces": [
     "client",
-    "server",
+    "server-cloudflare",
     "shared"
   ],
   "scripts": {
     "dev:client": "npm run dev -w client",
-    "dev:server": "npm run dev -w server",
+    "dev:server": "npm run dev -w server-cloudflare",
     "build:client": "npm run build -w client",
-    "deploy:server": "npm run deploy -w server"
+    "deploy:server": "npm run deploy -w server-cloudflare"
   },
   "author": "Vincent Hiribarren",
   "license": "MIT"
