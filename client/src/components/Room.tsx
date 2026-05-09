@@ -44,8 +44,8 @@ const Room = () => {
 
   useEffect(() => {
     if (linkUserId && linkName) {
-      localStorage.setItem('conclave_user_id', linkUserId);
-      localStorage.setItem('conclave_name', linkName);
+      localStorage.setItem('conclave.user_id', linkUserId);
+      localStorage.setItem('conclave.name', linkName);
       // Clean up URL to prevent sharing identity further
       window.history.replaceState({}, document.title, window.location.pathname + (isRemoteView ? '?remote=true' : ''));
       window.location.reload(); // Reload to pick up new ID from services
@@ -53,7 +53,7 @@ const Room = () => {
   }, [linkUserId, linkName, isRemoteView]);
 
   const [name, setName] = useState(getUserName());
-  const [isJoined, setIsJoined] = useState(false);
+  const [isJoined, setIsJoined] = useState(!!getUserName());
   const userId = getUserId();
   const [state, setState] = useState<RoomState>({ 
     participants: [], 

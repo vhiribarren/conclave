@@ -1,7 +1,7 @@
 import { generateUserId } from '@conclave/shared';
 
-const USER_ID_KEY = 'conclave_user_id';
-const USER_NAME_KEY = 'conclave_name';
+const USER_ID_KEY = 'conclave.user_id';
+const USER_NAME_KEY = 'conclave.name';
 
 export const getUserId = (): string => {
   let userId = localStorage.getItem(USER_ID_KEY);
