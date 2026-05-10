@@ -156,7 +156,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
               <div className="timer-input-wrapper">
                 <input 
                   type="number" 
-                  className="premium-input" 
+                  className={`premium-input ${![15, 30, 45, 60].includes(selectedDurationMs / 1000) ? 'active' : ''}`}
                   value={customTimerValue}
                   onChange={(e) => {
                     setCustomTimerValue(e.target.value);

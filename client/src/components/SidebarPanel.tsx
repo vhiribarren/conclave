@@ -218,7 +218,7 @@ export const SidebarPanel: React.FC<Props> = ({
               <div className="timer-input-wrapper">
                 <input 
                   type="number" 
-                  className="premium-input" 
+                  className={`premium-input ${![15, 30, 45, 60].includes(selectedDurationMs / 1000) ? 'active' : ''}`}
                   value={customTimerValue}
                   onChange={(e) => {
                     setCustomTimerValue(e.target.value);
@@ -226,7 +226,6 @@ export const SidebarPanel: React.FC<Props> = ({
                     if (!isNaN(val)) setSelectedDurationMs(val * 1000);
                   }}
                   placeholder="Custom"
-                  style={{ paddingRight: '2rem' }}
                 />
                 <span className="timer-input-unit">s</span>
               </div>
