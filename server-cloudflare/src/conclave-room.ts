@@ -33,6 +33,7 @@ export class ConclaveRoom extends DurableObject {
     currentTaskId: null,
     deck: DEFAULT_DECK,
     timerEndAt: null,
+    timerPausedRemainingMs: null,
   };
 
   constructor(ctx: DurableObjectState, env: any) {
@@ -170,7 +171,8 @@ export class ConclaveRoom extends DurableObject {
           const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
           if (task && task.rounds.length > 0) {
             task.rounds[task.rounds.length - 1].revealed = true;
-            this.state.timerEndAt = null; // stop timer if revealed
+            this.state.timerEndAt = null;
+            this.state.timerPausedRemainingMs = null;
             this.broadcastState();
           }
         }
@@ -182,6 +184,7 @@ export class ConclaveRoom extends DurableObject {
           if (task) {
             task.rounds.push({ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false });
             this.state.timerEndAt = null;
+            this.state.timerPausedRemainingMs = null;
             this.broadcastState();
           }
         }
@@ -206,6 +209,7 @@ export class ConclaveRoom extends DurableObject {
         if (this.isAdmin(ws)) {
           this.state.currentTaskId = data.taskId;
           this.state.timerEndAt = null;
+          this.state.timerPausedRemainingMs = null;
           this.broadcastState();
         }
         break;
@@ -230,11 +234,28 @@ export class ConclaveRoom extends DurableObject {
 
       case "SET_TIMER":
         if (this.isAdmin(ws)) {
+          this.state.timerPausedRemainingMs = null;
           if (data.durationMs === null) {
             this.state.timerEndAt = null;
           } else {
             this.state.timerEndAt = Date.now() + data.durationMs;
           }
+          this.broadcastState();
+        }
+        break;
+
+      case "PAUSE_TIMER":
+        if (this.isAdmin(ws) && this.state.timerEndAt) {
+          this.state.timerPausedRemainingMs = Math.max(0, this.state.timerEndAt - Date.now());
+          this.state.timerEndAt = null;
+          this.broadcastState();
+        }
+        break;
+
+      case "RESUME_TIMER":
+        if (this.isAdmin(ws) && this.state.timerPausedRemainingMs !== null) {
+          this.state.timerEndAt = Date.now() + this.state.timerPausedRemainingMs;
+          this.state.timerPausedRemainingMs = null;
           this.broadcastState();
         }
         break;

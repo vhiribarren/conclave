@@ -33,6 +33,8 @@ export interface ConclaveActions {
   setTask: (taskId: string) => void;
   setDeck: (deck: string[]) => void;
   setTimer: (durationMs: number | null) => void;
+  pauseTimer: () => void;
+  resumeTimer: () => void;
   deleteTask: (taskId: string) => void;
   transferAdmin: (targetUserId: string) => void;
   updateUser: (name: string, mood: string) => void;
@@ -105,6 +107,8 @@ export class ConclaveSocket {
       setTask: (taskId) => send({ type: 'SET_TASK', taskId }),
       setDeck: (deck) => send({ type: 'SET_DECK', deck }),
       setTimer: (durationMs) => send({ type: 'SET_TIMER', durationMs }),
+      pauseTimer: () => send({ type: 'PAUSE_TIMER' }),
+      resumeTimer: () => send({ type: 'RESUME_TIMER' }),
       deleteTask: (taskId) => send({ type: 'DELETE_TASK', taskId }),
       transferAdmin: (targetUserId) => send({ type: 'TRANSFER_ADMIN', targetUserId }),
       updateUser: (name, mood) => send({ type: 'UPDATE_USER', name, mood }),

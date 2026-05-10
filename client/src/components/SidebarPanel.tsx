@@ -4,7 +4,7 @@
  * Copyright (c) 2026 Vincent Hiribarren
  */
 import React, { useState } from 'react';
-import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout } from 'lucide-react';
+import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, Pause } from 'lucide-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import { AggregationResult } from './AggregationResult';
 
@@ -149,19 +149,29 @@ export const SidebarPanel: React.FC<Props> = ({
               <div className="sidebar-section">
                 <span className="sidebar-section-title">⏱ Timer</span>
                 <div className="sidebar-actions">
-                  <button 
-                    onClick={startTimer}
-                    className="premium-button secondary"
-                    style={{ flex: 1 }}
-                  >
-                    <Play size={14} /> Start ({selectedDurationMs / 1000}s)
-                  </button>
-                  <button 
-                    onClick={() => actions?.setTimer(null)}
-                    className="premium-button danger"
-                  >
-                    <X size={14} />
-                  </button>
+                  {state.timerPausedRemainingMs !== null ? (
+                    <button onClick={() => actions?.resumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
+                      <Play size={14} /> Resume
+                    </button>
+                  ) : state.timerEndAt ? (
+                    <button onClick={() => actions?.pauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
+                      <Pause size={14} /> Pause
+                    </button>
+                  ) : (
+                    <button onClick={startTimer} className="premium-button secondary" style={{ flex: 1 }}>
+                      <Play size={14} /> Start ({selectedDurationMs / 1000}s)
+                    </button>
+                  )}
+                  
+                  {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
+                    <button 
+                      onClick={() => actions?.setTimer(null)}
+                      className="premium-button danger"
+                      title="Reset timer"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  )}
                 </div>
               </div>
 

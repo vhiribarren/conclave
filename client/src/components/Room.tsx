@@ -270,9 +270,12 @@ const Room = () => {
           <>
             {/* ── Left column: participants ──────────────────────────── */}
             <main className="room-main">
-              {state.timerEndAt && (
+              { (state.timerEndAt || state.timerPausedRemainingMs !== null) && (
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <TimerDisplay timerEndAt={state.timerEndAt} />
+                  <TimerDisplay 
+                    timerEndAt={state.timerEndAt} 
+                    timerPausedRemainingMs={state.timerPausedRemainingMs} 
+                  />
                 </div>
               )}
 

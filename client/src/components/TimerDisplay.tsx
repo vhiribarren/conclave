@@ -3,12 +3,18 @@ import { Timer } from 'lucide-react';
 
 interface Props {
   timerEndAt: number | null;
+  timerPausedRemainingMs: number | null;
 }
 
-export const TimerDisplay: React.FC<Props> = ({ timerEndAt }) => {
+export const TimerDisplay: React.FC<Props> = ({ timerEndAt, timerPausedRemainingMs }) => {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
+    if (timerPausedRemainingMs !== null) {
+      setTimeLeft(timerPausedRemainingMs);
+      return;
+    }
+
     if (!timerEndAt) {
       setTimeLeft(null);
       return;
@@ -23,9 +29,9 @@ export const TimerDisplay: React.FC<Props> = ({ timerEndAt }) => {
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [timerEndAt]);
+  }, [timerEndAt, timerPausedRemainingMs]);
 
-  if (timerEndAt === null || timeLeft === null) {
+  if ((timerEndAt === null && timerPausedRemainingMs === null) || timeLeft === null) {
     return null;
   }
 

@@ -52,6 +52,7 @@ export interface RoomState {
   currentTaskId: string | null;
   deck: string[];
   timerEndAt: number | null;
+  timerPausedRemainingMs: number | null;
 }
 
 export type SocketMessage = 
@@ -65,6 +66,8 @@ export type SocketMessage =
   | { type: 'DELETE_TASK'; taskId: string }
   | { type: 'SET_DECK'; deck: string[] }
   | { type: 'SET_TIMER'; durationMs: number | null }
+  | { type: 'PAUSE_TIMER' }
+  | { type: 'RESUME_TIMER' }
   | { type: 'TRANSFER_ADMIN'; targetUserId: string };
 
 export * from './id';

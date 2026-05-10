@@ -75,12 +75,29 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
           <div className="remote-box glass">
             <h3 className="remote-section-title">Timer</h3>
             <div className="remote-actions">
-              <button onClick={() => actions.setTimer(selectedDurationMs)} className="premium-button secondary" style={{ flex: 1 }}>
-                <Play size={16} /> Start ({selectedDurationMs / 1000}s)
-              </button>
-              <button onClick={() => actions.setTimer(null)} className="premium-button danger">
-                <X size={16} />
-              </button>
+              {state.timerPausedRemainingMs !== null ? (
+                <button onClick={() => actions.resumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
+                  <Play size={16} /> Resume
+                </button>
+              ) : state.timerEndAt ? (
+                <button onClick={() => actions.pauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
+                  <Pause size={16} /> Pause
+                </button>
+              ) : (
+                <button onClick={() => actions.setTimer(selectedDurationMs)} className="premium-button secondary" style={{ flex: 1 }}>
+                  <Play size={16} /> Start ({selectedDurationMs / 1000}s)
+                </button>
+              )}
+
+              {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
+                <button 
+                  onClick={() => actions.setTimer(null)}
+                  className="premium-button danger"
+                  title="Reset timer"
+                >
+                  <RotateCcw size={16} />
+                </button>
+              )}
             </div>
           </div>
 
