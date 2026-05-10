@@ -31,7 +31,7 @@ export interface ConclaveActions {
   reset: () => void;
   addTask: (name: string) => void;
   setTask: (taskId: string) => void;
-  setDeck: (deck: string[]) => void;
+  setDeck: (deck: string[], mode: 'preset' | 'custom') => void;
   setTimer: (durationMs: number | null) => void;
   pauseTimer: () => void;
   resumeTimer: () => void;
@@ -105,7 +105,7 @@ export class ConclaveSocket {
       reset: () => send({ type: 'RESET' }),
       addTask: (name) => send({ type: 'ADD_TASK', name }),
       setTask: (taskId) => send({ type: 'SET_TASK', taskId }),
-      setDeck: (deck) => send({ type: 'SET_DECK', deck }),
+      setDeck: (deck, mode) => send({ type: 'SET_DECK', deck, mode }),
       setTimer: (durationMs) => send({ type: 'SET_TIMER', durationMs }),
       pauseTimer: () => send({ type: 'PAUSE_TIMER' }),
       resumeTimer: () => send({ type: 'RESUME_TIMER' }),

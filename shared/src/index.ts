@@ -51,6 +51,7 @@ export interface RoomState {
   tasks: Task[];
   currentTaskId: string | null;
   deck: string[];
+  deckMode: 'preset' | 'custom';
   timerEndAt: number | null;
   timerPausedRemainingMs: number | null;
   adminId: string | null;
@@ -65,7 +66,7 @@ export type SocketMessage =
   | { type: 'SET_TASK'; taskId: string }
   | { type: 'ADD_TASK'; name: string }
   | { type: 'DELETE_TASK'; taskId: string }
-  | { type: 'SET_DECK'; deck: string[] }
+  | { type: 'SET_DECK'; deck: string[]; mode: 'preset' | 'custom' }
   | { type: 'SET_TIMER'; durationMs: number | null }
   | { type: 'PAUSE_TIMER' }
   | { type: 'RESUME_TIMER' }

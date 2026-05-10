@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, RotateCw, GripVertical, Smile } from 'lucide-react';
+import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 
 interface Props {
@@ -9,12 +10,29 @@ interface Props {
 }
 
 export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
-  const [activeTab, setActiveTab] = useState<'control' | 'settings'>('control');
-  const [newTaskName, setNewTaskName] = useState('');
-  const [customTimerValue, setCustomTimerValue] = useState('30');
   const [selectedDurationMs, setSelectedDurationMs] = useState(30000);
   const [newCardValue, setNewCardValue] = useState('');
-  
+  const [customTimerValue, setCustomTimerValue] = useState('30');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [activeTab, setActiveTab] = useState<'control' | 'settings'>('control');
+  const [newTaskName, setNewTaskName] = useState('');
+  const [localDeck, setLocalDeck] = useState<string[] | null>(null);
+  const dragSourceIdx = useRef<number | null>(null);
+
+  const [savedCustomDeck, setSavedCustomDeck] = useState<string[]>(() => {
+    const saved = localStorage.getItem('conclave_custom_deck');
+    return saved ? JSON.parse(saved) : ['1','2','3','5','8','13','?','☕'];
+  });
+
+  const updateDeck = (newDeck: string[], mode: 'preset' | 'custom' = 'custom') => {
+    setLocalDeck(null); // Force clear local temporary state
+    actions.setDeck(newDeck, mode);
+    if (mode === 'custom') {
+      setSavedCustomDeck(newDeck);
+      localStorage.setItem('conclave_custom_deck', JSON.stringify(newDeck));
+    }
+  };
+
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
   const currentRound = currentTask?.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null;
   const isRevealed = currentRound?.revealed || false;
@@ -30,7 +48,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
   const handleAddCard = (e: React.FormEvent) => {
     e.preventDefault();
     if (newCardValue.trim()) {
-      actions.setDeck([...(state.deck || []), newCardValue.trim()]);
+      updateDeck([...(state.deck || []), newCardValue.trim()]);
       setNewCardValue('');
     }
   };
@@ -38,7 +56,33 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
   const removeCard = (index: number) => {
     const newDeck = [...(state.deck || [])];
     newDeck.splice(index, 1);
-    actions.setDeck(newDeck);
+    updateDeck(newDeck);
+  };
+
+  const handleDragStart = (idx: number) => {
+    dragSourceIdx.current = idx;
+    setLocalDeck([...(state.deck || [])]);
+  };
+
+  const handleDragOver = (e: React.DragEvent, idx: number) => {
+    e.preventDefault();
+    if (dragSourceIdx.current === null || dragSourceIdx.current === idx || !localDeck) return;
+    
+    const newDeck = [...localDeck];
+    const item = newDeck.splice(dragSourceIdx.current, 1)[0];
+    newDeck.splice(idx, 0, item);
+    
+    setLocalDeck(newDeck);
+    setSavedCustomDeck(newDeck);
+    dragSourceIdx.current = idx;
+  };
+
+  const handleDragEnd = () => {
+    if (localDeck) {
+      updateDeck(localDeck, 'custom');
+    }
+    setLocalDeck(null);
+    dragSourceIdx.current = null;
   };
 
   return (
@@ -196,29 +240,92 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
 
           <div className="remote-box glass">
             <h3 className="remote-section-title">Deck Editor</h3>
-            <div className="deck-editor">
-              {(state.deck || []).map((card, idx) => (
-                <div key={`${card}-${idx}`} className="deck-chip">
-                  {card}
-                  <X size={12} className="deck-chip-remove" onClick={() => removeCard(idx)} />
-                </div>
-              ))}
+            <div className="deck-editor" onDragOver={(e) => e.preventDefault()}>
+              {(localDeck || state.deck || []).map((card, idx) => {
+                const isCustom = state.deckMode === 'custom' || localDeck !== null;
+                return (
+                  <div 
+                    key={`card-${idx}-${card}`} 
+                    className={`deck-chip ${!isCustom ? 'read-only' : ''}`}
+                    draggable={isCustom}
+                    onDragStart={() => isCustom && handleDragStart(idx)}
+                    onDragOver={(e) => isCustom && handleDragOver(e, idx)}
+                    onDragEnd={isCustom ? handleDragEnd : undefined}
+                  >
+                    {isCustom && <GripVertical size={14} className="deck-chip-grip" />}
+                    <span className="deck-chip-value">{card}</span>
+                    {isCustom && <X size={12} className="deck-chip-remove" onClick={() => removeCard(idx)} />}
+                  </div>
+                );
+              })}
             </div>
-            <form onSubmit={handleAddCard} className="deck-add-form">
-              <input 
-                type="text" 
-                className="premium-input" 
-                placeholder="Value..." 
-                value={newCardValue}
-                onChange={(e) => setNewCardValue(e.target.value)}
-                maxLength={10}
-              />
-              <button type="submit" className="premium-button">Add</button>
-            </form>
-            <div className="remote-actions" style={{ flexWrap: 'wrap', marginTop: '0.75rem' }}>
-               <button onClick={() => actions.setDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'])} className="premium-button secondary sidebar-chip">Standard</button>
-               <button onClick={() => actions.setDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'])} className="premium-button secondary sidebar-chip">Fibonacci</button>
-               <button onClick={() => actions.setDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'])} className="premium-button secondary sidebar-chip">T-Shirt</button>
+
+            {state.deckMode === 'custom' ? (
+              <div style={{ position: 'relative' }}>
+                <form onSubmit={handleAddCard} className="deck-add-form animate-fade-in">
+                  <div style={{ display: 'flex', gap: '0.25rem', flex: 1 }}>
+                    <input 
+                      type="text" 
+                      className="premium-input" 
+                      placeholder="Value..." 
+                      value={newCardValue}
+                      onChange={(e) => setNewCardValue(e.target.value)}
+                      maxLength={10}
+                      style={{ flex: 1 }}
+                    />
+                    <button 
+                      type="button" 
+                      className="premium-button secondary" 
+                      style={{ padding: '0 0.5rem' }}
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    >
+                      <Smile size={20} />
+                    </button>
+                  </div>
+                  <button type="submit" className="premium-button">Add</button>
+                </form>
+
+                {showEmojiPicker && (
+                  <div style={{ position: 'absolute', zIndex: 100, bottom: '100%', right: 0, marginBottom: '0.5rem' }}>
+                    <EmojiPicker 
+                      onEmojiClick={(emojiData) => {
+                        setNewCardValue(prev => prev + emojiData.emoji);
+                        setShowEmojiPicker(false);
+                      }}
+                      theme={Theme.LIGHT}
+                      lazyLoadEmojis={true}
+                      height={350}
+                      width={280}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="animate-fade-in" style={{ textAlign: 'center', padding: '0.75rem', background: 'rgba(0,0,0,0.03)', borderRadius: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <span>Preset is read-only.</span>
+                <button 
+                  onClick={() => {
+                    updateDeck(state.deck || [], 'custom');
+                  }}
+                  className="premium-button secondary sidebar-chip"
+                  style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '0.8rem' }}
+                >
+                  Customize
+                </button>
+              </div>
+            )}
+
+            <div className="remote-actions" style={{ flexWrap: 'wrap', marginTop: '0.75rem', gap: '0.5rem' }}>
+               <button onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'accent' : 'secondary'}`}>Standard</button>
+               <button onClick={() => updateDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'accent' : 'secondary'}`}>Fibonacci</button>
+               <button onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'accent' : 'secondary'}`}>T-Shirt</button>
+               <button 
+                onClick={() => updateDeck(savedCustomDeck, 'custom')} 
+                className={`premium-button sidebar-chip ${state.deckMode === 'custom' ? 'accent' : 'secondary'}`}
+                title="Use your custom deck"
+               >
+                 <RotateCw size={14} /> Custom
+               </button>
             </div>
           </div>
 

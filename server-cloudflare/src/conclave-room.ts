@@ -32,6 +32,7 @@ export class ConclaveRoom extends DurableObject {
     tasks: [],
     currentTaskId: null,
     deck: DEFAULT_DECK,
+    deckMode: 'preset',
     timerEndAt: null,
     timerPausedRemainingMs: null,
     adminId: null,
@@ -51,6 +52,7 @@ export class ConclaveRoom extends DurableObject {
     const url = new URL(request.url);
     
     if (request.method === "POST" && url.pathname === "/init") {
+      console.log("Initializing room...");
       const data = await request.json() as { name?: string };
       this.state.created = true;
       this.state.name = data.name;
@@ -81,8 +83,10 @@ export class ConclaveRoom extends DurableObject {
     this.updateAlarm();
     try {
       const data = JSON.parse(message as string);
+      console.log(`Received message: ${data.type}`);
       await this.handleMessage(ws, data);
     } catch (err) {
+      console.error("Error handling message:", err);
       ws.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
     }
   }
@@ -232,6 +236,7 @@ export class ConclaveRoom extends DurableObject {
       case "SET_DECK":
         if (this.isAdmin(ws) && Array.isArray(data.deck)) {
           this.state.deck = data.deck;
+          this.state.deckMode = data.mode || 'custom';
           this.broadcastState();
         }
         break;

@@ -80,25 +80,43 @@ const Room = () => {
   const actionsRef = useRef<ConclaveActions | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+    let socketActions: ConclaveActions | null = null;
+
     if (isJoined && roomId && !linkUserId) {
-      const actions = ConclaveSocket.connect(roomId, userId, name, mood, (newState) => {
-        setState(newState);
-        setConnectionError(null);
-        if (roomId) {
-          const isUserAdmin = newState.participants.find(p => p.id === userId)?.isAdmin;
-          addToHistory(roomId, newState.name, isUserAdmin);
-        }
-      }, (error) => {
-        setConnectionError(error);
-      });
-      
-      actionsRef.current = actions;
+      // Small delay to let previous connections close properly (Strict Mode)
+      const timeoutId = setTimeout(() => {
+        if (!isMounted) return;
+        
+        console.log(`Connecting to room ${roomId}...`);
+        socketActions = ConclaveSocket.connect(roomId, userId, name, mood, (newState) => {
+          if (isMounted) {
+            setState(newState);
+            setConnectionError(null);
+            if (roomId) {
+              const isUserAdmin = newState.participants.find(p => p.id === userId)?.isAdmin;
+              addToHistory(roomId, newState.name, isUserAdmin);
+            }
+          }
+        }, (error) => {
+          if (isMounted) {
+            setConnectionError(error);
+          }
+        });
+        actionsRef.current = socketActions;
+      }, 100);
 
       return () => {
-        actions.disconnect();
+        isMounted = false;
+        clearTimeout(timeoutId);
+        if (socketActions) {
+          console.log("Disconnecting...");
+          socketActions.disconnect();
+          actionsRef.current = null;
+        }
       };
     }
-  }, [isJoined, roomId, name]);
+  }, [isJoined, roomId, name, mood]);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
