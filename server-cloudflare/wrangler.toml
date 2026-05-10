@@ -2,10 +2,16 @@ name = "conclave-backend"
 main = "src/index.ts"
 compatibility_date = "2024-04-03"
 
-[[durable_objects.bindings]]
+[env.dev]
+vars = { ENVIRONMENT = "dev" }
+
+[[env.dev.durable_objects.bindings]]
 name = "CONCLAVE_ROOM"
 class_name = "ConclaveRoom"
 
-[[migrations]]
-tag = "v1"
-new_classes = ["ConclaveRoom"]
+[env.prod]
+vars = { ENVIRONMENT = "prod" }
+
+[[env.prod.durable_objects.bindings]]
+name = "CONCLAVE_ROOM"
+class_name = "ConclaveRoom"

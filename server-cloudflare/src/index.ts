@@ -26,11 +26,26 @@ import { generateRoomId } from "conclave-shared";
 
 export interface Env {
   CONCLAVE_ROOM: DurableObjectNamespace;
+  ENVIRONMENT: string;
 }
 
 export default {
   async fetch(request: Request, env: Env) {
     const url = new URL(request.url);
+    const isDev = env.ENVIRONMENT === "dev";
+
+    const commonHeaders = isDev ? {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type",
+        } : undefined;
+
+    // Handle CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: commonHeaders,
+      });
+    }
 
     if (request.method === "POST" && url.pathname === "/api/rooms/create") {
       const { name } = await request.json() as { name?: string };
@@ -46,10 +61,7 @@ export default {
       }));
 
       return new Response(JSON.stringify({ roomId }), {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
+        headers: commonHeaders,
       });
     }
 
