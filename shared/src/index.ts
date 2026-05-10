@@ -59,19 +59,19 @@ export interface RoomState {
 }
 
 export type SocketMessage = 
-  | { type: 'JOIN'; userId: string; name: string; mood: string; isSpectator?: boolean }
-  | { type: 'UPDATE_USER'; name: string; mood: string }
-  | { type: 'VOTE'; vote: string | null }
-  | { type: 'REVEAL' }
-  | { type: 'RESET' }
-  | { type: 'SET_TASK'; taskId: string | null }
-  | { type: 'ADD_TASK'; name: string }
-  | { type: 'DELETE_TASK'; taskId: string }
-  | { type: 'SET_DECK'; deck: string[]; mode: 'preset' | 'custom' }
-  | { type: 'SET_TIMER'; durationMs: number | null }
-  | { type: 'PAUSE_TIMER' }
-  | { type: 'RESUME_TIMER' }
-  | { type: 'TRANSFER_ADMIN'; targetUserId: string }
-  | { type: 'RENAME_ROOM'; name: string };
+  | { type: 'USER_JOIN'; userId: string; name: string; mood: string; isSpectator?: boolean }
+  | { type: 'USER_UPDATE_PROFILE'; name: string; mood: string }
+  | { type: 'USER_VOTE'; vote: string | null }
+  | { type: 'ADMIN_REVEAL' }
+  | { type: 'ADMIN_RESET' }
+  | { type: 'ADMIN_SET_TASK'; taskId: string | null }
+  | { type: 'ADMIN_ADD_TASK'; name: string }
+  | { type: 'ADMIN_DELETE_TASK'; taskId: string }
+  | { type: 'ADMIN_SET_DECK'; deck: string[]; mode: 'preset' | 'custom' }
+  | { type: 'ADMIN_SET_TIMER'; durationMs: number | null }
+  | { type: 'ADMIN_PAUSE_TIMER' }
+  | { type: 'ADMIN_RESUME_TIMER' }
+  | { type: 'ADMIN_TRANSFER_ADMIN'; targetUserId: string }
+  | { type: 'ADMIN_RENAME_ROOM'; name: string };
 
 export * from './id';

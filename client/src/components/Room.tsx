@@ -117,7 +117,7 @@ const Room = () => {
         clearTimeout(timeoutId);
         if (socketActions) {
           console.log("Disconnecting...");
-          socketActions.disconnect();
+          socketActions.userDisconnect();
           actionsRef.current = null;
         }
       };
@@ -146,7 +146,7 @@ const Room = () => {
       setUserName(name);
       setUserEmoji(mood);
       if (actionsRef.current) {
-        actionsRef.current.updateUser(name, mood);
+        actionsRef.current.userUpdateProfile(name, mood);
       }
       setIsJoined(true);
     }
@@ -155,12 +155,12 @@ const Room = () => {
   const handleVote = (card: string) => {
     const newVote = myVote === card ? null : card;
     setMyVote(newVote);
-    actionsRef.current?.vote(newVote);
+    actionsRef.current?.userVote(newVote);
   };
 
-  const handleReveal = () => actionsRef.current?.reveal();
+  const handleReveal = () => actionsRef.current?.adminReveal();
   const handleReset = () => {
-    actionsRef.current?.reset();
+    actionsRef.current?.adminReset();
   };
 
 
@@ -174,7 +174,7 @@ const Room = () => {
   const handleRenameRoom = (e: React.FormEvent) => {
     e.preventDefault();
     if (tempRoomName.trim() && actionsRef.current) {
-      actionsRef.current.renameRoom(tempRoomName.trim());
+      actionsRef.current.adminRenameRoom(tempRoomName.trim());
       setIsEditingRoomName(false);
     }
   };

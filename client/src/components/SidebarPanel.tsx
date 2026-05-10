@@ -43,20 +43,19 @@ export const SidebarPanel: React.FC<Props> = ({
   });
 
   const updateDeck = (newDeck: string[], mode: 'preset' | 'custom' = 'custom') => {
-    if (actions) {
-      setLocalDeck(null); // Force clear local temporary state
-      actions.setDeck(newDeck, mode);
-      if (mode === 'custom') {
-        setSavedCustomDeck(newDeck);
-        localStorage.setItem('conclave_custom_deck', JSON.stringify(newDeck));
-      }
+    if (window.confirm(`Are you sure you want to change the deck to ${mode}? This will clear all current votes.`)) {
+      actions.adminSetDeck(newDeck, mode);
+    }
+    if (mode === 'custom') {
+      setSavedCustomDeck(newDeck);
+      localStorage.setItem('conclave_custom_deck', JSON.stringify(newDeck));
     }
   };
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newTaskName.trim() && actions) {
-      actions.addTask(newTaskName.trim());
+    if (newTaskName.trim()) {
+      actions.adminAddTask(newTaskName.trim());
       setNewTaskName('');
     }
   };
@@ -107,9 +106,9 @@ export const SidebarPanel: React.FC<Props> = ({
     setCustomTimerValue(seconds.toString());
   };
 
-  const startTimer = () => {
-    if (actions) {
-      actions.setTimer(selectedDurationMs);
+  const handleSetTimer = () => {
+    if (selectedDurationMs > 0) {
+      actions.adminSetTimer(selectedDurationMs);
     }
   };
 
@@ -161,7 +160,7 @@ export const SidebarPanel: React.FC<Props> = ({
                 <span className="sidebar-section-title">⚡ Actions</span>
                 <div className="sidebar-actions">
                   <button
-                    onClick={() => actions?.reveal()}
+                    onClick={() => actions?.adminReveal()}
                     disabled={isRevealed}
                     className="premium-button"
                     style={{ flex: 1 }}
@@ -169,7 +168,7 @@ export const SidebarPanel: React.FC<Props> = ({
                     <Eye size={15} /> Reveal
                   </button>
                   <button
-                    onClick={() => actions?.reset()}
+                    onClick={() => actions?.adminReset()}
                     className="premium-button secondary"
                     title="Reset round"
                   >
@@ -190,22 +189,22 @@ export const SidebarPanel: React.FC<Props> = ({
                   <span className="sidebar-section-title">⏱ Timer</span>
                 <div className="sidebar-actions">
                   {state.timerPausedRemainingMs !== null ? (
-                    <button onClick={() => actions?.resumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
+                    <button onClick={() => actions?.adminResumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
                       <Play size={14} /> Resume
                     </button>
                   ) : state.timerEndAt ? (
-                    <button onClick={() => actions?.pauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
+                    <button onClick={() => actions?.adminPauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
                       <Pause size={14} /> Pause
                     </button>
                   ) : (
-                    <button onClick={startTimer} className="premium-button secondary" style={{ flex: 1 }}>
+                    <button onClick={handleSetTimer} className="premium-button secondary" style={{ flex: 1 }}>
                       <Play size={14} /> Start ({selectedDurationMs / 1000}s)
                     </button>
                   )}
                   
                   {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
                     <button 
-                      onClick={() => actions?.setTimer(null)}
+                      onClick={() => actions?.adminSetTimer(null)}
                       className="premium-button danger"
                       title="Reset timer"
                     >
@@ -222,7 +221,7 @@ export const SidebarPanel: React.FC<Props> = ({
                   {state.tasks.map((task) => (
                     <div
                       key={task.id}
-                      onClick={() => actions?.setTask(state.currentTaskId === task.id ? null : task.id)}
+                      onClick={() => actions?.adminSetTask(state.currentTaskId === task.id ? null : task.id)}
                       className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
                     >
                       {task.name}
@@ -287,21 +286,21 @@ export const SidebarPanel: React.FC<Props> = ({
                 <Plus size={15} />
               </button>
             </form>
-            <div className="task-list" style={{ maxHeight: '20vh' }}>
-              {state.tasks.map((task) => (
-                <div key={task.id} className="task-item">
-                  <div className="task-item-content">
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); actions?.deleteTask(task.id); }}
-                      className="task-delete-btn"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+              <div className="task-list" style={{ maxHeight: '20vh' }}>
+                {state.tasks.map((task) => (
+                  <div key={task.id} className="task-item">
+                    <div className="task-item-content">
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); actions?.adminDeleteTask(task.id); }}
+                        className="task-delete-btn"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
           </div>
 
           <div className="sidebar-section">

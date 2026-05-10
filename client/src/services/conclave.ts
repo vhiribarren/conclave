@@ -26,20 +26,20 @@ import type { RoomState, SocketMessage } from "@conclave/shared";
 export type { RoomState, SocketMessage };
 
 export interface ConclaveActions {
-  vote: (vote: string | null) => void;
-  reveal: () => void;
-  reset: () => void;
-  addTask: (name: string) => void;
-  setTask: (taskId: string) => void;
-  setDeck: (deck: string[], mode: 'preset' | 'custom') => void;
-  setTimer: (durationMs: number | null) => void;
-  pauseTimer: () => void;
-  resumeTimer: () => void;
-  deleteTask: (taskId: string) => void;
-  transferAdmin: (targetUserId: string) => void;
-  updateUser: (name: string, mood: string) => void;
-  renameRoom: (name: string) => void;
-  disconnect: () => void;
+  userVote: (vote: string | null) => void;
+  adminReveal: () => void;
+  adminReset: () => void;
+  adminAddTask: (name: string) => void;
+  adminSetTask: (taskId: string | null) => void;
+  adminSetDeck: (deck: string[], mode: 'preset' | 'custom') => void;
+  adminSetTimer: (durationMs: number | null) => void;
+  adminPauseTimer: () => void;
+  adminResumeTimer: () => void;
+  adminDeleteTask: (taskId: string) => void;
+  adminTransferAdmin: (targetUserId: string) => void;
+  userUpdateProfile: (name: string, mood: string) => void;
+  adminRenameRoom: (name: string) => void;
+  userDisconnect: () => void;
 }
 
 
@@ -81,7 +81,7 @@ export class ConclaveSocket {
 
     ws.onopen = () => {
       connected = true;
-      send({ type: 'JOIN', userId, name, mood });
+      send({ type: 'USER_JOIN', userId, name, mood });
     };
 
     ws.onerror = (event) => {
@@ -101,20 +101,20 @@ export class ConclaveSocket {
     };
 
     return {
-      vote: (vote) => send({ type: 'VOTE', vote }),
-      reveal: () => send({ type: 'REVEAL' }),
-      reset: () => send({ type: 'RESET' }),
-      addTask: (name) => send({ type: 'ADD_TASK', name }),
-      setTask: (taskId) => send({ type: 'SET_TASK', taskId }),
-      setDeck: (deck, mode) => send({ type: 'SET_DECK', deck, mode }),
-      setTimer: (durationMs) => send({ type: 'SET_TIMER', durationMs }),
-      pauseTimer: () => send({ type: 'PAUSE_TIMER' }),
-      resumeTimer: () => send({ type: 'RESUME_TIMER' }),
-      deleteTask: (taskId) => send({ type: 'DELETE_TASK', taskId }),
-      transferAdmin: (targetUserId) => send({ type: 'TRANSFER_ADMIN', targetUserId }),
-      updateUser: (name, mood) => send({ type: 'UPDATE_USER', name, mood }),
-      renameRoom: (name) => send({ type: 'RENAME_ROOM', name }),
-      disconnect: () => ws.close(),
+      userVote: (vote) => send({ type: 'USER_VOTE', vote }),
+      adminReveal: () => send({ type: 'ADMIN_REVEAL' }),
+      adminReset: () => send({ type: 'ADMIN_RESET' }),
+      adminAddTask: (name) => send({ type: 'ADMIN_ADD_TASK', name }),
+      adminSetTask: (taskId) => send({ type: 'ADMIN_SET_TASK', taskId }),
+      adminSetDeck: (deck, mode) => send({ type: 'ADMIN_SET_DECK', deck, mode }),
+      adminSetTimer: (durationMs) => send({ type: 'ADMIN_SET_TIMER', durationMs }),
+      adminPauseTimer: () => send({ type: 'ADMIN_PAUSE_TIMER' }),
+      adminResumeTimer: () => send({ type: 'ADMIN_RESUME_TIMER' }),
+      adminDeleteTask: (taskId) => send({ type: 'ADMIN_DELETE_TASK', taskId }),
+      adminTransferAdmin: (targetUserId) => send({ type: 'ADMIN_TRANSFER_ADMIN', targetUserId }),
+      userUpdateProfile: (name, mood) => send({ type: 'USER_UPDATE_PROFILE', name, mood }),
+      adminRenameRoom: (name) => send({ type: 'ADMIN_RENAME_ROOM', name }),
+      userDisconnect: () => ws.close(),
     };
   }
 }

@@ -28,7 +28,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
 
   const updateDeck = (newDeck: string[], mode: 'preset' | 'custom' = 'custom') => {
     setLocalDeck(null); // Force clear local temporary state
-    actions.setDeck(newDeck, mode);
+    actions.adminSetDeck(newDeck, mode);
     if (mode === 'custom') {
       setSavedCustomDeck(newDeck);
       localStorage.setItem('conclave_custom_deck', JSON.stringify(newDeck));
@@ -44,7 +44,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTaskName.trim()) {
-      actions.addTask(newTaskName.trim());
+      actions.adminAddTask(newTaskName.trim());
       setNewTaskName('');
     }
   };
@@ -111,10 +111,10 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
           <div className="remote-box glass">
             <h2 className="remote-title">Actions</h2>
             <div className="remote-actions">
-              <button onClick={() => actions.reveal()} disabled={isRevealed} className="premium-button">
+              <button onClick={() => actions.adminReveal()} disabled={isRevealed} className="premium-button">
                 <Eye size={16} /> Reveal
               </button>
-              <button onClick={() => actions.reset()} className="premium-button secondary">
+              <button onClick={() => actions.adminReset()} className="premium-button secondary">
                 <RotateCcw size={16} /> Reset
               </button>
             </div>
@@ -125,22 +125,22 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
               <h3 className="remote-section-title">Timer</h3>
               <div className="remote-actions">
                 {state.timerPausedRemainingMs !== null ? (
-                  <button onClick={() => actions.resumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
+                  <button onClick={() => actions.adminResumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
                     <Play size={16} /> Resume
                   </button>
                 ) : state.timerEndAt ? (
-                  <button onClick={() => actions.pauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
+                  <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
                     <Pause size={16} /> Pause
                   </button>
                 ) : (
-                  <button onClick={() => actions.setTimer(selectedDurationMs)} className="premium-button secondary" style={{ flex: 1 }}>
+                  <button onClick={() => actions.adminSetTimer(selectedDurationMs)} className="premium-button secondary" style={{ flex: 1 }}>
                     <Play size={16} /> Start ({selectedDurationMs / 1000}s)
                   </button>
                 )}
 
                 {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
                   <button 
-                    onClick={() => actions.setTimer(null)}
+                    onClick={() => actions.adminSetTimer(null)}
                     className="premium-button danger"
                     title="Reset timer"
                   >
@@ -163,7 +163,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
               {state.tasks.map(task => (
                 <div 
                   key={task.id} 
-                  onClick={() => actions.setTask(state.currentTaskId === task.id ? null : task.id)}
+                  onClick={() => actions.adminSetTask(state.currentTaskId === task.id ? null : task.id)}
                   className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
                 >
                   {task.name}
@@ -243,7 +243,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
                 <div key={task.id} className="task-item">
                   <div className="task-item-content">
                     <span style={{overflow:'hidden', textOverflow:'ellipsis'}}>{task.name}</span>
-                    <button onClick={() => actions.deleteTask(task.id)} className="task-delete-btn"><Trash2 size={14}/></button>
+                    <button onClick={() => actions.adminDeleteTask(task.id)} className="task-delete-btn"><Trash2 size={14}/></button>
                   </div>
                 </div>
               ))}

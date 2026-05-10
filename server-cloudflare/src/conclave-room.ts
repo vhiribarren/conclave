@@ -126,7 +126,7 @@ export class ConclaveRoom extends DurableObject {
     const attachment = (ws.deserializeAttachment() || {}) as { sessionId?: string };
 
     switch (data.type) {
-      case "JOIN":
+      case "USER_JOIN":
         const sessionId = data.userId || Math.random().toString(36).substring(2, 15);
         ws.serializeAttachment({ ...attachment, sessionId });
         
@@ -148,165 +148,214 @@ export class ConclaveRoom extends DurableObject {
         this.broadcastState();
         break;
 
-      case "UPDATE_USER":
+      case "USER_UPDATE_PROFILE":
         const p = this.state.participants.find((p) => p.id === attachment.sessionId);
-        if (p) {
-          p.name = data.name || p.name;
-          p.mood = data.mood || p.mood;
-          this.broadcastState();
+        if (!p) {
+          console.error(`USER_UPDATE_PROFILE: Participant not found for session ${attachment.sessionId}`);
+          return;
         }
+        p.name = data.name || p.name;
+        p.mood = data.mood || p.mood;
+        this.broadcastState();
         break;
 
-      case "VOTE":
+      case "USER_VOTE":
         const participant = this.state.participants.find((p) => p.id === attachment.sessionId);
-        if (participant) {
-          let currentRound: Round | undefined;
-          if (this.state.currentTaskId) {
-            const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
-            if (task && task.rounds.length > 0) {
-              currentRound = task.rounds[task.rounds.length - 1];
-            }
-          } else {
-            currentRound = this.state.unassociatedRound;
+        if (!participant) {
+          console.error(`USER_VOTE: Participant not found for session ${attachment.sessionId}`);
+          return;
+        }
+        
+        let currentRound: Round | undefined;
+        if (this.state.currentTaskId) {
+          const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
+          if (task && task.rounds.length > 0) {
+            currentRound = task.rounds[task.rounds.length - 1];
           }
+        } else {
+          currentRound = this.state.unassociatedRound;
+        }
 
-          if (currentRound && !currentRound.revealed) {
-            if (data.vote === null) {
-              delete currentRound.votes[participant.id];
-            } else {
-              currentRound.votes[participant.id] = data.vote;
-            }
-            this.broadcastState();
+        if (currentRound && !currentRound.revealed) {
+          if (data.vote === null) {
+            delete currentRound.votes[participant.id];
+          } else {
+            currentRound.votes[participant.id] = data.vote;
           }
+          this.broadcastState();
         }
         break;
 
-      case "REVEAL":
-        if (this.isAdmin(ws)) {
-          let roundToReveal: Round | undefined;
-          if (this.state.currentTaskId) {
-            const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
-            if (task && task.rounds.length > 0) {
-              roundToReveal = task.rounds[task.rounds.length - 1];
-            }
-          } else {
-            roundToReveal = this.state.unassociatedRound;
-          }
-
-          if (roundToReveal) {
-            roundToReveal.revealed = true;
-            this.state.timerEndAt = null;
-            this.state.timerPausedRemainingMs = null;
-            this.broadcastState();
-          }
+      case "ADMIN_REVEAL":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_REVEAL: Unauthorized access from session ${attachment.sessionId}`);
+          return;
         }
-        break;
-
-      case "RESET":
-        if (this.isAdmin(ws)) {
-          if (this.state.currentTaskId) {
-            const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
-            if (task) {
-              task.rounds.push({ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false });
-            }
-          } else {
-            this.state.unassociatedRound = { id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false };
+        let roundToReveal: Round | undefined;
+        if (this.state.currentTaskId) {
+          const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
+          if (task && task.rounds.length > 0) {
+            roundToReveal = task.rounds[task.rounds.length - 1];
           }
+        } else {
+          roundToReveal = this.state.unassociatedRound;
+        }
+
+        if (roundToReveal) {
+          roundToReveal.revealed = true;
           this.state.timerEndAt = null;
           this.state.timerPausedRemainingMs = null;
           this.broadcastState();
         }
         break;
 
-      case "ADD_TASK":
-        if (this.isAdmin(ws) && data.name) {
-          const newTask: Task = {
-            id: Math.random().toString(36).substring(2, 10),
-            name: data.name,
-            rounds: [{ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false }]
-          };
-          this.state.tasks.push(newTask);
-          if (!this.state.currentTaskId) {
-            this.state.currentTaskId = newTask.id;
-          }
-          this.broadcastState();
+      case "ADMIN_RESET":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_RESET: Unauthorized access from session ${attachment.sessionId}`);
+          return;
         }
+        if (this.state.currentTaskId) {
+          const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
+          if (task) {
+            task.rounds.push({ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false });
+          }
+        } else {
+          this.state.unassociatedRound = { id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false };
+        }
+        this.state.timerEndAt = null;
+        this.state.timerPausedRemainingMs = null;
+        this.broadcastState();
         break;
 
-      case "SET_TASK":
-        if (this.isAdmin(ws)) {
-          this.state.currentTaskId = data.taskId;
+      case "ADMIN_ADD_TASK":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_ADD_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        if (!data.name) {
+          console.error("ADMIN_ADD_TASK: Missing task name");
+          return;
+        }
+        const newTask: Task = {
+          id: Math.random().toString(36).substring(2, 10),
+          name: data.name,
+          rounds: [{ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false }]
+        };
+        this.state.tasks.push(newTask);
+        if (!this.state.currentTaskId) {
+          this.state.currentTaskId = newTask.id;
+        }
+        this.broadcastState();
+        break;
+
+      case "ADMIN_SET_TASK":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_SET_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        this.state.currentTaskId = data.taskId;
+        this.state.timerEndAt = null;
+        this.state.timerPausedRemainingMs = null;
+        this.broadcastState();
+        break;
+      
+      case "ADMIN_DELETE_TASK":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_DELETE_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        if (!data.taskId) {
+          console.error("ADMIN_DELETE_TASK: Missing taskId");
+          return;
+        }
+        this.state.tasks = this.state.tasks.filter(t => t.id !== data.taskId);
+        if (this.state.currentTaskId === data.taskId) {
+          this.state.currentTaskId = this.state.tasks.length > 0 ? this.state.tasks[0]?.id : null;
           this.state.timerEndAt = null;
-          this.state.timerPausedRemainingMs = null;
+        }
+        this.broadcastState();
+        break;
+
+      case "ADMIN_SET_DECK":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_SET_DECK: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        if (!Array.isArray(data.deck)) {
+          console.error("ADMIN_SET_DECK: Invalid deck format");
+          return;
+        }
+        this.state.deck = data.deck;
+        this.state.deckMode = data.mode || 'custom';
+        this.broadcastState();
+        break;
+
+      case "ADMIN_SET_TIMER":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_SET_TIMER: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        this.state.timerPausedRemainingMs = null;
+        if (data.durationMs === null) {
+          this.state.timerEndAt = null;
+        } else {
+          this.state.timerEndAt = Date.now() + data.durationMs;
+        }
+        this.broadcastState();
+        break;
+
+      case "ADMIN_PAUSE_TIMER":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_PAUSE_TIMER: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        if (!this.state.timerEndAt) return;
+        this.state.timerPausedRemainingMs = Math.max(0, this.state.timerEndAt - Date.now());
+        this.state.timerEndAt = null;
+        this.broadcastState();
+        break;
+
+      case "ADMIN_RESUME_TIMER":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_RESUME_TIMER: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        if (this.state.timerPausedRemainingMs === null) return;
+        this.state.timerEndAt = Date.now() + this.state.timerPausedRemainingMs;
+        this.state.timerPausedRemainingMs = null;
+        this.broadcastState();
+        break;
+
+      case "ADMIN_TRANSFER_ADMIN":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_TRANSFER_ADMIN: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        if (!data.targetUserId) {
+          console.error("ADMIN_TRANSFER_ADMIN: Missing targetUserId");
+          return;
+        }
+        const currentAdmin = this.state.participants.find((p) => p.id === attachment.sessionId);
+        const targetUser = this.state.participants.find((p) => p.id === data.targetUserId);
+        if (currentAdmin && targetUser) {
+          this.state.adminId = data.targetUserId;
+          currentAdmin.isAdmin = false;
+          targetUser.isAdmin = true;
           this.broadcastState();
         }
         break;
       
-      case "DELETE_TASK":
-        if (this.isAdmin(ws) && data.taskId) {
-          this.state.tasks = this.state.tasks.filter(t => t.id !== data.taskId);
-          if (this.state.currentTaskId === data.taskId) {
-            this.state.currentTaskId = this.state.tasks.length > 0 ? this.state.tasks[0]?.id : null;
-            this.state.timerEndAt = null;
-          }
-          this.broadcastState();
+      case "ADMIN_RENAME_ROOM":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_RENAME_ROOM: Unauthorized access from session ${attachment.sessionId}`);
+          return;
         }
-        break;
-
-      case "SET_DECK":
-        if (this.isAdmin(ws) && Array.isArray(data.deck)) {
-          this.state.deck = data.deck;
-          this.state.deckMode = data.mode || 'custom';
-          this.broadcastState();
+        if (!data.name) {
+          console.error("ADMIN_RENAME_ROOM: Missing name");
+          return;
         }
-        break;
-
-      case "SET_TIMER":
-        if (this.isAdmin(ws)) {
-          this.state.timerPausedRemainingMs = null;
-          if (data.durationMs === null) {
-            this.state.timerEndAt = null;
-          } else {
-            this.state.timerEndAt = Date.now() + data.durationMs;
-          }
-          this.broadcastState();
-        }
-        break;
-
-      case "PAUSE_TIMER":
-        if (this.isAdmin(ws) && this.state.timerEndAt) {
-          this.state.timerPausedRemainingMs = Math.max(0, this.state.timerEndAt - Date.now());
-          this.state.timerEndAt = null;
-          this.broadcastState();
-        }
-        break;
-
-      case "RESUME_TIMER":
-        if (this.isAdmin(ws) && this.state.timerPausedRemainingMs !== null) {
-          this.state.timerEndAt = Date.now() + this.state.timerPausedRemainingMs;
-          this.state.timerPausedRemainingMs = null;
-          this.broadcastState();
-        }
-        break;
-
-      case "TRANSFER_ADMIN":
-        if (this.isAdmin(ws) && data.targetUserId) {
-          const currentAdmin = this.state.participants.find((p) => p.id === attachment.sessionId);
-          const targetUser = this.state.participants.find((p) => p.id === data.targetUserId);
-          if (currentAdmin && targetUser) {
-            this.state.adminId = data.targetUserId;
-            currentAdmin.isAdmin = false;
-            targetUser.isAdmin = true;
-            this.broadcastState();
-          }
-        }
-        break;
-      
-      case "RENAME_ROOM":
-        if (this.isAdmin(ws) && data.name) {
-          this.state.name = data.name;
-          this.broadcastState();
-        }
+        this.state.name = data.name;
+        this.broadcastState();
         break;
     }
     await this.ctx.storage.put("state", this.state);
