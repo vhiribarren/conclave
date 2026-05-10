@@ -1,4 +1,4 @@
-import { generateUserId } from '@conclave/shared';
+import { generateUserId } from 'conclave-shared';
 import { settings } from './settings';
 
 export const DEFAULT_EMOJIS = ['🦊', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐣', '🦄', '🐝', '🦖', '🐙', '🦋', '🌵', '🍕', '🚀', '🎸', '🕹️', '🧙', '👽'];

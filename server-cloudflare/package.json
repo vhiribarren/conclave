@@ -1,5 +1,5 @@
 {
-  "name": "conclave-backend",
+  "name": "conclave-server-cloudflare",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,7 @@
   "author": "Vincent Hiribarren",
   "license": "MIT",
   "dependencies": {
-    "@conclave/shared": "*"
+    "conclave-shared": "*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260509.1",

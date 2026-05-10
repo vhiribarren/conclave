@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import type { RoomState, SocketMessage } from "@conclave/shared";
+import type { RoomState, SocketMessage } from "conclave-shared";
 
 export type { RoomState, SocketMessage };
 

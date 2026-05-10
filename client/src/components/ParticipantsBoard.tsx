@@ -1,6 +1,6 @@
 import React from 'react';
 import { Crown, Check } from 'lucide-react';
-import type { Participant } from '@conclave/shared';
+import type { Participant } from 'conclave-shared';
 import { TimerDisplay } from './TimerDisplay';
 import './ParticipantsBoard.css';
 

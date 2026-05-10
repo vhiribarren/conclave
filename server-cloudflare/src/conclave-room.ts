@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 import { DurableObject } from "cloudflare:workers";
-import type { RoomState, Task, Round } from "@conclave/shared";
-import { DEFAULT_DECK } from "@conclave/shared";
+import type { RoomState, Task, Round } from "conclave-shared";
+import { DEFAULT_DECK } from "conclave-shared";
 
 export class ConclaveRoom extends DurableObject {
   private state: RoomState = {

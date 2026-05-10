@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Participant } from '@conclave/shared';
+import type { Participant } from 'conclave-shared';
 import { Trophy } from 'lucide-react';
 import './AggregationResult.css';
 
