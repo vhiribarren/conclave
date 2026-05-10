@@ -1,6 +1,7 @@
 import React from 'react';
 import { Crown, Check } from 'lucide-react';
 import type { Participant } from '@conclave/shared';
+import { TimerDisplay } from './TimerDisplay';
 
 export type LayoutMode = 'auto' | 'grid';
 
@@ -10,9 +11,11 @@ interface Props {
   currentTaskName: string;
   myName: string;
   layoutMode: LayoutMode;
+  timerEndAt: number | null;
+  timerPausedRemainingMs: number | null;
 }
 
-export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, currentTaskName, myName, layoutMode }) => {
+export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, currentTaskName, myName, layoutMode, timerEndAt, timerPausedRemainingMs }) => {
   const canUseCircle = participants.length <= 12 && participants.length > 0;
   const useCircle = layoutMode === 'auto' && canUseCircle;
 
@@ -38,9 +41,13 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
     <div className="circle-container">
       <div className="circle-wrapper">
         <div className="circle-table">
-           <span className="circle-table-text">
-             {currentTaskName || "Waiting for a task..."}
-           </span>
+           {(timerEndAt || timerPausedRemainingMs !== null) ? (
+             <TimerDisplay timerEndAt={timerEndAt} timerPausedRemainingMs={timerPausedRemainingMs} />
+           ) : (
+             <span className="circle-table-text">
+               {currentTaskName || "Quick Vote"}
+             </span>
+           )}
         </div>
         
         {participants.map((p, i) => {

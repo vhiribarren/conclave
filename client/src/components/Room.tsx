@@ -125,6 +125,7 @@ const Room = () => {
     ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
     : state.unassociatedRound;
   const isRevealed = currentRound?.revealed || false;
+  const isCircleLayout = layoutMode === 'auto' && state.participants.length <= 12 && state.participants.length > 0;
 
   // Reset local vote when the round changes (e.g. admin reset)
   useEffect(() => {
@@ -300,7 +301,7 @@ const Room = () => {
           <>
             {/* ── Left column: participants ──────────────────────────── */}
             <main className="room-main">
-              { (state.timerEndAt || state.timerPausedRemainingMs !== null) && (
+              { !isCircleLayout && (state.timerEndAt || state.timerPausedRemainingMs !== null) && (
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <TimerDisplay 
                     timerEndAt={state.timerEndAt} 
@@ -310,10 +311,12 @@ const Room = () => {
               )}
 
               <div className="task-section">
-                <h2 className="task-title">Current Task</h2>
-                <div className="task-box glass">
-                  {currentTask?.name || 'Waiting for a task…'}
-                </div>
+                <h2 className="task-title">{currentTask ? 'Current Task' : 'Quick Vote'}</h2>
+                {currentTask && (
+                  <div className="task-box glass">
+                    {currentTask.name}
+                  </div>
+                )}
               </div>
 
               <ParticipantsBoard
@@ -322,6 +325,8 @@ const Room = () => {
                 currentTaskName={currentTask?.name || ''}
                 myName={name}
                 layoutMode={layoutMode}
+                timerEndAt={state.timerEndAt}
+                timerPausedRemainingMs={state.timerPausedRemainingMs}
               />
 
               {/* Mobile-only: aggregation result below participants */}
