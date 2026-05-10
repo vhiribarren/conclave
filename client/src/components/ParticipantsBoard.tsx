@@ -2,30 +2,36 @@ import React from 'react';
 import { Crown, Check } from 'lucide-react';
 import type { Participant } from '@conclave/shared';
 
+export type LayoutMode = 'auto' | 'grid';
+
 interface Props {
   participants: (Participant & { vote: string | null })[];
   isRevealed: boolean;
   currentTaskName: string;
   myName: string;
+  layoutMode: LayoutMode;
 }
 
-export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, currentTaskName, myName }) => {
-  const isCircle = participants.length <= 12 && participants.length > 0;
+export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, currentTaskName, myName, layoutMode }) => {
+  const canUseCircle = participants.length <= 12 && participants.length > 0;
+  const useCircle = layoutMode === 'auto' && canUseCircle;
 
-  if (!isCircle) {
+  if (!useCircle) {
     return (
-      <div className="participants-grid">
-        {participants.length === 0 && (
-          <div className="empty-state">No participants yet.</div>
-        )}
-        {participants.map((p) => (
-          <ParticipantCard key={p.id} participant={p} isRevealed={isRevealed} myName={myName} />
-        ))}
+      <div className="participants-grid-wrapper">
+        <div className="participants-grid">
+          {participants.length === 0 && (
+            <div className="empty-state">No participants yet.</div>
+          )}
+          {participants.map((p) => (
+            <ParticipantCard key={p.id} participant={p} isRevealed={isRevealed} myName={myName} />
+          ))}
+        </div>
       </div>
     );
   }
 
-  const radius = Math.min(window.innerWidth / 3, 200); // responsive radius
+  const radius = Math.min(window.innerWidth / 3, 200);
   const angleStep = (2 * Math.PI) / participants.length;
 
   return (
@@ -38,7 +44,7 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
         </div>
         
         {participants.map((p, i) => {
-          const angle = i * angleStep - Math.PI / 2; // start from top
+          const angle = i * angleStep - Math.PI / 2;
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
           

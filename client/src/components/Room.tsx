@@ -23,14 +23,14 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronLeft } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronLeft, CircleDot, LayoutGrid } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';
 import { getUserId, getUserName, setUserName, getUserEmoji, setUserEmoji } from '../services/user';
 import { addToHistory } from '../services/history';
-import { ParticipantsBoard } from './ParticipantsBoard';
+import { ParticipantsBoard, type LayoutMode } from './ParticipantsBoard';
 import { AggregationResult } from './AggregationResult';
 import { TimerDisplay } from './TimerDisplay';
 import { AdminRemote } from './AdminRemote';
@@ -74,6 +74,7 @@ const Room = () => {
   const [showEmojiPickerJoin, setShowEmojiPickerJoin] = useState(false);
   const [showEmojiPickerSettings, setShowEmojiPickerSettings] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('auto');
   const actionsRef = useRef<ConclaveActions | null>(null);
 
   useEffect(() => {
@@ -216,6 +217,32 @@ const Room = () => {
         </div>
         
         <div className="header-actions">
+          {/* Layout toggle — only in main (non-remote) view */}
+          {!isRemoteView && (
+            <>
+              <div className="header-separator" />
+              <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
+                <button
+                  id="layout-btn-circle"
+                  className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
+                  onClick={() => setLayoutMode('auto')}
+                  title="Vue circulaire"
+                  disabled={state.participants.length > 12 || state.participants.length === 0}
+                >
+                  <CircleDot size={16} />
+                </button>
+                <button
+                  id="layout-btn-grid"
+                  className={`layout-toggle-btn ${layoutMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setLayoutMode('grid')}
+                  title="Vue grille"
+                >
+                  <LayoutGrid size={16} />
+                </button>
+              </div>
+              <div className="header-separator" />
+            </>
+          )}
           <button onClick={() => setShowUserSettings(true)} className="icon-button" title="User Settings">
             <UserCog size={18} />
           </button>
@@ -261,6 +288,7 @@ const Room = () => {
                 isRevealed={isRevealed}
                 currentTaskName={currentTask?.name || ''}
                 myName={name}
+                layoutMode={layoutMode}
               />
 
               {/* Mobile-only: aggregation result below participants */}
