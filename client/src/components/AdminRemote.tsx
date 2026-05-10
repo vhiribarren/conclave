@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, RotateCw, GripVertical, Smile } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Eye, RotateCcw, Plus, Settings, Play, Pause, X, Trash2, Layout, RotateCw, GripVertical, Smile } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import { AggregationResult } from './AggregationResult';
+import { settings } from '../services/settings';
 
 interface Props {
   state: RoomState;
@@ -22,8 +23,8 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
   const dragSourceIdx = useRef<number | null>(null);
 
   const [savedCustomDeck, setSavedCustomDeck] = useState<string[]>(() => {
-    const saved = localStorage.getItem('conclave_custom_deck');
-    return saved ? JSON.parse(saved) : ['1','2','3','5','8','13','?','☕'];
+    const saved = settings.getDeckCustom();
+    return saved ? JSON.parse(saved) : ['1', '2', '3', '5', '8', '13', '?', '☕'];
   });
 
   const updateDeck = (newDeck: string[], mode: 'preset' | 'custom' = 'custom') => {
@@ -31,12 +32,12 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
     actions.adminSetDeck(newDeck, mode);
     if (mode === 'custom') {
       setSavedCustomDeck(newDeck);
-      localStorage.setItem('conclave_custom_deck', JSON.stringify(newDeck));
+      settings.setDeckCustom(JSON.stringify(newDeck));
     }
   };
 
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
-  const currentRound = currentTask 
+  const currentRound = currentTask
     ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
     : state.unassociatedRound;
   const isRevealed = currentRound?.revealed || false;
@@ -71,11 +72,11 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
   const handleDragOver = (e: React.DragEvent, idx: number) => {
     e.preventDefault();
     if (dragSourceIdx.current === null || dragSourceIdx.current === idx || !localDeck) return;
-    
+
     const newDeck = [...localDeck];
-    const item = newDeck.splice(dragSourceIdx.current, 1)[0];
+    const item = newDeck.splice(dragSourceIdx.current, 1)[0]!;
     newDeck.splice(idx, 0, item);
-    
+
     setLocalDeck(newDeck);
     setSavedCustomDeck(newDeck);
     dragSourceIdx.current = idx;
@@ -92,13 +93,13 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
   return (
     <div className="remote-container">
       <div className="admin-tabs glass">
-        <button 
+        <button
           className={`admin-tab ${activeTab === 'control' ? 'active' : ''}`}
           onClick={() => setActiveTab('control')}
         >
           <Layout size={16} /> Control
         </button>
-        <button 
+        <button
           className={`admin-tab ${activeTab === 'settings' ? 'active' : ''}`}
           onClick={() => setActiveTab('settings')}
         >
@@ -139,7 +140,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
                 )}
 
                 {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                  <button 
+                  <button
                     onClick={() => actions.adminSetTimer(null)}
                     className="premium-button danger"
                     title="Reset timer"
@@ -161,21 +162,21 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
             <h3 className="remote-section-title">Current Task</h3>
             <div className="task-list">
               {state.tasks.map(task => (
-                <div 
-                  key={task.id} 
+                <div
+                  key={task.id}
                   onClick={() => actions.adminSetTask(state.currentTaskId === task.id ? null : task.id)}
                   className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
                 >
                   {task.name}
                 </div>
               ))}
-              {state.tasks.length === 0 && <p style={{textAlign:'center', fontSize:'0.8rem', color:'var(--text-secondary)'}}>No tasks. Go to Settings.</p>}
+              {state.tasks.length === 0 && <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>No tasks. Go to Settings.</p>}
             </div>
           </div>
 
           {!isRevealed && (
             <div className="remote-box glass">
-              <h3 className="remote-section-title" style={{textAlign: 'center'}}>Your Secret Vote</h3>
+              <h3 className="remote-section-title" style={{ textAlign: 'center' }}>Your Secret Vote</h3>
               <div className="voting-cards">
                 {(state.deck || []).map((card) => (
                   <div
@@ -193,25 +194,25 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
       ) : (
         /* ── SETTINGS TAB ────────────────────────────────────────── */
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          
+
           <div className="remote-box glass">
             <h3 className="remote-section-title">Timer Duration</h3>
             <div className="remote-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
               {[15, 30, 45, 60].map(s => (
-                <button 
+                <button
                   key={s}
                   onClick={() => { setSelectedDurationMs(s * 1000); setCustomTimerValue(s.toString()); }}
                   className={`premium-button ${selectedDurationMs === s * 1000 ? 'accent' : 'secondary'} sidebar-chip`}
                   style={{ padding: '0.4rem 0.8rem', minWidth: '3.5rem' }}
                 >
-                  {s >= 60 ? `${s/60}m` : `${s}s`}
+                  {s >= 60 ? `${s / 60}m` : `${s}s`}
                 </button>
               ))}
             </div>
             <div className="timer-custom-row">
               <div className="timer-input-wrapper">
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   className={`premium-input ${![15, 30, 45, 60].includes(selectedDurationMs / 1000) ? 'active' : ''}`}
                   value={customTimerValue}
                   onChange={(e) => {
@@ -229,11 +230,11 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
           <div className="remote-box glass">
             <h3 className="remote-section-title">Task Management</h3>
             <form onSubmit={handleAddTask} className="remote-form">
-              <input 
-                type="text" 
-                value={newTaskName} 
-                onChange={(e) => setNewTaskName(e.target.value)} 
-                placeholder="New task..." 
+              <input
+                type="text"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                placeholder="New task..."
                 className="premium-input"
               />
               <button type="submit" className="premium-button"><Plus size={16} /></button>
@@ -242,8 +243,8 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
               {state.tasks.map(task => (
                 <div key={task.id} className="task-item">
                   <div className="task-item-content">
-                    <span style={{overflow:'hidden', textOverflow:'ellipsis'}}>{task.name}</span>
-                    <button onClick={() => actions.adminDeleteTask(task.id)} className="task-delete-btn"><Trash2 size={14}/></button>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
+                    <button onClick={() => actions.adminDeleteTask(task.id)} className="task-delete-btn"><Trash2 size={14} /></button>
                   </div>
                 </div>
               ))}
@@ -256,8 +257,8 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
               {(localDeck || state.deck || []).map((card, idx) => {
                 const isCustom = state.deckMode === 'custom' || localDeck !== null;
                 return (
-                  <div 
-                    key={`card-${idx}-${card}`} 
+                  <div
+                    key={`card-${idx}-${card}`}
                     className={`deck-chip ${!isCustom ? 'read-only' : ''}`}
                     draggable={isCustom}
                     onDragStart={() => isCustom && handleDragStart(idx)}
@@ -276,18 +277,18 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
               <div style={{ position: 'relative' }}>
                 <form onSubmit={handleAddCard} className="deck-add-form animate-fade-in">
                   <div style={{ display: 'flex', gap: '0.25rem', flex: 1 }}>
-                    <input 
-                      type="text" 
-                      className="premium-input" 
-                      placeholder="Value..." 
+                    <input
+                      type="text"
+                      className="premium-input"
+                      placeholder="Value..."
                       value={newCardValue}
                       onChange={(e) => setNewCardValue(e.target.value)}
                       maxLength={10}
                       style={{ flex: 1 }}
                     />
-                    <button 
-                      type="button" 
-                      className="premium-button secondary" 
+                    <button
+                      type="button"
+                      className="premium-button secondary"
                       style={{ padding: '0 0.5rem' }}
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
@@ -299,7 +300,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
 
                 {showEmojiPicker && (
                   <div style={{ position: 'absolute', zIndex: 100, bottom: '100%', right: 0, marginBottom: '0.5rem' }}>
-                    <EmojiPicker 
+                    <EmojiPicker
                       onEmojiClick={(emojiData) => {
                         setNewCardValue(prev => prev + emojiData.emoji);
                         setShowEmojiPicker(false);
@@ -315,7 +316,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
             ) : (
               <div className="animate-fade-in" style={{ textAlign: 'center', padding: '0.75rem', background: 'rgba(0,0,0,0.03)', borderRadius: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                 <span>Preset is read-only.</span>
-                <button 
+                <button
                   onClick={() => {
                     updateDeck(state.deck || [], 'custom');
                   }}
@@ -328,16 +329,16 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
             )}
 
             <div className="remote-actions" style={{ flexWrap: 'wrap', marginTop: '0.75rem', gap: '0.5rem' }}>
-               <button onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'accent' : 'secondary'}`}>Standard</button>
-               <button onClick={() => updateDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'accent' : 'secondary'}`}>Fibonacci</button>
-               <button onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'accent' : 'secondary'}`}>T-Shirt</button>
-               <button 
-                onClick={() => updateDeck(savedCustomDeck, 'custom')} 
+              <button onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'accent' : 'secondary'}`}>Standard</button>
+              <button onClick={() => updateDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'accent' : 'secondary'}`}>Fibonacci</button>
+              <button onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'accent' : 'secondary'}`}>T-Shirt</button>
+              <button
+                onClick={() => updateDeck(savedCustomDeck, 'custom')}
                 className={`premium-button sidebar-chip ${state.deckMode === 'custom' ? 'accent' : 'secondary'}`}
                 title="Use your custom deck"
-               >
-                 <RotateCw size={14} /> Custom
-               </button>
+              >
+                <RotateCw size={14} /> Custom
+              </button>
             </div>
           </div>
 

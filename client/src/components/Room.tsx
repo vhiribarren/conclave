@@ -35,6 +35,7 @@ import { AggregationResult } from './AggregationResult';
 import { TimerDisplay } from './TimerDisplay';
 import { AdminRemote } from './AdminRemote';
 import { SidebarPanel } from './SidebarPanel';
+import { settings } from '../services/settings';
 
 
 const Room = () => {
@@ -47,8 +48,8 @@ const Room = () => {
 
   useEffect(() => {
     if (linkUserId && linkName) {
-      localStorage.setItem('conclave.user_id', linkUserId);
-      localStorage.setItem('conclave.name', linkName);
+      settings.setUserId(linkUserId);
+      settings.setUserName(linkName);
       // Clean up URL to prevent sharing identity further
       window.history.replaceState({}, document.title, window.location.pathname + (isRemoteView ? '?remote=true' : ''));
       window.location.reload(); // Reload to pick up new ID from services
@@ -59,8 +60,8 @@ const Room = () => {
   const [mood, setMood] = useState(getUserEmoji());
   const [isJoined, setIsJoined] = useState(!!getUserName());
   const userId = getUserId();
-  const [state, setState] = useState<RoomState>({ 
-    participants: [], 
+  const [state, setState] = useState<RoomState>({
+    participants: [],
     tasks: [],
     currentTaskId: null,
     deck: [],
@@ -93,7 +94,7 @@ const Room = () => {
       // Small delay to let previous connections close properly (Strict Mode)
       const timeoutId = setTimeout(() => {
         if (!isMounted) return;
-        
+
         console.log(`Connecting to room ${roomId}...`);
         socketActions = ConclaveSocket.connect(roomId, userId, name, mood, (newState) => {
           if (isMounted) {
@@ -127,7 +128,7 @@ const Room = () => {
   const isAdmin = state.participants.find(p => p.id === userId)?.isAdmin;
 
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
-  const currentRound = currentTask 
+  const currentRound = currentTask
     ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
     : state.unassociatedRound;
   const isRevealed = currentRound?.revealed || false;
@@ -164,13 +165,13 @@ const Room = () => {
   };
 
 
-  
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
-  
+
   const handleRenameRoom = (e: React.FormEvent) => {
     e.preventDefault();
     if (tempRoomName.trim() && actionsRef.current) {
@@ -199,21 +200,21 @@ const Room = () => {
             onChange={(e) => setName(e.target.value)}
             autoFocus
           />
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Choose your avatar</span>
-            <button 
-              type="button" 
-              className="icon-button" 
+            <button
+              type="button"
+              className="icon-button"
               style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
               onClick={() => setShowEmojiPickerJoin(!showEmojiPickerJoin)}
             >
               {mood}
             </button>
-            
+
             {showEmojiPickerJoin && (
               <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                <EmojiPicker 
+                <EmojiPicker
                   onEmojiClick={(emojiData) => {
                     setMood(emojiData.emoji);
                     setShowEmojiPickerJoin(false);
@@ -253,319 +254,319 @@ const Room = () => {
     <>
       {!isJoined && renderOnboardingModal()}
       <div className={`room-container ${!isJoined ? 'blurred' : ''}`}>
-      {/* Header */}
-      <header className="header glass">
-        <div className="header-left">
-          <div className="header-logo">C</div>
-          <div>
-            {isEditingRoomName ? (
-              <form onSubmit={handleRenameRoom} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                <input
-                  type="text"
-                  className="premium-input"
-                  style={{ padding: '0.15rem 0.5rem', fontSize: '0.9rem', height: 'auto', width: '180px' }}
-                  value={tempRoomName}
-                  onChange={(e) => setTempRoomName(e.target.value)}
-                  autoFocus
-                  onBlur={() => {
-                    // Small delay to allow clicking the save button
-                    setTimeout(() => setIsEditingRoomName(false), 200);
-                  }}
-                />
-                <button type="submit" className="icon-button success" title="Save">
-                  <Check size={14} />
-                </button>
-                <button type="button" className="icon-button danger" onClick={() => setIsEditingRoomName(false)} title="Cancel">
-                  <X size={14} />
-                </button>
-              </form>
-            ) : (
-              <div className="room-name-container" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <h1 className="header-title">{state.name || roomId}</h1>
-                {isAdmin && (
-                  <button onClick={startEditingRoomName} className="icon-button-subtle rename-btn" title="Rename Room">
-                    <Edit2 size={12} />
+        {/* Header */}
+        <header className="header glass">
+          <div className="header-left">
+            <div className="header-logo">C</div>
+            <div>
+              {isEditingRoomName ? (
+                <form onSubmit={handleRenameRoom} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <input
+                    type="text"
+                    className="premium-input"
+                    style={{ padding: '0.15rem 0.5rem', fontSize: '0.9rem', height: 'auto', width: '180px' }}
+                    value={tempRoomName}
+                    onChange={(e) => setTempRoomName(e.target.value)}
+                    autoFocus
+                    onBlur={() => {
+                      // Small delay to allow clicking the save button
+                      setTimeout(() => setIsEditingRoomName(false), 200);
+                    }}
+                  />
+                  <button type="submit" className="icon-button success" title="Save">
+                    <Check size={14} />
                   </button>
-                )}
+                  <button type="button" className="icon-button danger" onClick={() => setIsEditingRoomName(false)} title="Cancel">
+                    <X size={14} />
+                  </button>
+                </form>
+              ) : (
+                <div className="room-name-container" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <h1 className="header-title">{state.name || roomId}</h1>
+                  {isAdmin && (
+                    <button onClick={startEditingRoomName} className="icon-button-subtle rename-btn" title="Rename Room">
+                      <Edit2 size={12} />
+                    </button>
+                  )}
+                </div>
+              )}
+              <div className="header-subtitle">
+                <span className="header-dot"></span>
+                {state.participants.length} online
               </div>
-            )}
-            <div className="header-subtitle">
-              <span className="header-dot"></span>
-              {state.participants.length} online
             </div>
           </div>
-        </div>
-        
-        <div className="header-actions">
-          {/* Layout toggle — only in main (non-remote) view */}
-          {!isRemoteView && (
+
+          <div className="header-actions">
+            {/* Layout toggle — only in main (non-remote) view */}
+            {!isRemoteView && (
+              <>
+                <div className="header-separator" />
+                <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
+                  <button
+                    id="layout-btn-circle"
+                    className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
+                    onClick={() => setLayoutMode('auto')}
+                    title="Vue circulaire"
+                    disabled={state.participants.length > 12 || state.participants.length === 0}
+                  >
+                    <CircleDot size={16} />
+                  </button>
+                  <button
+                    id="layout-btn-grid"
+                    className={`layout-toggle-btn ${layoutMode === 'grid' ? 'active' : ''}`}
+                    onClick={() => setLayoutMode('grid')}
+                    title="Vue grille"
+                  >
+                    <LayoutGrid size={16} />
+                  </button>
+                </div>
+                <div className="header-separator" />
+              </>
+            )}
+            <button onClick={() => setShowUserSettings(true)} className="icon-button" title="User Settings">
+              <UserCog size={18} />
+            </button>
+            {isAdmin && !isRemoteView && (
+              <button onClick={() => setShowQR(true)} className="icon-button accent" title="Remote Control">
+                <Smartphone size={18} />
+              </button>
+            )}
+            <button onClick={() => setShowShareModal(true)} className="icon-button" title="Share Room">
+              <Share2 size={18} />
+            </button>
+            <button onClick={() => navigate('/')} className="icon-button danger" title="Leave">
+              <LogOut size={18} />
+            </button>
+          </div>
+        </header>
+
+        <div className="room-layout">
+          {isRemoteView && isAdmin && actionsRef.current ? (
+            // ── Remote / mobile admin view ───────────────────────────────
+            <main className="room-main">
+              <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} onVote={handleVote} />
+            </main>
+          ) : (
             <>
-              <div className="header-separator" />
-              <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
+              {/* ── Left column: participants ──────────────────────────── */}
+              <main className="room-main">
+                {!isCircleLayout && (state.timerEndAt || state.timerPausedRemainingMs !== null) && (
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <TimerDisplay
+                      timerEndAt={state.timerEndAt}
+                      timerPausedRemainingMs={state.timerPausedRemainingMs}
+                    />
+                  </div>
+                )}
+
+                <div className="task-section">
+                  <h2 className="task-title">{currentTask ? 'Current Task' : 'Quick Vote'}</h2>
+                  {currentTask && (
+                    <div className="task-box glass">
+                      {currentTask.name}
+                    </div>
+                  )}
+                </div>
+
+                <ParticipantsBoard
+                  participants={state.participants}
+                  isRevealed={isRevealed}
+                  currentTaskName={currentTask?.name || ''}
+                  myName={name}
+                  layoutMode={layoutMode}
+                  timerEndAt={state.timerEndAt}
+                  timerPausedRemainingMs={state.timerPausedRemainingMs}
+                />
+
+                {/* Mobile-only: aggregation result below participants */}
+                {isRevealed && (
+                  <div className="sidebar-section animate-fade-in">
+                    <span className="sidebar-section-title">📊 Results</span>
+                    <AggregationResult participants={state.participants} deck={state.deck} />
+                  </div>
+                )}
+
+                {/* Mobile-only: voting cards sticky bottom */}
+                {!isRevealed && !isAdmin && (
+                  <div className="voting-section glass mobile-voting">
+                    <span className="voting-title">Pick a card</span>
+                    <div className="voting-cards">
+                      {(state.deck || []).map((card) => (
+                        <div
+                          key={card}
+                          onClick={() => handleVote(card)}
+                          className={`poker-card ${myVote === card ? 'selected' : ''}`}
+                        >
+                          {card}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile-only: admin controls fixed bottom */}
+                {isAdmin && (
+                  <div className="admin-controls glass mobile-admin">
+                    <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
+                      Reveal
+                    </button>
+                    <button onClick={handleReset} className="premium-button secondary">
+                      Reset
+                    </button>
+                  </div>
+                )}
+              </main>
+
+              {/* ── Right column: sidebar ──────────────────────────────── */}
+              <aside className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
                 <button
-                  id="layout-btn-circle"
-                  className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
-                  onClick={() => setLayoutMode('auto')}
-                  title="Vue circulaire"
-                  disabled={state.participants.length > 12 || state.participants.length === 0}
+                  className="sidebar-toggle-btn"
+                  onClick={() => setSidebarCollapsed((c) => !c)}
+                  title={sidebarCollapsed ? 'Expand panel' : 'Collapse panel'}
                 >
-                  <CircleDot size={16} />
+                  <ChevronLeft size={18} />
                 </button>
-                <button
-                  id="layout-btn-grid"
-                  className={`layout-toggle-btn ${layoutMode === 'grid' ? 'active' : ''}`}
-                  onClick={() => setLayoutMode('grid')}
-                  title="Vue grille"
-                >
-                  <LayoutGrid size={16} />
-                </button>
-              </div>
-              <div className="header-separator" />
+                <SidebarPanel
+                  state={state}
+                  actions={actionsRef.current!}
+                  isAdmin={!!isAdmin}
+                  myVote={myVote}
+                  onVote={handleVote}
+                  isRevealed={isRevealed}
+                  hasCurrentTask={!!currentTask}
+                />
+              </aside>
             </>
           )}
-          <button onClick={() => setShowUserSettings(true)} className="icon-button" title="User Settings">
-            <UserCog size={18} />
-          </button>
-          {isAdmin && !isRemoteView && (
-            <button onClick={() => setShowQR(true)} className="icon-button accent" title="Remote Control">
-              <Smartphone size={18} />
-            </button>
-          )}
-          <button onClick={() => setShowShareModal(true)} className="icon-button" title="Share Room">
-            <Share2 size={18} />
-          </button>
-          <button onClick={() => navigate('/')} className="icon-button danger" title="Leave">
-            <LogOut size={18} />
-          </button>
         </div>
-      </header>
+      </div>
 
-      <div className="room-layout">
-        {isRemoteView && isAdmin && actionsRef.current ? (
-          // ── Remote / mobile admin view ───────────────────────────────
-          <main className="room-main">
-            <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} onVote={handleVote} />
-          </main>
-        ) : (
-          <>
-            {/* ── Left column: participants ──────────────────────────── */}
-            <main className="room-main">
-              { !isCircleLayout && (state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <TimerDisplay 
-                    timerEndAt={state.timerEndAt} 
-                    timerPausedRemainingMs={state.timerPausedRemainingMs} 
-                  />
-                </div>
-              )}
 
-              <div className="task-section">
-                <h2 className="task-title">{currentTask ? 'Current Task' : 'Quick Vote'}</h2>
-                {currentTask && (
-                  <div className="task-box glass">
-                    {currentTask.name}
+      {showUserSettings && (
+        <div className="modal-overlay" onClick={() => setShowUserSettings(false)}>
+          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+            <h3 className="modal-title">User Settings</h3>
+            <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }} className="landing-form">
+              <input
+                type="text"
+                placeholder="Your Name"
+                className="premium-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoFocus
+              />
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Change your avatar</span>
+                <button
+                  type="button"
+                  className="icon-button"
+                  style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+                  onClick={() => setShowEmojiPickerSettings(!showEmojiPickerSettings)}
+                >
+                  {mood}
+                </button>
+
+                {showEmojiPickerSettings && (
+                  <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                    <EmojiPicker
+                      onEmojiClick={(emojiData) => {
+                        setMood(emojiData.emoji);
+                        setShowEmojiPickerSettings(false);
+                      }}
+                      theme={Theme.LIGHT}
+                      lazyLoadEmojis={true}
+                      height={450}
+                      width={350}
+                    />
                   </div>
                 )}
               </div>
 
-              <ParticipantsBoard
-                participants={state.participants}
-                isRevealed={isRevealed}
-                currentTaskName={currentTask?.name || ''}
-                myName={name}
-                layoutMode={layoutMode}
-                timerEndAt={state.timerEndAt}
-                timerPausedRemainingMs={state.timerPausedRemainingMs}
-              />
+              <button type="submit" className="premium-button">Update Profile</button>
+            </form>
+            <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">Cancel</button>
+          </div>
+        </div>
+      )}
 
-              {/* Mobile-only: aggregation result below participants */}
-              {isRevealed && (
-                <div className="sidebar-section animate-fade-in">
-                  <span className="sidebar-section-title">📊 Results</span>
-                  <AggregationResult participants={state.participants} deck={state.deck} />
+      {showShareModal && (
+        <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
+          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+            <h3 className="modal-title">Share Room</h3>
+            <p className="modal-subtitle">Invite others to join this session.</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', margin: '1rem 0' }}>
+              <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem' }} className="animate-fade-in">
+                <QRCodeSVG value={window.location.href} size={180} />
+              </div>
+
+              <div style={{ width: '100%', textAlign: 'left' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Room ID</span>
+                <div className="premium-input" style={{ marginTop: '0.25rem', background: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.9rem' }}>
+                  {roomId}
                 </div>
-              )}
+              </div>
 
-              {/* Mobile-only: voting cards sticky bottom */}
-              {!isRevealed && !isAdmin && (
-                <div className="voting-section glass mobile-voting">
-                  <span className="voting-title">Pick a card</span>
-                  <div className="voting-cards">
-                    {(state.deck || []).map((card) => (
-                      <div
-                        key={card}
-                        onClick={() => handleVote(card)}
-                        className={`poker-card ${myVote === card ? 'selected' : ''}`}
-                      >
-                        {card}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Mobile-only: admin controls fixed bottom */}
-              {isAdmin && (
-                <div className="admin-controls glass mobile-admin">
-                  <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
-                    Reveal
-                  </button>
-                  <button onClick={handleReset} className="premium-button secondary">
-                    Reset
-                  </button>
-                </div>
-              )}
-            </main>
-
-            {/* ── Right column: sidebar ──────────────────────────────── */}
-            <aside className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-              <button
-                className="sidebar-toggle-btn"
-                onClick={() => setSidebarCollapsed((c) => !c)}
-                title={sidebarCollapsed ? 'Expand panel' : 'Collapse panel'}
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <SidebarPanel
-                state={state}
-                actions={actionsRef.current}
-                isAdmin={!!isAdmin}
-                myVote={myVote}
-                onVote={handleVote}
-                isRevealed={isRevealed}
-                hasCurrentTask={!!currentTask}
-              />
-            </aside>
-          </>
-        )}
-      </div>
-    </div>
-
-
-    {showUserSettings && (
-      <div className="modal-overlay" onClick={() => setShowUserSettings(false)}>
-        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-          <h3 className="modal-title">User Settings</h3>
-          <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }} className="landing-form">
-            <input
-              type="text"
-              placeholder="Your Name"
-              className="premium-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoFocus
-            />
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Change your avatar</span>
-              <button 
-                type="button" 
-                className="icon-button" 
-                style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
-                onClick={() => setShowEmojiPickerSettings(!showEmojiPickerSettings)}
-              >
-                {mood}
-              </button>
-              
-              {showEmojiPickerSettings && (
-                <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                  <EmojiPicker 
-                    onEmojiClick={(emojiData) => {
-                      setMood(emojiData.emoji);
-                      setShowEmojiPickerSettings(false);
-                    }}
-                    theme={Theme.LIGHT}
-                    lazyLoadEmojis={true}
-                    height={450}
-                    width={350}
+              <div style={{ width: '100%', textAlign: 'left' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Invite Link</span>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
+                  <input
+                    type="text"
+                    readOnly
+                    value={window.location.href}
+                    className="premium-input"
+                    style={{ fontSize: '0.85rem', flex: 1 }}
                   />
+                  <button onClick={handleCopyLink} className={`premium-button ${copySuccess ? 'success' : 'secondary'}`} style={{ padding: '0.5rem 1rem', flexShrink: 0 }}>
+                    {copySuccess ? <Check size={18} /> : <Copy size={18} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <button onClick={() => setShowShareModal(false)} className="premium-button secondary">Close</button>
+          </div>
+        </div>
+      )}
+
+      {showQR && (
+        <div className="modal-overlay" onClick={() => { setShowQR(false); setIsQRVisible(false); }}>
+          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+            <h3 className="modal-title">Admin Remote Control</h3>
+            <p className="modal-subtitle">Open the remote control in a new window, or scan the QR code with your phone.</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0' }}>
+              <a
+                href={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="premium-button"
+                style={{ textDecoration: 'none' }}
+              >
+                <Smartphone size={18} /> Open Remote in New Tab
+              </a>
+
+              <button
+                onClick={() => setIsQRVisible(!isQRVisible)}
+                className="premium-button secondary"
+                style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
+              >
+                {isQRVisible ? 'Hide QR Code' : 'Show QR Code'}
+              </button>
+
+              {isQRVisible && (
+                <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center' }} className="animate-fade-in">
+                  <QRCodeSVG value={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
                 </div>
               )}
             </div>
 
-            <button type="submit" className="premium-button">Update Profile</button>
-          </form>
-          <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">Cancel</button>
-        </div>
-      </div>
-    )}
-
-    {showShareModal && (
-      <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
-        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-          <h3 className="modal-title">Share Room</h3>
-          <p className="modal-subtitle">Invite others to join this session.</p>
-          
-          <div style={{display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', margin: '1rem 0'}}>
-            <div style={{background: 'white', padding: '1rem', borderRadius: '1rem'}} className="animate-fade-in">
-              <QRCodeSVG value={window.location.href} size={180} />
-            </div>
-
-            <div style={{width: '100%', textAlign: 'left'}}>
-              <span style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase'}}>Room ID</span>
-              <div className="premium-input" style={{marginTop: '0.25rem', background: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.9rem'}}>
-                {roomId}
-              </div>
-            </div>
-
-            <div style={{width: '100%', textAlign: 'left'}}>
-              <span style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase'}}>Invite Link</span>
-              <div style={{display: 'flex', gap: '0.5rem', marginTop: '0.25rem'}}>
-                <input 
-                  type="text" 
-                  readOnly 
-                  value={window.location.href} 
-                  className="premium-input" 
-                  style={{fontSize: '0.85rem', flex: 1}}
-                />
-                <button onClick={handleCopyLink} className={`premium-button ${copySuccess ? 'success' : 'secondary'}`} style={{padding: '0.5rem 1rem', flexShrink: 0}}>
-                  {copySuccess ? <Check size={18} /> : <Copy size={18} />}
-                </button>
-              </div>
-            </div>
+            <button onClick={() => { setShowQR(false); setIsQRVisible(false); }} className="premium-button secondary">Close</button>
           </div>
-          
-          <button onClick={() => setShowShareModal(false)} className="premium-button secondary">Close</button>
         </div>
-      </div>
-    )}
-
-    {showQR && (
-      <div className="modal-overlay" onClick={() => {setShowQR(false); setIsQRVisible(false);}}>
-        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-          <h3 className="modal-title">Admin Remote Control</h3>
-          <p className="modal-subtitle">Open the remote control in a new window, or scan the QR code with your phone.</p>
-          
-          <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0'}}>
-            <a 
-              href={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="premium-button" 
-              style={{textDecoration: 'none'}}
-            >
-              <Smartphone size={18} /> Open Remote in New Tab
-            </a>
-            
-            <button 
-              onClick={() => setIsQRVisible(!isQRVisible)} 
-              className="premium-button secondary" 
-              style={{fontSize: '0.8rem', padding: '0.5rem 1rem'}}
-            >
-              {isQRVisible ? 'Hide QR Code' : 'Show QR Code'}
-            </button>
-            
-            {isQRVisible && (
-              <div style={{background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center'}} className="animate-fade-in">
-                <QRCodeSVG value={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
-              </div>
-            )}
-          </div>
-          
-          <button onClick={() => {setShowQR(false); setIsQRVisible(false);}} className="premium-button secondary">Close</button>
-        </div>
-      </div>
-    )}
+      )}
     </>
   );
 };

@@ -3,15 +3,16 @@
  *
  * Copyright (c) 2026 Vincent Hiribarren
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, Pause, RotateCw, GripVertical, Smile } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import { AggregationResult } from './AggregationResult';
+import { settings } from '../services/settings';
 
 interface Props {
   state: RoomState;
-  actions: ConclaveActions | null;
+  actions: ConclaveActions;
   isAdmin: boolean;
   myVote: string | null;
   onVote: (card: string) => void;
@@ -26,7 +27,6 @@ export const SidebarPanel: React.FC<Props> = ({
   myVote,
   onVote,
   isRevealed,
-  hasCurrentTask,
 }) => {
   const [activeTab, setActiveTab] = useState<'control' | 'settings'>(isAdmin ? 'control' : 'control');
   const [newTaskName, setNewTaskName] = useState('');
@@ -38,8 +38,8 @@ export const SidebarPanel: React.FC<Props> = ({
   const dragSourceIdx = useRef<number | null>(null);
 
   const [savedCustomDeck, setSavedCustomDeck] = useState<string[]>(() => {
-    const saved = localStorage.getItem('conclave_custom_deck');
-    return saved ? JSON.parse(saved) : ['1','2','3','5','8','13','?','☕'];
+    const saved = settings.getDeckCustom();
+    return saved ? JSON.parse(saved) : ['1', '2', '3', '5', '8', '13', '?', '☕'];
   });
 
   const updateDeck = (newDeck: string[], mode: 'preset' | 'custom' = 'custom') => {
@@ -48,7 +48,7 @@ export const SidebarPanel: React.FC<Props> = ({
     }
     if (mode === 'custom') {
       setSavedCustomDeck(newDeck);
-      localStorage.setItem('conclave_custom_deck', JSON.stringify(newDeck));
+      settings.setDeckCustom(JSON.stringify(newDeck));
     }
   };
 
@@ -83,11 +83,11 @@ export const SidebarPanel: React.FC<Props> = ({
   const handleDragOver = (e: React.DragEvent, idx: number) => {
     e.preventDefault();
     if (dragSourceIdx.current === null || dragSourceIdx.current === idx || !localDeck) return;
-    
+
     const newDeck = [...localDeck];
-    const item = newDeck.splice(dragSourceIdx.current, 1)[0];
+    const item = newDeck.splice(dragSourceIdx.current, 1)[0]!;
     newDeck.splice(idx, 0, item);
-    
+
     setLocalDeck(newDeck);
     setSavedCustomDeck(newDeck);
     dragSourceIdx.current = idx;
@@ -116,13 +116,13 @@ export const SidebarPanel: React.FC<Props> = ({
     <div className="sidebar-inner">
       {isAdmin && (
         <div className="admin-tabs">
-          <button 
+          <button
             className={`admin-tab ${activeTab === 'control' ? 'active' : ''}`}
             onClick={() => setActiveTab('control')}
           >
             <Layout size={14} /> Control
           </button>
-          <button 
+          <button
             className={`admin-tab ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
@@ -187,35 +187,35 @@ export const SidebarPanel: React.FC<Props> = ({
               {!isRevealed && (
                 <div className="sidebar-section">
                   <span className="sidebar-section-title">⏱ Timer</span>
-                <div className="sidebar-actions">
-                  {state.timerPausedRemainingMs !== null ? (
-                    <button onClick={() => actions?.adminResumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
-                      <Play size={14} /> Resume
-                    </button>
-                  ) : state.timerEndAt ? (
-                    <button onClick={() => actions?.adminPauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
-                      <Pause size={14} /> Pause
-                    </button>
-                  ) : (
-                    <button onClick={handleSetTimer} className="premium-button secondary" style={{ flex: 1 }}>
-                      <Play size={14} /> Start ({selectedDurationMs / 1000}s)
-                    </button>
-                  )}
-                  
-                  {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                    <button 
-                      onClick={() => actions?.adminSetTimer(null)}
-                      className="premium-button danger"
-                      title="Reset timer"
-                    >
-                      <RotateCcw size={14} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
+                  <div className="sidebar-actions">
+                    {state.timerPausedRemainingMs !== null ? (
+                      <button onClick={() => actions?.adminResumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
+                        <Play size={14} /> Resume
+                      </button>
+                    ) : state.timerEndAt ? (
+                      <button onClick={() => actions?.adminPauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
+                        <Pause size={14} /> Pause
+                      </button>
+                    ) : (
+                      <button onClick={handleSetTimer} className="premium-button secondary" style={{ flex: 1 }}>
+                        <Play size={14} /> Start ({selectedDurationMs / 1000}s)
+                      </button>
+                    )}
 
-            <div className="sidebar-section">
+                    {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
+                      <button
+                        onClick={() => actions?.adminSetTimer(null)}
+                        className="premium-button danger"
+                        title="Reset timer"
+                      >
+                        <RotateCcw size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="sidebar-section">
                 <span className="sidebar-section-title">📋 Select Task</span>
                 <div className="task-list" style={{ maxHeight: '35vh' }}>
                   {state.tasks.map((task) => (
@@ -240,24 +240,24 @@ export const SidebarPanel: React.FC<Props> = ({
       ) : (
         /* ── SETTINGS TAB ────────────────────────────────────────── */
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          
+
           <div className="sidebar-section">
             <span className="sidebar-section-title">⏱ Timer Setup</span>
             <div className="sidebar-actions sidebar-actions--wrap">
               {[15, 30, 45, 60].map(s => (
-                <button 
+                <button
                   key={s}
                   onClick={() => setTimerDuration(s)}
                   className={`premium-button ${selectedDurationMs === s * 1000 ? 'accent' : 'secondary'} sidebar-chip`}
                 >
-                  {s >= 60 ? `${s/60}m` : `${s}s`}
+                  {s >= 60 ? `${s / 60}m` : `${s}s`}
                 </button>
               ))}
             </div>
             <div className="timer-custom-row">
               <div className="timer-input-wrapper">
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   className={`premium-input ${![15, 30, 45, 60].includes(selectedDurationMs / 1000) ? 'active' : ''}`}
                   value={customTimerValue}
                   onChange={(e) => {
@@ -286,21 +286,21 @@ export const SidebarPanel: React.FC<Props> = ({
                 <Plus size={15} />
               </button>
             </form>
-              <div className="task-list" style={{ maxHeight: '20vh' }}>
-                {state.tasks.map((task) => (
-                  <div key={task.id} className="task-item">
-                    <div className="task-item-content">
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); actions?.adminDeleteTask(task.id); }}
-                        className="task-delete-btn"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+            <div className="task-list" style={{ maxHeight: '20vh' }}>
+              {state.tasks.map((task) => (
+                <div key={task.id} className="task-item">
+                  <div className="task-item-content">
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); actions?.adminDeleteTask(task.id); }}
+                      className="task-delete-btn"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="sidebar-section">
@@ -309,8 +309,8 @@ export const SidebarPanel: React.FC<Props> = ({
               {(localDeck || state.deck || []).map((card, idx) => {
                 const isCustom = state.deckMode === 'custom' || localDeck !== null;
                 return (
-                  <div 
-                    key={`card-${idx}-${card}`} 
+                  <div
+                    key={`card-${idx}-${card}`}
                     className={`deck-chip ${!isCustom ? 'read-only' : ''}`}
                     draggable={isCustom}
                     onDragStart={() => isCustom && handleDragStart(idx)}
@@ -324,23 +324,23 @@ export const SidebarPanel: React.FC<Props> = ({
                 );
               })}
             </div>
-            
+
             {state.deckMode === 'custom' ? (
               <div style={{ position: 'relative' }}>
                 <form onSubmit={handleAddCard} className="deck-add-form animate-fade-in">
                   <div style={{ display: 'flex', gap: '0.25rem', flex: 1 }}>
-                    <input 
-                      type="text" 
-                      className="premium-input" 
-                      placeholder="Card value..." 
+                    <input
+                      type="text"
+                      className="premium-input"
+                      placeholder="Card value..."
                       value={newCardValue}
                       onChange={(e) => setNewCardValue(e.target.value)}
                       maxLength={10}
                       style={{ flex: 1 }}
                     />
-                    <button 
-                      type="button" 
-                      className="premium-button secondary" 
+                    <button
+                      type="button"
+                      className="premium-button secondary"
                       style={{ padding: '0 0.5rem' }}
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
@@ -349,10 +349,10 @@ export const SidebarPanel: React.FC<Props> = ({
                   </div>
                   <button type="submit" className="premium-button">Add</button>
                 </form>
-                
+
                 {showEmojiPicker && (
                   <div style={{ position: 'absolute', zIndex: 100, bottom: '100%', right: 0, marginBottom: '0.5rem' }}>
-                    <EmojiPicker 
+                    <EmojiPicker
                       onEmojiClick={(emojiData) => {
                         setNewCardValue(prev => prev + emojiData.emoji);
                         setShowEmojiPicker(false);
@@ -368,7 +368,7 @@ export const SidebarPanel: React.FC<Props> = ({
             ) : (
               <div className="animate-fade-in" style={{ textAlign: 'center', padding: '0.5rem', background: 'rgba(0,0,0,0.03)', borderRadius: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                 <span>This preset is read-only.</span>
-                <button 
+                <button
                   onClick={() => {
                     updateDeck(state.deck || [], 'custom');
                   }}
@@ -380,11 +380,11 @@ export const SidebarPanel: React.FC<Props> = ({
               </div>
             )}
             <div className="sidebar-actions sidebar-actions--wrap" style={{ marginTop: '0.75rem' }}>
-              <button onClick={() => updateDeck(['0','1','2','3','5','8','13','21','?','☕'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'accent' : 'secondary'}`}>Standard</button>
-              <button onClick={() => updateDeck(['1','2','3','5','8','13','21','34','55','89'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'accent' : 'secondary'}`}>Fibonacci</button>
-              <button onClick={() => updateDeck(['XS','S','M','L','XL','XXL','?'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'accent' : 'secondary'}`}>T-Shirt</button>
-              <button 
-                onClick={() => updateDeck(savedCustomDeck, 'custom')} 
+              <button onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'accent' : 'secondary'}`}>Standard</button>
+              <button onClick={() => updateDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'accent' : 'secondary'}`}>Fibonacci</button>
+              <button onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'accent' : 'secondary'}`}>T-Shirt</button>
+              <button
+                onClick={() => updateDeck(savedCustomDeck, 'custom')}
                 className={`premium-button sidebar-chip ${state.deckMode === 'custom' ? 'accent' : 'secondary'}`}
                 title="Use your custom deck"
               >
