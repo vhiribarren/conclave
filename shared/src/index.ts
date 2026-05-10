@@ -53,6 +53,7 @@ export interface RoomState {
   deck: string[];
   timerEndAt: number | null;
   timerPausedRemainingMs: number | null;
+  adminId: string | null;
 }
 
 export type SocketMessage = 

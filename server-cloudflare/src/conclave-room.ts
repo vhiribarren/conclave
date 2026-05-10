@@ -34,6 +34,7 @@ export class ConclaveRoom extends DurableObject {
     deck: DEFAULT_DECK,
     timerEndAt: null,
     timerPausedRemainingMs: null,
+    adminId: null,
   };
 
   constructor(ctx: DurableObjectState, env: any) {
@@ -127,13 +128,16 @@ export class ConclaveRoom extends DurableObject {
         // Remove old participant if they reconnected
         this.state.participants = this.state.participants.filter((p) => p.id !== sessionId);
         
-        const isFirst = this.state.participants.length === 0;
+        if (!this.state.adminId) {
+          this.state.adminId = sessionId;
+        }
+
         this.state.participants.push({
           id: sessionId,
           name: data.name || "Anonymous",
           mood: data.mood || "🦊",
           vote: null,
-          isAdmin: isFirst,
+          isAdmin: sessionId === this.state.adminId,
           isSpectator: data.isSpectator || false,
         });
         this.broadcastState();
@@ -265,6 +269,7 @@ export class ConclaveRoom extends DurableObject {
           const currentAdmin = this.state.participants.find((p) => p.id === attachment.sessionId);
           const targetUser = this.state.participants.find((p) => p.id === data.targetUserId);
           if (currentAdmin && targetUser) {
+            this.state.adminId = data.targetUserId;
             currentAdmin.isAdmin = false;
             targetUser.isAdmin = true;
             this.broadcastState();
