@@ -146,23 +146,17 @@ export const SidebarPanel: React.FC<Props> = ({
           {!isRevealed && !isAdmin && (
             <div className="sidebar-section">
               <span className="sidebar-section-title">🎴 Pick a card</span>
-              {hasCurrentTask ? (
-                <div className="sidebar-cards">
-                  {(state.deck || []).map((card) => (
-                    <div
-                      key={card}
-                      onClick={() => onVote(card)}
-                      className={`poker-card ${myVote === card ? 'selected' : ''}`}
-                    >
-                      {card}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="sidebar-empty">
-                  <span>⏳ Waiting for a task…</span>
-                </div>
-              )}
+              <div className="sidebar-cards">
+                {(state.deck || []).map((card) => (
+                  <div
+                    key={card}
+                    onClick={() => onVote(card)}
+                    className={`poker-card ${myVote === card ? 'selected' : ''}`}
+                  >
+                    {card}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -174,7 +168,7 @@ export const SidebarPanel: React.FC<Props> = ({
                 <div className="sidebar-actions">
                   <button
                     onClick={() => actions?.reveal()}
-                    disabled={!hasCurrentTask || isRevealed}
+                    disabled={isRevealed}
                     className="premium-button"
                     style={{ flex: 1 }}
                   >
@@ -225,7 +219,7 @@ export const SidebarPanel: React.FC<Props> = ({
                   {state.tasks.map((task) => (
                     <div
                       key={task.id}
-                      onClick={() => actions?.setTask(task.id)}
+                      onClick={() => actions?.setTask(state.currentTaskId === task.id ? null : task.id)}
                       className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
                     >
                       {task.name}

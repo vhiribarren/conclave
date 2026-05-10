@@ -34,7 +34,9 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
   };
 
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
-  const currentRound = currentTask?.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null;
+  const currentRound = currentTask 
+    ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
+    : state.unassociatedRound;
   const isRevealed = currentRound?.revealed || false;
 
   const handleAddTask = (e: React.FormEvent) => {
@@ -107,7 +109,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
           <div className="remote-box glass">
             <h2 className="remote-title">Actions</h2>
             <div className="remote-actions">
-              <button onClick={() => actions.reveal()} disabled={isRevealed || !currentTask} className="premium-button">
+              <button onClick={() => actions.reveal()} disabled={isRevealed} className="premium-button">
                 <Eye size={16} /> Reveal
               </button>
               <button onClick={() => actions.reset()} className="premium-button secondary">
@@ -151,7 +153,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
               {state.tasks.map(task => (
                 <div 
                   key={task.id} 
-                  onClick={() => actions.setTask(task.id)}
+                  onClick={() => actions.setTask(state.currentTaskId === task.id ? null : task.id)}
                   className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
                 >
                   {task.name}
@@ -161,7 +163,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
             </div>
           </div>
 
-          {!isRevealed && currentTask && (
+          {!isRevealed && (
             <div className="remote-box glass">
               <h3 className="remote-section-title" style={{textAlign: 'center'}}>Your Secret Vote</h3>
               <div className="voting-cards">

@@ -55,6 +55,7 @@ export interface RoomState {
   timerEndAt: number | null;
   timerPausedRemainingMs: number | null;
   adminId: string | null;
+  unassociatedRound: Round;
 }
 
 export type SocketMessage = 
@@ -63,7 +64,7 @@ export type SocketMessage =
   | { type: 'VOTE'; vote: string | null }
   | { type: 'REVEAL' }
   | { type: 'RESET' }
-  | { type: 'SET_TASK'; taskId: string }
+  | { type: 'SET_TASK'; taskId: string | null }
   | { type: 'ADD_TASK'; name: string }
   | { type: 'DELETE_TASK'; taskId: string }
   | { type: 'SET_DECK'; deck: string[]; mode: 'preset' | 'custom' }

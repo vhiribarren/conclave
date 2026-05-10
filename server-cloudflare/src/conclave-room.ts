@@ -36,6 +36,7 @@ export class ConclaveRoom extends DurableObject {
     timerEndAt: null,
     timerPausedRemainingMs: null,
     adminId: null,
+    unassociatedRound: { id: 'unassociated', votes: {}, revealed: false },
   };
 
   constructor(ctx: DurableObjectState, env: any) {
@@ -158,27 +159,42 @@ export class ConclaveRoom extends DurableObject {
 
       case "VOTE":
         const participant = this.state.participants.find((p) => p.id === attachment.sessionId);
-        if (participant && this.state.currentTaskId) {
-          const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
-          if (task && task.rounds.length > 0) {
-            const currentRound = task.rounds[task.rounds.length - 1];
-            if (!currentRound.revealed) {
-              if (data.vote === null) {
-                delete currentRound.votes[participant.id];
-              } else {
-                currentRound.votes[participant.id] = data.vote;
-              }
-              this.broadcastState();
+        if (participant) {
+          let currentRound: Round | undefined;
+          if (this.state.currentTaskId) {
+            const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
+            if (task && task.rounds.length > 0) {
+              currentRound = task.rounds[task.rounds.length - 1];
             }
+          } else {
+            currentRound = this.state.unassociatedRound;
+          }
+
+          if (currentRound && !currentRound.revealed) {
+            if (data.vote === null) {
+              delete currentRound.votes[participant.id];
+            } else {
+              currentRound.votes[participant.id] = data.vote;
+            }
+            this.broadcastState();
           }
         }
         break;
 
       case "REVEAL":
-        if (this.isAdmin(ws) && this.state.currentTaskId) {
-          const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
-          if (task && task.rounds.length > 0) {
-            task.rounds[task.rounds.length - 1].revealed = true;
+        if (this.isAdmin(ws)) {
+          let roundToReveal: Round | undefined;
+          if (this.state.currentTaskId) {
+            const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
+            if (task && task.rounds.length > 0) {
+              roundToReveal = task.rounds[task.rounds.length - 1];
+            }
+          } else {
+            roundToReveal = this.state.unassociatedRound;
+          }
+
+          if (roundToReveal) {
+            roundToReveal.revealed = true;
             this.state.timerEndAt = null;
             this.state.timerPausedRemainingMs = null;
             this.broadcastState();
@@ -187,14 +203,18 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "RESET":
-        if (this.isAdmin(ws) && this.state.currentTaskId) {
-          const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
-          if (task) {
-            task.rounds.push({ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false });
-            this.state.timerEndAt = null;
-            this.state.timerPausedRemainingMs = null;
-            this.broadcastState();
+        if (this.isAdmin(ws)) {
+          if (this.state.currentTaskId) {
+            const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
+            if (task) {
+              task.rounds.push({ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false });
+            }
+          } else {
+            this.state.unassociatedRound = { id: 'unassociated', votes: {}, revealed: false };
           }
+          this.state.timerEndAt = null;
+          this.state.timerPausedRemainingMs = null;
+          this.broadcastState();
         }
         break;
 
@@ -297,6 +317,8 @@ export class ConclaveRoom extends DurableObject {
       if (task && task.rounds.length > 0) {
         currentRound = task.rounds[task.rounds.length - 1];
       }
+    } else {
+      currentRound = this.state.unassociatedRound;
     }
 
     const stateToSend = JSON.stringify({

@@ -153,7 +153,9 @@ const Room = () => {
   const isAdmin = state.participants.find(p => p.isAdmin && p.name === name);
 
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
-  const currentRound = currentTask?.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null;
+  const currentRound = currentTask 
+    ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
+    : state.unassociatedRound;
   const isRevealed = currentRound?.revealed || false;
 
   const renderOnboardingModal = () => (
@@ -323,7 +325,7 @@ const Room = () => {
               )}
 
               {/* Mobile-only: voting cards sticky bottom */}
-              {!isRevealed && currentTask && !isAdmin && (
+              {!isRevealed && !isAdmin && (
                 <div className="voting-section glass mobile-voting">
                   <span className="voting-title">Pick a card</span>
                   <div className="voting-cards">
