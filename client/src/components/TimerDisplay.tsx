@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Timer } from 'lucide-react';
+import './TimerDisplay.css';
 
 interface Props {
   timerEndAt: number | null;

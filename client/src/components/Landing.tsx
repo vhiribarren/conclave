@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { getUserName, setUserName, getUserEmoji, setUserEmoji } from '../services/user';
+import './Landing.css';
 import { getHistory, type HistoryEntry } from '../services/history';
 
 const Landing = () => {

@@ -8,6 +8,7 @@ import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, Pause, RotateC
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import { AggregationResult } from './AggregationResult';
+import './SidebarPanel.css';
 import { settings } from '../services/settings';
 
 interface Props {

@@ -1,0 +1,38 @@
+.remote-container {
+  flex: 1;
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+.remote-box {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.remote-title {
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.remote-section-title {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+.remote-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.remote-actions button {
+  flex: 1;
+}
+.remote-form {
+  display: flex;
+  gap: 0.5rem;
+}

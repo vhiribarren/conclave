@@ -25,6 +25,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import './Room.css';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';

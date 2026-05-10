@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Eye, RotateCcw, Plus, Settings, Play, Pause, X, Trash2, Layout, RotateCw, GripVertical, Smile } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
+import './AdminRemote.css';
 import { AggregationResult } from './AggregationResult';
 import { settings } from '../services/settings';
 
