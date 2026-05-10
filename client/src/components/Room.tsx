@@ -23,7 +23,7 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronLeft, CircleDot, LayoutGrid, Copy, Check, Edit2, X } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
@@ -425,7 +425,7 @@ const Room = () => {
                   onClick={() => setSidebarCollapsed((c) => !c)}
                   title={sidebarCollapsed ? 'Expand panel' : 'Collapse panel'}
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronRight size={18} />
                 </button>
                 <SidebarPanel
                   state={state}
