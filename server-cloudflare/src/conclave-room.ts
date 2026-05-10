@@ -209,6 +209,17 @@ export class ConclaveRoom extends DurableObject {
           this.broadcastState();
         }
         break;
+      
+      case "DELETE_TASK":
+        if (this.isAdmin(ws) && data.taskId) {
+          this.state.tasks = this.state.tasks.filter(t => t.id !== data.taskId);
+          if (this.state.currentTaskId === data.taskId) {
+            this.state.currentTaskId = this.state.tasks.length > 0 ? this.state.tasks[0].id : null;
+            this.state.timerEndAt = null;
+          }
+          this.broadcastState();
+        }
+        break;
 
       case "SET_DECK":
         if (this.isAdmin(ws) && Array.isArray(data.deck)) {

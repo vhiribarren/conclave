@@ -2,27 +2,9 @@
  * MIT License
  *
  * Copyright (c) 2026 Vincent Hiribarren
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
  */
 import React, { useState } from 'react';
-import { Eye, RotateCcw, Plus } from 'lucide-react';
+import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout } from 'lucide-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import { AggregationResult } from './AggregationResult';
 
@@ -45,7 +27,11 @@ export const SidebarPanel: React.FC<Props> = ({
   isRevealed,
   hasCurrentTask,
 }) => {
+  const [activeTab, setActiveTab] = useState<'control' | 'settings'>(isAdmin ? 'control' : 'control');
   const [newTaskName, setNewTaskName] = useState('');
+  const [customTimerValue, setCustomTimerValue] = useState('30');
+  const [selectedDurationMs, setSelectedDurationMs] = useState(30000);
+  const [newCardValue, setNewCardValue] = useState('');
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,70 +41,96 @@ export const SidebarPanel: React.FC<Props> = ({
     }
   };
 
+  const handleAddCard = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newCardValue.trim() && actions) {
+      const newDeck = [...(state.deck || []), newCardValue.trim()];
+      actions.setDeck(newDeck);
+      setNewCardValue('');
+    }
+  };
+
+  const removeCard = (index: number) => {
+    if (actions) {
+      const newDeck = [...(state.deck || [])];
+      newDeck.splice(index, 1);
+      actions.setDeck(newDeck);
+    }
+  };
+
+  const setTimerDuration = (seconds: number) => {
+    setSelectedDurationMs(seconds * 1000);
+    setCustomTimerValue(seconds.toString());
+  };
+
+  const startTimer = () => {
+    if (actions) {
+      actions.setTimer(selectedDurationMs);
+    }
+  };
+
   return (
     <div className="sidebar-inner">
-
-      {/* ── REVEALED PHASE ─────────────────────────────────────── */}
-      {isRevealed && (
-        <>
-          <div className="sidebar-section">
-            <span className="sidebar-section-title">📊 Results</span>
-            <AggregationResult participants={state.participants} />
-          </div>
-
-          {isAdmin && (
-            <div className="sidebar-section">
-              <span className="sidebar-section-title">⚡ Round</span>
-              <div className="sidebar-actions">
-                <button
-                  onClick={() => actions?.reset()}
-                  className="premium-button secondary"
-                  style={{ flex: 1 }}
-                >
-                  <RotateCcw size={15} /> Reset round
-                </button>
-              </div>
-            </div>
-          )}
-        </>
+      {isAdmin && (
+        <div className="admin-tabs">
+          <button 
+            className={`admin-tab ${activeTab === 'control' ? 'active' : ''}`}
+            onClick={() => setActiveTab('control')}
+          >
+            <Layout size={14} /> Control
+          </button>
+          <button 
+            className={`admin-tab ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            <Settings size={14} /> Settings
+          </button>
+        </div>
       )}
 
-      {/* ── VOTING PHASE ───────────────────────────────────────── */}
-      {!isRevealed && (
+      {activeTab === 'control' ? (
         <>
-          {/* Card picker — all players */}
-          {hasCurrentTask ? (
+          {/* ── REVEALED PHASE ─────────────────────────────────────── */}
+          {isRevealed && (
             <div className="sidebar-section">
-              <span className="sidebar-section-title">🎴 Pick a card</span>
-              <div className="sidebar-cards">
-                {(state.deck || []).map((card) => (
-                  <div
-                    key={card}
-                    onClick={() => onVote(card)}
-                    className={`poker-card ${myVote === card ? 'selected' : ''}`}
-                  >
-                    {card}
-                  </div>
-                ))}
-              </div>
+              <span className="sidebar-section-title">📊 Results</span>
+              <AggregationResult participants={state.participants} />
             </div>
-          ) : (
-            !isAdmin && (
-              <div className="sidebar-empty">
-                <span>⏳ Waiting for a task…</span>
-              </div>
-            )
           )}
 
-          {/* Admin controls */}
+          {/* ── VOTING PHASE ───────────────────────────────────────── */}
+          {!isRevealed && (
+            <div className="sidebar-section">
+              <span className="sidebar-section-title">🎴 Pick a card</span>
+              {hasCurrentTask ? (
+                <div className="sidebar-cards">
+                  {(state.deck || []).map((card) => (
+                    <div
+                      key={card}
+                      onClick={() => onVote(card)}
+                      className={`poker-card ${myVote === card ? 'selected' : ''}`}
+                    >
+                      {card}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="sidebar-empty">
+                  <span>⏳ Waiting for a task…</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── ADMIN CONTROLS ─────────────────────────────────────── */}
           {isAdmin && (
             <>
               <div className="sidebar-section">
-                <span className="sidebar-section-title">⚡ Controls</span>
+                <span className="sidebar-section-title">⚡ Actions</span>
                 <div className="sidebar-actions">
                   <button
                     onClick={() => actions?.reveal()}
-                    disabled={!hasCurrentTask}
+                    disabled={!hasCurrentTask || isRevealed}
                     className="premium-button"
                     style={{ flex: 1 }}
                   >
@@ -129,37 +141,33 @@ export const SidebarPanel: React.FC<Props> = ({
                     className="premium-button secondary"
                     title="Reset round"
                   >
-                    <RotateCcw size={15} />
+                    <RotateCcw size={15} /> Reset
                   </button>
                 </div>
               </div>
 
               <div className="sidebar-section">
                 <span className="sidebar-section-title">⏱ Timer</span>
-                <div className="sidebar-actions sidebar-actions--wrap">
-                  <button onClick={() => actions?.setTimer(60000)}  className="premium-button secondary sidebar-chip">1m</button>
-                  <button onClick={() => actions?.setTimer(120000)} className="premium-button secondary sidebar-chip">2m</button>
-                  <button onClick={() => actions?.setTimer(300000)} className="premium-button secondary sidebar-chip">5m</button>
-                  <button onClick={() => actions?.setTimer(null)}   className="premium-button danger sidebar-chip">Stop</button>
+                <div className="sidebar-actions">
+                  <button 
+                    onClick={startTimer}
+                    className="premium-button secondary"
+                    style={{ flex: 1 }}
+                  >
+                    <Play size={14} /> Start ({selectedDurationMs / 1000}s)
+                  </button>
+                  <button 
+                    onClick={() => actions?.setTimer(null)}
+                    className="premium-button danger"
+                  >
+                    <X size={14} />
+                  </button>
                 </div>
               </div>
 
               <div className="sidebar-section">
-                <span className="sidebar-section-title">📋 Tasks</span>
-                <form onSubmit={handleAddTask} className="remote-form">
-                  <input
-                    type="text"
-                    value={newTaskName}
-                    onChange={(e) => setNewTaskName(e.target.value)}
-                    placeholder="New task…"
-                    className="premium-input"
-                    style={{ fontSize: '0.875rem', padding: '9px 13px' }}
-                  />
-                  <button type="submit" className="premium-button" style={{ padding: '9px 13px', flexShrink: 0 }}>
-                    <Plus size={15} />
-                  </button>
-                </form>
-                <div className="task-list" style={{ maxHeight: '28vh' }}>
+                <span className="sidebar-section-title">📋 Select Task</span>
+                <div className="task-list" style={{ maxHeight: '35vh' }}>
                   {state.tasks.map((task) => (
                     <div
                       key={task.id}
@@ -171,23 +179,110 @@ export const SidebarPanel: React.FC<Props> = ({
                   ))}
                   {state.tasks.length === 0 && (
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.5rem' }}>
-                      No tasks yet.
+                      No tasks yet. Go to Settings.
                     </p>
                   )}
-                </div>
-              </div>
-
-              <div className="sidebar-section">
-                <span className="sidebar-section-title">🃏 Deck</span>
-                <div className="sidebar-actions sidebar-actions--wrap">
-                  <button onClick={() => actions?.setDeck(['0','1','2','3','5','8','13','21','?','☕'])} className="premium-button secondary sidebar-chip">Standard</button>
-                  <button onClick={() => actions?.setDeck(['1','2','3','5','8','13','21','34','55','89'])} className="premium-button secondary sidebar-chip">Fibonacci</button>
-                  <button onClick={() => actions?.setDeck(['XS','S','M','L','XL','XXL','?'])} className="premium-button secondary sidebar-chip">T-Shirt</button>
                 </div>
               </div>
             </>
           )}
         </>
+      ) : (
+        /* ── SETTINGS TAB ────────────────────────────────────────── */
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          
+          <div className="sidebar-section">
+            <span className="sidebar-section-title">⏱ Timer Setup</span>
+            <div className="sidebar-actions sidebar-actions--wrap">
+              {[15, 30, 45, 60].map(s => (
+                <button 
+                  key={s}
+                  onClick={() => setTimerDuration(s)}
+                  className={`premium-button ${selectedDurationMs === s * 1000 ? 'accent' : 'secondary'} sidebar-chip`}
+                >
+                  {s >= 60 ? `${s/60}m` : `${s}s`}
+                </button>
+              ))}
+            </div>
+            <div className="timer-custom-row">
+              <div className="timer-input-wrapper">
+                <input 
+                  type="number" 
+                  className="premium-input" 
+                  value={customTimerValue}
+                  onChange={(e) => {
+                    setCustomTimerValue(e.target.value);
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val)) setSelectedDurationMs(val * 1000);
+                  }}
+                  placeholder="Custom"
+                  style={{ paddingRight: '2rem' }}
+                />
+                <span className="timer-input-unit">s</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="sidebar-section">
+            <span className="sidebar-section-title">📋 Task Preparation</span>
+            <form onSubmit={handleAddTask} className="remote-form">
+              <input
+                type="text"
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                placeholder="Add task..."
+                className="premium-input"
+              />
+              <button type="submit" className="premium-button">
+                <Plus size={15} />
+              </button>
+            </form>
+            <div className="task-list" style={{ maxHeight: '20vh' }}>
+              {state.tasks.map((task) => (
+                <div key={task.id} className="task-item">
+                  <div className="task-item-content">
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); actions?.deleteTask(task.id); }}
+                      className="task-delete-btn"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="sidebar-section">
+            <span className="sidebar-section-title">🃏 Deck Editor</span>
+            <div className="deck-editor">
+              {(state.deck || []).map((card, idx) => (
+                <div key={`${card}-${idx}`} className="deck-chip">
+                  {card}
+                  <X size={12} className="deck-chip-remove" onClick={() => removeCard(idx)} />
+                </div>
+              ))}
+            </div>
+            <form onSubmit={handleAddCard} className="deck-add-form">
+              <input 
+                type="text" 
+                className="premium-input" 
+                placeholder="Card value..." 
+                value={newCardValue}
+                onChange={(e) => setNewCardValue(e.target.value)}
+                maxLength={10}
+              />
+              <button type="submit" className="premium-button">Add</button>
+            </form>
+            <div className="sidebar-actions sidebar-actions--wrap" style={{ marginTop: '0.75rem' }}>
+              <button onClick={() => actions?.setDeck(['0','1','2','3','5','8','13','21','?','☕'])} className="premium-button secondary sidebar-chip">Standard</button>
+              <button onClick={() => actions?.setDeck(['1','2','3','5','8','13','21','34','55','89'])} className="premium-button secondary sidebar-chip">Fibonacci</button>
+              <button onClick={() => actions?.setDeck(['XS','S','M','L','XL','XXL','?'])} className="premium-button secondary sidebar-chip">T-Shirt</button>
+            </div>
+          </div>
+
+        </div>
       )}
     </div>
   );

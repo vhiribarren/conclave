@@ -62,6 +62,7 @@ export type SocketMessage =
   | { type: 'RESET' }
   | { type: 'SET_TASK'; taskId: string }
   | { type: 'ADD_TASK'; name: string }
+  | { type: 'DELETE_TASK'; taskId: string }
   | { type: 'SET_DECK'; deck: string[] }
   | { type: 'SET_TIMER'; durationMs: number | null }
   | { type: 'TRANSFER_ADMIN'; targetUserId: string };

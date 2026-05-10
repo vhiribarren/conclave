@@ -478,7 +478,108 @@ h1, h2, h3, .poker-card, .premium-button {
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+/* Tabs */
+.admin-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-tab {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 0.5rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.admin-tab.active {
+  background: white;
+  color: var(--accent-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Deck Editor */
+.deck-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  border: 1px solid var(--surface-border);
+}
+
+.deck-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: white;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.deck-chip-remove {
+  cursor: pointer;
+  color: #ef4444;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.deck-chip-remove:hover {
+  opacity: 1;
+}
+
+.deck-add-form {
+  display: flex;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+/* Timer Custom */
+.timer-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.timer-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.timer-input-unit {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
 
 .sidebar-actions {
   display: flex;
@@ -915,6 +1016,27 @@ h1, h2, h3, .poker-card, .premium-button {
   color: var(--accent-hover);
   font-weight: 500;
 }
+.task-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.task-delete-btn {
+  padding: 0.2rem;
+  color: #ef4444;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 0.3rem;
+}
+.task-item:hover .task-delete-btn {
+  opacity: 0.6;
+}
+.task-delete-btn:hover {
+  opacity: 1 !important;
+  background: rgba(239, 68, 68, 0.1);
+}
+
 
 /* Timer Display */
 .timer-display {
