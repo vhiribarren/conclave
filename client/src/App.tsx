@@ -28,7 +28,7 @@ import Room from './views/Room';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <div>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/room/:roomId" element={<Room />} />
