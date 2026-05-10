@@ -38,6 +38,7 @@ export interface ConclaveActions {
   deleteTask: (taskId: string) => void;
   transferAdmin: (targetUserId: string) => void;
   updateUser: (name: string, mood: string) => void;
+  renameRoom: (name: string) => void;
   disconnect: () => void;
 }
 
@@ -112,6 +113,7 @@ export class ConclaveSocket {
       deleteTask: (taskId) => send({ type: 'DELETE_TASK', taskId }),
       transferAdmin: (targetUserId) => send({ type: 'TRANSFER_ADMIN', targetUserId }),
       updateUser: (name, mood) => send({ type: 'UPDATE_USER', name, mood }),
+      renameRoom: (name) => send({ type: 'RENAME_ROOM', name }),
       disconnect: () => ws.close(),
     };
   }

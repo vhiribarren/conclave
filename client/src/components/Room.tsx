@@ -23,7 +23,7 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronLeft, CircleDot, LayoutGrid, Copy, Check } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronLeft, CircleDot, LayoutGrid, Copy, Check, Edit2, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
@@ -64,7 +64,11 @@ const Room = () => {
     tasks: [],
     currentTaskId: null,
     deck: [],
-    timerEndAt: null
+    deckMode: 'preset',
+    timerEndAt: null,
+    timerPausedRemainingMs: null,
+    adminId: null,
+    unassociatedRound: { id: '', votes: {}, revealed: false }
   });
   const [myVote, setMyVote] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
@@ -77,6 +81,8 @@ const Room = () => {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('auto');
   const [showShareModal, setShowShareModal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [isEditingRoomName, setIsEditingRoomName] = useState(false);
+  const [tempRoomName, setTempRoomName] = useState('');
   const actionsRef = useRef<ConclaveActions | null>(null);
 
   useEffect(() => {
@@ -164,6 +170,19 @@ const Room = () => {
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
+  
+  const handleRenameRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (tempRoomName.trim() && actionsRef.current) {
+      actionsRef.current.renameRoom(tempRoomName.trim());
+      setIsEditingRoomName(false);
+    }
+  };
+
+  const startEditingRoomName = () => {
+    setTempRoomName(state.name || roomId || '');
+    setIsEditingRoomName(true);
+  };
 
 
   const renderOnboardingModal = () => (
@@ -239,7 +258,37 @@ const Room = () => {
         <div className="header-left">
           <div className="header-logo">C</div>
           <div>
-            <h1 className="header-title">{state.name || roomId}</h1>
+            {isEditingRoomName ? (
+              <form onSubmit={handleRenameRoom} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <input
+                  type="text"
+                  className="premium-input"
+                  style={{ padding: '0.15rem 0.5rem', fontSize: '0.9rem', height: 'auto', width: '180px' }}
+                  value={tempRoomName}
+                  onChange={(e) => setTempRoomName(e.target.value)}
+                  autoFocus
+                  onBlur={() => {
+                    // Small delay to allow clicking the save button
+                    setTimeout(() => setIsEditingRoomName(false), 200);
+                  }}
+                />
+                <button type="submit" className="icon-button success" title="Save">
+                  <Check size={14} />
+                </button>
+                <button type="button" className="icon-button danger" onClick={() => setIsEditingRoomName(false)} title="Cancel">
+                  <X size={14} />
+                </button>
+              </form>
+            ) : (
+              <div className="room-name-container" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h1 className="header-title">{state.name || roomId}</h1>
+                {isAdmin && (
+                  <button onClick={startEditingRoomName} className="icon-button-subtle rename-btn" title="Rename Room">
+                    <Edit2 size={12} />
+                  </button>
+                )}
+              </div>
+            )}
             <div className="header-subtitle">
               <span className="header-dot"></span>
               {state.participants.length} online

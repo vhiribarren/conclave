@@ -246,7 +246,7 @@ export class ConclaveRoom extends DurableObject {
         if (this.isAdmin(ws) && data.taskId) {
           this.state.tasks = this.state.tasks.filter(t => t.id !== data.taskId);
           if (this.state.currentTaskId === data.taskId) {
-            this.state.currentTaskId = this.state.tasks.length > 0 ? this.state.tasks[0].id : null;
+            this.state.currentTaskId = this.state.tasks.length > 0 ? this.state.tasks[0]?.id : null;
             this.state.timerEndAt = null;
           }
           this.broadcastState();
@@ -301,6 +301,13 @@ export class ConclaveRoom extends DurableObject {
           }
         }
         break;
+      
+      case "RENAME_ROOM":
+        if (this.isAdmin(ws) && data.name) {
+          this.state.name = data.name;
+          this.broadcastState();
+        }
+        break;
     }
     await this.ctx.storage.put("state", this.state);
   }
@@ -315,7 +322,7 @@ export class ConclaveRoom extends DurableObject {
     if (this.state.currentTaskId) {
       const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
       if (task && task.rounds.length > 0) {
-        currentRound = task.rounds[task.rounds.length - 1];
+        currentRound = task.rounds[task.rounds.length - 1] || null;
       }
     } else {
       currentRound = this.state.unassociatedRound;

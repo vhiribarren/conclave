@@ -388,6 +388,36 @@ h1, h2, h3, .poker-card, .premium-button {
 }
 .icon-button.accent { color: var(--accent-color); }
 .icon-button.danger { color: #ef4444; }
+.icon-button.success { color: #10b981; }
+
+.icon-button-subtle {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-secondary);
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-button-subtle:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--accent-color);
+}
+
+.room-name-container .rename-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.room-name-container:hover .rename-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 .room-layout {
   flex: 1;

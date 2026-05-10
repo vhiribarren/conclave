@@ -71,6 +71,7 @@ export type SocketMessage =
   | { type: 'SET_TIMER'; durationMs: number | null }
   | { type: 'PAUSE_TIMER' }
   | { type: 'RESUME_TIMER' }
-  | { type: 'TRANSFER_ADMIN'; targetUserId: string };
+  | { type: 'TRANSFER_ADMIN'; targetUserId: string }
+  | { type: 'RENAME_ROOM'; name: string };
 
 export * from './id';
