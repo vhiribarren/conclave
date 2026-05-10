@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { cloudflare } from "@cloudflare/vite-plugin"
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  define: {
-    'import.meta.env.VITE_WS_PORT': JSON.stringify('8787'),
-  },
+  plugins: [
+    react(),
+    cloudflare({configPath: "../server-cloudflare/wrangler.toml"}),
+  ],
 })

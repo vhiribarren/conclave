@@ -52,14 +52,8 @@ export class ConclaveSocket {
     onStateUpdate: (state: RoomState) => void,
     onError: (error: string) => void
   ): ConclaveActions {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.hostname;
-    const port = import.meta.env.VITE_WS_PORT || window.location.port;
 
-    const portSuffix = port ? `:${port}` : '';
-    const wsUrl = import.meta.env.PROD
-      ? `${protocol}//${host}/ws?roomId=${roomId}`
-      : `${protocol}//${host}${portSuffix}?roomId=${roomId}`;
+    const wsUrl = `ws?roomId=${roomId}`;
 
     const ws = new WebSocket(wsUrl);
 
@@ -75,6 +69,7 @@ export class ConclaveSocket {
     const handleError = (msg: string) => {
       if (!connected && !errorDispatched) {
         errorDispatched = true;
+        console.log(msg)
         onError(msg);
       }
     };

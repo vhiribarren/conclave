@@ -8,14 +8,17 @@
     "shared"
   ],
   "scripts": {
-    "dev:client": "npm run dev -w client",
-    "dev:server": "npm run dev -w server-cloudflare",
-    "build:client": "npm run build -w client",
-    "deploy:server": "npm run deploy -w server-cloudflare"
+    "dev": "npm run dev -w client",
+    "build": "npm run build -w client",
+    "preview": "npm run preview -w client",
+    "deploy": "npm run build -w client && wrangler deploy"
   },
   "author": "Vincent Hiribarren",
   "license": "MIT",
   "dependencies": {
     "nanoid": "^5.1.11"
+  },
+  "devDependencies": {
+    "wrangler": "^4.90.0"
   }
 }

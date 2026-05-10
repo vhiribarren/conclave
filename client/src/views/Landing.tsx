@@ -48,8 +48,7 @@ const Landing = () => {
     }
     try {
       setIsLoading(true);
-      const host = import.meta.env.PROD ? '' : `http://${window.location.hostname}:8787`;
-      const res = await fetch(`${host}/api/rooms/create`, {
+      const res = await fetch(`api/rooms/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: roomTitle }),
