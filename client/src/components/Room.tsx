@@ -23,7 +23,7 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronLeft, CircleDot, LayoutGrid } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronLeft, CircleDot, LayoutGrid, Copy, Check } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
@@ -75,6 +75,8 @@ const Room = () => {
   const [showEmojiPickerSettings, setShowEmojiPickerSettings] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('auto');
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   const actionsRef = useRef<ConclaveActions | null>(null);
 
   useEffect(() => {
@@ -126,7 +128,8 @@ const Room = () => {
   
   const handleCopyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Link copied to clipboard!');
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
   };
 
   const isAdmin = state.participants.find(p => p.isAdmin && p.name === name);
@@ -251,7 +254,7 @@ const Room = () => {
               <Smartphone size={18} />
             </button>
           )}
-          <button onClick={handleCopyLink} className="icon-button" title="Copy Link">
+          <button onClick={() => setShowShareModal(true)} className="icon-button" title="Share Room">
             <Share2 size={18} />
           </button>
           <button onClick={() => navigate('/')} className="icon-button danger" title="Leave">
@@ -401,6 +404,46 @@ const Room = () => {
             <button type="submit" className="premium-button">Update Profile</button>
           </form>
           <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">Cancel</button>
+        </div>
+      </div>
+    )}
+
+    {showShareModal && (
+      <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
+        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <h3 className="modal-title">Share Room</h3>
+          <p className="modal-subtitle">Invite others to join this session.</p>
+          
+          <div style={{display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', margin: '1rem 0'}}>
+            <div style={{background: 'white', padding: '1rem', borderRadius: '1rem'}} className="animate-fade-in">
+              <QRCodeSVG value={window.location.href} size={180} />
+            </div>
+
+            <div style={{width: '100%', textAlign: 'left'}}>
+              <span style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase'}}>Room ID</span>
+              <div className="premium-input" style={{marginTop: '0.25rem', background: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.9rem'}}>
+                {roomId}
+              </div>
+            </div>
+
+            <div style={{width: '100%', textAlign: 'left'}}>
+              <span style={{fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase'}}>Invite Link</span>
+              <div style={{display: 'flex', gap: '0.5rem', marginTop: '0.25rem'}}>
+                <input 
+                  type="text" 
+                  readOnly 
+                  value={window.location.href} 
+                  className="premium-input" 
+                  style={{fontSize: '0.85rem', flex: 1}}
+                />
+                <button onClick={handleCopyLink} className={`premium-button ${copySuccess ? 'success' : 'secondary'}`} style={{padding: '0.5rem 1rem', flexShrink: 0}}>
+                  {copySuccess ? <Check size={18} /> : <Copy size={18} />}
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <button onClick={() => setShowShareModal(false)} className="premium-button secondary">Close</button>
         </div>
       </div>
     )}

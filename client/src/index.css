@@ -78,17 +78,15 @@ h1, h2, h3, .poker-card, .premium-button {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  color: #ef4444;
 }
 
 .premium-button.secondary {
-  background: rgba(255,255,255,0.5);
+  background: rgba(0, 0, 0, 0.05);
   color: var(--text-primary);
-  border: 1px solid var(--surface-border);
-  box-shadow: var(--shadow-sm);
 }
-.premium-button.secondary:hover:not(:disabled) {
-  background: white;
-  color: var(--accent-color);
+.premium-button.secondary:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .premium-button.danger {
@@ -98,6 +96,12 @@ h1, h2, h3, .poker-card, .premium-button {
 .premium-button.danger:hover:not(:disabled) {
   background: #e11d48;
   box-shadow: 0 6px 16px rgba(244, 63, 94, 0.4);
+}
+
+.premium-button.success {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .premium-input {
