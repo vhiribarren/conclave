@@ -302,7 +302,7 @@ const Room = () => {
               )}
 
               {/* Mobile-only: voting cards sticky bottom */}
-              {!isRevealed && currentTask && (
+              {!isRevealed && currentTask && !isAdmin && (
                 <div className="voting-section glass mobile-voting">
                   <span className="voting-title">Pick a card</span>
                   <div className="voting-cards">

@@ -99,7 +99,7 @@ export const SidebarPanel: React.FC<Props> = ({
           )}
 
           {/* ── VOTING PHASE ───────────────────────────────────────── */}
-          {!isRevealed && (
+          {!isRevealed && !isAdmin && (
             <div className="sidebar-section">
               <span className="sidebar-section-title">🎴 Pick a card</span>
               {hasCurrentTask ? (
