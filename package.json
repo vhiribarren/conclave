@@ -11,7 +11,7 @@
     "dev": "npm run dev -w client",
     "build": "npm run build -w client",
     "preview": "npm run preview -w client",
-    "deploy": "npm run build -w client && wrangler deploy"
+    "deploy": "npm run build -w client && wrangler deploy --cwd client"
   },
   "author": "Vincent Hiribarren",
   "license": "MIT",
