@@ -380,8 +380,9 @@ const Room = () => {
 
               {/* Mobile-only: aggregation result below participants */}
               {isRevealed && (
-                <div className="aggregation-mobile">
-                  <AggregationResult participants={state.participants} />
+                <div className="sidebar-section animate-fade-in">
+                  <span className="sidebar-section-title">📊 Results</span>
+                  <AggregationResult participants={state.participants} deck={state.deck} />
                 </div>
               )}
 

@@ -180,7 +180,7 @@ export const SidebarPanel: React.FC<Props> = ({
               {isRevealed && (
                 <div className="sidebar-section animate-fade-in">
                   <span className="sidebar-section-title">📊 Results</span>
-                  <AggregationResult participants={state.participants} />
+                  <AggregationResult participants={state.participants} deck={state.deck} />
                 </div>
               )}
 

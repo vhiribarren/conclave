@@ -153,7 +153,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
 
           {isRevealed && (
             <div className="remote-box glass animate-fade-in">
-              <AggregationResult participants={state.participants} />
+              <AggregationResult participants={state.participants} deck={state.deck} />
             </div>
           )}
 
