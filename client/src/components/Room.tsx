@@ -118,6 +118,21 @@ const Room = () => {
     }
   }, [isJoined, roomId, name, mood]);
 
+  const isAdmin = state.participants.find(p => p.id === userId)?.isAdmin;
+
+  const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
+  const currentRound = currentTask 
+    ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
+    : state.unassociatedRound;
+  const isRevealed = currentRound?.revealed || false;
+
+  // Reset local vote when the round changes (e.g. admin reset)
+  useEffect(() => {
+    if (currentRound?.id) {
+      setMyVote(null);
+    }
+  }, [currentRound?.id]);
+
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
@@ -138,7 +153,6 @@ const Room = () => {
 
   const handleReveal = () => actionsRef.current?.reveal();
   const handleReset = () => {
-    setMyVote(null);
     actionsRef.current?.reset();
   };
 
@@ -150,13 +164,6 @@ const Room = () => {
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
-  const isAdmin = state.participants.find(p => p.isAdmin && p.name === name);
-
-  const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
-  const currentRound = currentTask 
-    ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
-    : state.unassociatedRound;
-  const isRevealed = currentRound?.revealed || false;
 
   const renderOnboardingModal = () => (
     <div className="modal-overlay">
@@ -287,7 +294,7 @@ const Room = () => {
         {isRemoteView && isAdmin && actionsRef.current ? (
           // ── Remote / mobile admin view ───────────────────────────────
           <main className="room-main">
-            <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} />
+            <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} onVote={handleVote} />
           </main>
         ) : (
           <>

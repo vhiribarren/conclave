@@ -2,14 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, RotateCw, GripVertical, Smile } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
+import { AggregationResult } from './AggregationResult';
 
 interface Props {
   state: RoomState;
   actions: ConclaveActions;
   myVote: string | null;
+  onVote: (card: string) => void;
 }
 
-export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
+export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote }) => {
   const [selectedDurationMs, setSelectedDurationMs] = useState(30000);
   const [newCardValue, setNewCardValue] = useState('');
   const [customTimerValue, setCustomTimerValue] = useState('30');
@@ -118,34 +120,42 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
             </div>
           </div>
 
-          <div className="remote-box glass">
-            <h3 className="remote-section-title">Timer</h3>
-            <div className="remote-actions">
-              {state.timerPausedRemainingMs !== null ? (
-                <button onClick={() => actions.resumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
-                  <Play size={16} /> Resume
-                </button>
-              ) : state.timerEndAt ? (
-                <button onClick={() => actions.pauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
-                  <Pause size={16} /> Pause
-                </button>
-              ) : (
-                <button onClick={() => actions.setTimer(selectedDurationMs)} className="premium-button secondary" style={{ flex: 1 }}>
-                  <Play size={16} /> Start ({selectedDurationMs / 1000}s)
-                </button>
-              )}
+          {!isRevealed && (
+            <div className="remote-box glass">
+              <h3 className="remote-section-title">Timer</h3>
+              <div className="remote-actions">
+                {state.timerPausedRemainingMs !== null ? (
+                  <button onClick={() => actions.resumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
+                    <Play size={16} /> Resume
+                  </button>
+                ) : state.timerEndAt ? (
+                  <button onClick={() => actions.pauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
+                    <Pause size={16} /> Pause
+                  </button>
+                ) : (
+                  <button onClick={() => actions.setTimer(selectedDurationMs)} className="premium-button secondary" style={{ flex: 1 }}>
+                    <Play size={16} /> Start ({selectedDurationMs / 1000}s)
+                  </button>
+                )}
 
-              {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                <button 
-                  onClick={() => actions.setTimer(null)}
-                  className="premium-button danger"
-                  title="Reset timer"
-                >
-                  <RotateCcw size={16} />
-                </button>
-              )}
+                {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
+                  <button 
+                    onClick={() => actions.setTimer(null)}
+                    className="premium-button danger"
+                    title="Reset timer"
+                  >
+                    <RotateCcw size={16} />
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
+          )}
+
+          {isRevealed && (
+            <div className="remote-box glass animate-fade-in">
+              <AggregationResult participants={state.participants} />
+            </div>
+          )}
 
           <div className="remote-box glass">
             <h3 className="remote-section-title">Current Task</h3>
@@ -170,7 +180,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote }) => {
                 {(state.deck || []).map((card) => (
                   <div
                     key={card}
-                    onClick={() => actions.vote(myVote === card ? null : card)}
+                    onClick={() => onVote(card)}
                     className={`poker-card small ${myVote === card ? 'selected' : ''}`}
                   >
                     {card}

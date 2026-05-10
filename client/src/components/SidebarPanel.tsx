@@ -135,12 +135,6 @@ export const SidebarPanel: React.FC<Props> = ({
       {activeTab === 'control' ? (
         <>
           {/* ── REVEALED PHASE ─────────────────────────────────────── */}
-          {isRevealed && (
-            <div className="sidebar-section">
-              <span className="sidebar-section-title">📊 Results</span>
-              <AggregationResult participants={state.participants} />
-            </div>
-          )}
 
           {/* ── VOTING PHASE ───────────────────────────────────────── */}
           {!isRevealed && !isAdmin && (
@@ -184,8 +178,16 @@ export const SidebarPanel: React.FC<Props> = ({
                 </div>
               </div>
 
-              <div className="sidebar-section">
-                <span className="sidebar-section-title">⏱ Timer</span>
+              {isRevealed && (
+                <div className="sidebar-section animate-fade-in">
+                  <span className="sidebar-section-title">📊 Results</span>
+                  <AggregationResult participants={state.participants} />
+                </div>
+              )}
+
+              {!isRevealed && (
+                <div className="sidebar-section">
+                  <span className="sidebar-section-title">⏱ Timer</span>
                 <div className="sidebar-actions">
                   {state.timerPausedRemainingMs !== null ? (
                     <button onClick={() => actions?.resumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
@@ -212,8 +214,9 @@ export const SidebarPanel: React.FC<Props> = ({
                   )}
                 </div>
               </div>
+            )}
 
-              <div className="sidebar-section">
+            <div className="sidebar-section">
                 <span className="sidebar-section-title">📋 Select Task</span>
                 <div className="task-list" style={{ maxHeight: '35vh' }}>
                   {state.tasks.map((task) => (

@@ -36,7 +36,7 @@ export class ConclaveRoom extends DurableObject {
     timerEndAt: null,
     timerPausedRemainingMs: null,
     adminId: null,
-    unassociatedRound: { id: 'unassociated', votes: {}, revealed: false },
+    unassociatedRound: { id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false },
   };
 
   constructor(ctx: DurableObjectState, env: any) {
@@ -210,7 +210,7 @@ export class ConclaveRoom extends DurableObject {
               task.rounds.push({ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false });
             }
           } else {
-            this.state.unassociatedRound = { id: 'unassociated', votes: {}, revealed: false };
+            this.state.unassociatedRound = { id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false };
           }
           this.state.timerEndAt = null;
           this.state.timerPausedRemainingMs = null;
