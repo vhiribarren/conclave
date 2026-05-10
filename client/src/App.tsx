@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Landing from './components/Landing';
-import Room from './components/Room';
+import Landing from './views/Landing';
+import Room from './views/Room';
 
 function App() {
   return (

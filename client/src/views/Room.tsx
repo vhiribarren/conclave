@@ -25,19 +25,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import Button from './Button';
-import PokerCard from './PokerCard';
+import Button from '../components/Button';
+import PokerCard from '../components/PokerCard';
 import './Room.css';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';
 import { getUserId, getUserName, setUserName, getUserEmoji, setUserEmoji } from '../services/user';
 import { addToHistory } from '../services/history';
-import { ParticipantsBoard, type LayoutMode } from './ParticipantsBoard';
-import { AggregationResult } from './AggregationResult';
-import { TimerDisplay } from './TimerDisplay';
-import { AdminRemote } from './AdminRemote';
-import { SidebarPanel } from './SidebarPanel';
+import { ParticipantsBoard, type LayoutMode } from '../components/ParticipantsBoard';
+import { AggregationResult } from '../components/AggregationResult';
+import { TimerDisplay } from '../components/TimerDisplay';
+import { AdminRemote } from '../components/AdminRemote';
+import { SidebarPanel } from '../components/SidebarPanel';
 import { settings } from '../services/settings';
 
 

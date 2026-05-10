@@ -1,0 +1,60 @@
+.premium-button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px var(--accent-glow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.premium-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--accent-glow);
+}
+
+.premium-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.premium-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: #ef4444;
+}
+
+.premium-button.secondary {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.premium-button.secondary:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.premium-button.danger {
+  background: #f43f5e;
+  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
+}
+
+.premium-button.danger:hover:not(:disabled) {
+  background: #e11d48;
+  box-shadow: 0 6px 16px rgba(244, 63, 94, 0.4);
+}
+
+.premium-button.success {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}

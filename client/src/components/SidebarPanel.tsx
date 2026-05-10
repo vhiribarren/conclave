@@ -7,6 +7,7 @@ import React, { useState, useRef } from 'react';
 import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, Pause, RotateCw, GripVertical, Smile } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
+import PokerCard from './PokerCard';
 import { AggregationResult } from './AggregationResult';
 import './SidebarPanel.css';
 import { settings } from '../services/settings';
@@ -142,13 +143,12 @@ export const SidebarPanel: React.FC<Props> = ({
               <span className="sidebar-section-title">🎴 Pick a card</span>
               <div className="sidebar-cards">
                 {(state.deck || []).map((card) => (
-                  <div
+                  <PokerCard
                     key={card}
+                    value={card}
+                    selected={myVote === card}
                     onClick={() => onVote(card)}
-                    className={`poker-card ${myVote === card ? 'selected' : ''}`}
-                  >
-                    {card}
-                  </div>
+                  />
                 ))}
               </div>
             </div>

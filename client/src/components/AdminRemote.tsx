@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Eye, RotateCcw, Plus, Settings, Play, Pause, X, Trash2, Layout, RotateCw, GripVertical, Smile } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
+import Button from './Button';
+import PokerCard from './PokerCard';
 import './AdminRemote.css';
 import { AggregationResult } from './AggregationResult';
 import { settings } from '../services/settings';
@@ -113,12 +115,12 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
           <div className="remote-box glass">
             <h2 className="remote-title">Actions</h2>
             <div className="remote-actions">
-              <button onClick={() => actions.adminReveal()} disabled={isRevealed} className="premium-button">
+              <Button onClick={() => actions.adminReveal()} disabled={isRevealed}>
                 <Eye size={16} /> Reveal
-              </button>
-              <button onClick={() => actions.adminReset()} className="premium-button secondary">
+              </Button>
+              <Button onClick={() => actions.adminReset()} variant="secondary">
                 <RotateCcw size={16} /> Reset
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -127,27 +129,27 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
               <h3 className="remote-section-title">Timer</h3>
               <div className="remote-actions">
                 {state.timerPausedRemainingMs !== null ? (
-                  <button onClick={() => actions.adminResumeTimer()} className="premium-button accent" style={{ flex: 1 }}>
+                  <Button onClick={() => actions.adminResumeTimer()} style={{ flex: 1 }}>
                     <Play size={16} /> Resume
-                  </button>
+                  </Button>
                 ) : state.timerEndAt ? (
-                  <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" style={{ flex: 1 }}>
+                  <Button onClick={() => actions.adminPauseTimer()} variant="secondary" style={{ flex: 1 }}>
                     <Pause size={16} /> Pause
-                  </button>
+                  </Button>
                 ) : (
-                  <button onClick={() => actions.adminSetTimer(selectedDurationMs)} className="premium-button secondary" style={{ flex: 1 }}>
+                  <Button onClick={() => actions.adminSetTimer(selectedDurationMs)} variant="secondary" style={{ flex: 1 }}>
                     <Play size={16} /> Start ({selectedDurationMs / 1000}s)
-                  </button>
+                  </Button>
                 )}
 
                 {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                  <button
+                  <Button
                     onClick={() => actions.adminSetTimer(null)}
-                    className="premium-button danger"
+                    variant="danger"
                     title="Reset timer"
                   >
                     <RotateCcw size={16} />
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -180,13 +182,13 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
               <h3 className="remote-section-title" style={{ textAlign: 'center' }}>Your Secret Vote</h3>
               <div className="voting-cards">
                 {(state.deck || []).map((card) => (
-                  <div
+                  <PokerCard
                     key={card}
+                    value={card}
+                    selected={myVote === card}
+                    small
                     onClick={() => onVote(card)}
-                    className={`poker-card small ${myVote === card ? 'selected' : ''}`}
-                  >
-                    {card}
-                  </div>
+                  />
                 ))}
               </div>
             </div>
@@ -200,14 +202,15 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
             <h3 className="remote-section-title">Timer Duration</h3>
             <div className="remote-actions" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
               {[15, 30, 45, 60].map(s => (
-                <button
+                <Button
                   key={s}
                   onClick={() => { setSelectedDurationMs(s * 1000); setCustomTimerValue(s.toString()); }}
-                  className={`premium-button ${selectedDurationMs === s * 1000 ? 'accent' : 'secondary'} sidebar-chip`}
+                  variant={selectedDurationMs === s * 1000 ? 'primary' : 'secondary'}
+                  className="sidebar-chip"
                   style={{ padding: '0.4rem 0.8rem', minWidth: '3.5rem' }}
                 >
                   {s >= 60 ? `${s / 60}m` : `${s}s`}
-                </button>
+                </Button>
               ))}
             </div>
             <div className="timer-custom-row">
@@ -238,7 +241,7 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
                 placeholder="New task..."
                 className="premium-input"
               />
-              <button type="submit" className="premium-button"><Plus size={16} /></button>
+              <Button type="submit"><Plus size={16} /></Button>
             </form>
             <div className="task-list" style={{ marginTop: '0.5rem' }}>
               {state.tasks.map(task => (
@@ -287,16 +290,16 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
                       maxLength={10}
                       style={{ flex: 1 }}
                     />
-                    <button
+                    <Button
                       type="button"
-                      className="premium-button secondary"
+                      variant="secondary"
                       style={{ padding: '0 0.5rem' }}
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
                       <Smile size={20} />
-                    </button>
+                    </Button>
                   </div>
-                  <button type="submit" className="premium-button">Add</button>
+                  <Button type="submit">Add</Button>
                 </form>
 
                 {showEmojiPicker && (
@@ -317,29 +320,30 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
             ) : (
               <div className="animate-fade-in" style={{ textAlign: 'center', padding: '0.75rem', background: 'rgba(0,0,0,0.03)', borderRadius: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                 <span>Preset is read-only.</span>
-                <button
+                <Button
                   onClick={() => {
                     updateDeck(state.deck || [], 'custom');
                   }}
-                  className="premium-button secondary sidebar-chip"
+                  variant="secondary"
+                  className="sidebar-chip"
                   style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '0.8rem' }}
                 >
                   Customize
-                </button>
+                </Button>
               </div>
             )}
 
             <div className="remote-actions" style={{ flexWrap: 'wrap', marginTop: '0.75rem', gap: '0.5rem' }}>
-              <button onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'accent' : 'secondary'}`}>Standard</button>
-              <button onClick={() => updateDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'accent' : 'secondary'}`}>Fibonacci</button>
-              <button onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'], 'preset')} className={`premium-button sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'accent' : 'secondary'}`}>T-Shirt</button>
-              <button
+              <Button onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'], 'preset')} className={`sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '0' ? '' : 'secondary'}`}>Standard</Button>
+              <Button onClick={() => updateDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'], 'preset')} className={`sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === '1' ? '' : 'secondary'}`}>Fibonacci</Button>
+              <Button onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'], 'preset')} className={`sidebar-chip ${state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? '' : 'secondary'}`}>T-Shirt</Button>
+              <Button
                 onClick={() => updateDeck(savedCustomDeck, 'custom')}
-                className={`premium-button sidebar-chip ${state.deckMode === 'custom' ? 'accent' : 'secondary'}`}
+                className={`sidebar-chip ${state.deckMode === 'custom' ? '' : 'secondary'}`}
                 title="Use your custom deck"
               >
                 <RotateCw size={14} /> Custom
-              </button>
+              </Button>
             </div>
           </div>
 
