@@ -382,8 +382,6 @@ const Room = () => {
                     isAdmin={!!isAdmin}
                     myVote={myVote}
                     onVote={handleVote}
-                    isRevealed={isRevealed}
-                    hasCurrentTask={!!currentTask}
                     roomId={roomId}
                   />
                 )}
