@@ -427,21 +427,21 @@ export const AdminPanel: React.FC<Props> = ({
 
             <div className="panel-actions panel-actions--wrap" style={{ marginTop: '0.75rem' }}>
               <Button
-                onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'], 'preset')}
+                onClick={() => updateDeck(['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'], 'preset')}
                 variant={state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'primary' : 'secondary'}
                 className="sidebar-chip"
               >
                 Standard
               </Button>
               <Button
-                onClick={() => updateDeck(['1', '2', '3', '5', '8', '13', '21', '34', '55', '89'], 'preset')}
+                onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'], 'preset')}
                 variant={state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'primary' : 'secondary'}
                 className="sidebar-chip"
               >
                 Fibonacci
               </Button>
               <Button
-                onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?'], 'preset')}
+                onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕'], 'preset')}
                 variant={state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'primary' : 'secondary'}
                 className="sidebar-chip"
               >
