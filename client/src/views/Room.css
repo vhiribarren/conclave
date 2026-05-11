@@ -340,13 +340,12 @@
 }
 .layout-toggle-container {
   display: flex;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(8px);
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.2rem;
+  border-radius: 0.6rem;
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--surface-border);
-  box-shadow: var(--shadow-sm);
   align-self: flex-end;
   margin-right: 0;
 }
@@ -354,26 +353,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.4rem;
   border: none;
   background: transparent;
   cursor: pointer;
   color: var(--text-secondary);
   transition: var(--transition);
+  opacity: 0.4;
+  line-height: 1;
 }
-.layout-toggle-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.6);
-  color: var(--text-primary);
+.layout-toggle-btn:hover:not(:disabled):not(.active) {
+  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.5);
 }
 .layout-toggle-btn.active {
-  background: white;
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.7);
   color: var(--accent-color);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 .layout-toggle-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.2;
   cursor: not-allowed;
 }
 .task-section {
@@ -587,11 +588,13 @@
   }
 
   .voting-section {
-    margin: 0 -0.75rem;
+    margin: 0;
     border-radius: 1rem 1rem 0 0;
-    padding: 1rem;
+    padding: 0.75rem;
     bottom: 0;
     position: sticky;
+    max-width: none;
+    width: 100%;
   }
 
   .voting-cards {
