@@ -24,8 +24,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
 import { AdminPanel } from '../components/AdminPanel';
+import { LanguageSelector } from '../components/LanguageSelector';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import './Room.css';
 import './RoomRemote.css';
@@ -33,6 +35,7 @@ import './RoomRemote.css';
 const RoomRemote = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     actions,
     actionsRef,
@@ -70,9 +73,9 @@ const RoomRemote = () => {
     return (
       <div className="page-container animate-fade-in">
         <div className="landing-card glass" style={{ textAlign: 'center' }}>
-          <h2 className="modal-title" style={{ color: 'var(--danger-color)' }}>Room Not Found</h2>
+          <h2 className="modal-title" style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</h2>
           <p className="modal-subtitle">{connectionError}</p>
-          <Button onClick={() => navigate('/')}>Return Home</Button>
+          <Button onClick={() => navigate('/')}>{t('common.returnHome')}</Button>
         </div>
       </div>
     );
@@ -83,18 +86,18 @@ const RoomRemote = () => {
       {!isJoined && (
         <div className="modal-overlay">
           <div className="modal-content glass animate-fade-in">
-            <h2 className="modal-title">Join Room</h2>
-            <p className="modal-subtitle">Enter your name to start.</p>
+            <h2 className="modal-title">{t('room.joinTitle')}</h2>
+            <p className="modal-subtitle">{t('room.joinSubtitleRemote')}</p>
             <form onSubmit={handleJoin} className="landing-form">
               <input
                 type="text"
-                placeholder="Your Name"
+                placeholder={t('room.yourName')}
                 className="premium-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoFocus
               />
-              <Button type="submit">Enter Room</Button>
+              <Button type="submit">{t('common.enterRoom')}</Button>
             </form>
           </div>
         </div>
@@ -107,12 +110,13 @@ const RoomRemote = () => {
               <h1 className="header-title">{state.name || roomId}</h1>
               <div className="header-subtitle">
                 <span className="header-dot"></span>
-                {state.participants.length} online · Remote
+                {state.participants.length} {t('common.online')} · {t('common.remote')}
               </div>
             </div>
           </div>
           <div className="header-actions">
-            <button onClick={() => navigate(`/room/${roomId}`)} className="icon-button danger" title="Leave Remote">
+            <LanguageSelector />
+            <button onClick={() => navigate(`/room/${roomId}`)} className="icon-button danger" title={t('room.leaveRemote')}>
               <LogOut size={18} />
             </button>
           </div>
@@ -128,7 +132,7 @@ const RoomRemote = () => {
             {!isAdmin && (
               <div className="page-container">
                 <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  Remote control is only available for admins.
+                  {t('room.remoteAdminOnly')}
                 </p>
               </div>
             )}

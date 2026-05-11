@@ -24,6 +24,7 @@
 import React, { useState, useRef } from 'react';
 import { Eye, RotateCcw, Settings, Play, Pause, X, Layout, RotateCw, GripVertical, Smile, ListChecks } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import Button from './Button';
@@ -54,6 +55,7 @@ export const AdminPanel: React.FC<Props> = ({
   layout = 'sidebar',
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [selectedDurationMs, setSelectedDurationMs] = useState(30000);
   const [customTimerValue, setCustomTimerValue] = useState('30');
   const [newCardValue, setNewCardValue] = useState('');
@@ -145,13 +147,13 @@ export const AdminPanel: React.FC<Props> = ({
             className={`admin-tab ${activeTab === 'control' ? 'active' : ''}`}
             onClick={() => setActiveTab('control')}
           >
-            <Layout size={14} /> Control
+            <Layout size={14} /> {t('admin.control')}
           </button>
           <button
             className={`admin-tab ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
-            <Settings size={14} /> Settings
+            <Settings size={14} /> {t('admin.settings')}
           </button>
         </div>
       )}
@@ -161,7 +163,7 @@ export const AdminPanel: React.FC<Props> = ({
           {/* ── Non-admin: pick a card ─────────────────────────────── */}
           {!isRevealed && !isAdmin && (
             <Section>
-              <SectionTitle>🎴 Pick a card</SectionTitle>
+              <SectionTitle>🎴 {t('room.pickACard')}</SectionTitle>
               <div className="sidebar-cards">
                 {(state.deck || []).map((card) => (
                   <PokerCard
@@ -178,9 +180,9 @@ export const AdminPanel: React.FC<Props> = ({
           {/* ── Non-admin: tasks link ──────────────────────────────── */}
           {!isAdmin && roomId && (
             <Section>
-              <SectionTitle>📋 Tasks</SectionTitle>
+              <SectionTitle>📋 {t('tasks.title')}</SectionTitle>
               <Button onClick={() => navigate(`/room/${roomId}/tasks`)} variant="secondary">
-                <ListChecks size={15} /> View tasks
+                <ListChecks size={15} /> {t('room.viewTasks')}
               </Button>
             </Section>
           )}
@@ -189,14 +191,14 @@ export const AdminPanel: React.FC<Props> = ({
           {isAdmin && (
             <>
               <Section glass>
-                {layout === 'remote' && <h2 className="panel-section-title" style={{ color: 'var(--accent-color)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.875rem' }}>Actions</h2>}
-                {layout === 'sidebar' && <SectionTitle>⚡ Actions</SectionTitle>}
+                {layout === 'remote' && <h2 className="panel-section-title" style={{ color: 'var(--accent-color)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.875rem' }}>{t('admin.actions')}</h2>}
+                {layout === 'sidebar' && <SectionTitle>⚡ {t('admin.actions')}</SectionTitle>}
                 <div className="panel-actions">
                   <Button onClick={() => actions.adminReveal()} disabled={isRevealed} style={{ flex: 1 }}>
-                    <Eye size={15} /> Reveal
+                    <Eye size={15} /> {t('room.reveal')}
                   </Button>
                   <Button onClick={() => actions.adminReset()} variant="secondary">
-                    <RotateCcw size={15} /> Reset
+                    <RotateCcw size={15} /> {t('room.reset')}
                   </Button>
                 </div>
               </Section>
@@ -204,7 +206,7 @@ export const AdminPanel: React.FC<Props> = ({
               {/* ── Results (revealed) ──────────────────────────────── */}
               {isRevealed && (
                 <Section glass>
-                  {layout === 'sidebar' && <SectionTitle>📊 Results</SectionTitle>}
+                  {layout === 'sidebar' && <SectionTitle>📊 {t('room.results')}</SectionTitle>}
                   <AggregationResult participants={state.participants} deck={state.deck} />
                 </Section>
               )}
@@ -212,19 +214,19 @@ export const AdminPanel: React.FC<Props> = ({
               {/* ── Timer (voting phase) ────────────────────────────── */}
               {!isRevealed && (
                 <Section glass>
-                  <SectionTitle>{layout === 'sidebar' ? '⏱ Timer' : 'Timer'}</SectionTitle>
+                  <SectionTitle>{layout === 'sidebar' ? `⏱ ${t('admin.timer')}` : t('admin.timer')}</SectionTitle>
                   <div className="panel-actions">
                     {state.timerPausedRemainingMs !== null ? (
                       <Button onClick={() => actions.adminResumeTimer()} style={{ flex: 1 }}>
-                        <Play size={15} /> Resume
+                        <Play size={15} /> {t('admin.resume')}
                       </Button>
                     ) : state.timerEndAt ? (
                       <Button onClick={() => actions.adminPauseTimer()} variant="secondary" style={{ flex: 1 }}>
-                        <Pause size={15} /> Pause
+                        <Pause size={15} /> {t('admin.pause')}
                       </Button>
                     ) : (
                       <Button onClick={() => actions.adminSetTimer(selectedDurationMs)} variant="secondary" style={{ flex: 1 }}>
-                        <Play size={15} /> Start ({selectedDurationMs / 1000}s)
+                        <Play size={15} /> {t('admin.start')} ({selectedDurationMs / 1000}s)
                       </Button>
                     )}
                     {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
@@ -238,14 +240,14 @@ export const AdminPanel: React.FC<Props> = ({
 
               {/* ── Current task ────────────────────────────────────── */}
               <Section glass>
-                <SectionTitle>{layout === 'sidebar' ? '📋 Select Task' : 'Current Task'}</SectionTitle>
+                <SectionTitle>{layout === 'sidebar' ? `📋 ${t('admin.selectTask')}` : t('room.currentTask')}</SectionTitle>
                 <div className="vote-mode-switch" role="group" aria-label="Vote mode">
                   <button
                     type="button"
                     className={state.currentTaskId === null ? 'active' : ''}
                     onClick={() => actions.adminSetTask(null)}
                   >
-                    Adhoc vote
+                    {t('admin.adhocVote')}
                   </button>
                   <button
                     type="button"
@@ -257,25 +259,25 @@ export const AdminPanel: React.FC<Props> = ({
                     }}
                     disabled={state.tasks.length === 0}
                   >
-                    Task vote
+                    {t('admin.taskVote')}
                   </button>
                 </div>
                 {state.currentTaskId !== null && (
                   <>
                     <div className="panel-current-task">
-                      <span>{currentTask?.name || 'Task vote'}</span>
+                      <span>{currentTask?.name || t('admin.taskVote')}</span>
                       <small>
                         {currentTask
-                          ? `${currentTask.rounds.length} ${currentTask.rounds.length === 1 ? 'round' : 'rounds'}`
-                          : 'No task selected'}
+                          ? t('admin.round', { count: currentTask.rounds.length })
+                          : t('admin.noTaskSelected')}
                       </small>
                     </div>
                     <div className="panel-actions task-session-actions">
                       <Button onClick={() => nextTask && actions.adminSetTask(nextTask.id)} disabled={!nextTask}>
-                        Next task
+                        {t('admin.nextTask')}
                       </Button>
                       <Button onClick={() => setShowTaskSelector(true)} variant="secondary">
-                        <ListChecks size={15} /> Select task
+                        <ListChecks size={15} /> {t('admin.selectTaskBtn')}
                       </Button>
                     </div>
                   </>
@@ -285,7 +287,7 @@ export const AdminPanel: React.FC<Props> = ({
               {/* ── Admin secret vote (remote layout only) ──────────── */}
               {!isRevealed && layout === 'remote' && (
                 <Section glass>
-                  <SectionTitle style={{ textAlign: 'center' }}>Your Secret Vote</SectionTitle>
+                  <SectionTitle style={{ textAlign: 'center' }}>{t('admin.yourSecretVote')}</SectionTitle>
                   <div className="voting-cards">
                     {(state.deck || []).map((card) => (
                       <PokerCard
@@ -309,16 +311,16 @@ export const AdminPanel: React.FC<Props> = ({
           {/* ── Tasks setup ─────────────────────────────────────────── */}
           {roomId && (
             <Section glass>
-              <SectionTitle>📋 Tasks Setup</SectionTitle>
+              <SectionTitle>📋 {t('settings.tasksSetup')}</SectionTitle>
               <Button onClick={() => navigate(`/room/${roomId}/tasks`)} variant="secondary">
-                <ListChecks size={15} /> Manage tasks
+                <ListChecks size={15} /> {t('settings.manageTasks')}
               </Button>
             </Section>
           )}
 
           {/* ── Timer duration ──────────────────────────────────────── */}
           <Section glass>
-            <SectionTitle>⏱ Timer Duration</SectionTitle>
+            <SectionTitle>⏱ {t('settings.timerDuration')}</SectionTitle>
             <div className="panel-actions panel-actions--wrap">
               {[15, 30, 45, 60].map(s => (
                 <Button
@@ -351,7 +353,7 @@ export const AdminPanel: React.FC<Props> = ({
 
           {/* ── Deck editor ─────────────────────────────────────────── */}
           <Section glass>
-            <SectionTitle>🃏 Deck Editor</SectionTitle>
+            <SectionTitle>🃏 {t('settings.deckEditor')}</SectionTitle>
             <div className="deck-editor" onDragOver={(e) => e.preventDefault()}>
               {(state.deck || []).map((card, idx) => {
                 const isCustom = state.deckMode === 'custom';
@@ -379,7 +381,7 @@ export const AdminPanel: React.FC<Props> = ({
                     <input
                       type="text"
                       className="premium-input"
-                      placeholder="Card value..."
+                      placeholder={t('settings.cardPlaceholder')}
                       value={newCardValue}
                       onChange={(e) => setNewCardValue(e.target.value)}
                       maxLength={10}
@@ -394,7 +396,7 @@ export const AdminPanel: React.FC<Props> = ({
                       <Smile size={18} />
                     </Button>
                   </div>
-                  <Button type="submit">Add</Button>
+                  <Button type="submit">{t('settings.add')}</Button>
                 </form>
 
                 {showEmojiPicker && (
@@ -414,14 +416,14 @@ export const AdminPanel: React.FC<Props> = ({
               </div>
             ) : (
               <div className="animate-fade-in" style={{ textAlign: 'center', padding: '0.5rem', background: 'rgba(0,0,0,0.03)', borderRadius: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                <span>This preset is read-only.</span>
+                <span>{t('settings.readOnly')}</span>
                 <Button
                   onClick={() => setShowCustomizeConfirm(true)}
                   variant="secondary"
                   className="sidebar-chip"
                   style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}
                 >
-                  Customize
+                  {t('settings.customize')}
                 </Button>
               </div>
             )}
@@ -432,21 +434,21 @@ export const AdminPanel: React.FC<Props> = ({
                 variant={state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'primary' : 'secondary'}
                 className="sidebar-chip"
               >
-                Standard
+                {t('settings.standard')}
               </Button>
               <Button
                 onClick={() => updateDeck(['0', '1', '2', '3', '5', '8', '13', '21', '34', '55', '89', '?', '☕'], 'preset')}
                 variant={state.deckMode === 'preset' && state.deck?.[0] === '1' ? 'primary' : 'secondary'}
                 className="sidebar-chip"
               >
-                Fibonacci
+                {t('settings.fibonacci')}
               </Button>
               <Button
                 onClick={() => updateDeck(['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕'], 'preset')}
                 variant={state.deckMode === 'preset' && state.deck?.[0] === 'XS' ? 'primary' : 'secondary'}
                 className="sidebar-chip"
               >
-                T-Shirt
+                {t('settings.tshirt')}
               </Button>
               <Button
                 onClick={() => updateDeck(savedCustomDeck, 'custom')}
@@ -454,7 +456,7 @@ export const AdminPanel: React.FC<Props> = ({
                 className="sidebar-chip"
                 title="Use your custom deck"
               >
-                <RotateCw size={13} /> Custom
+                <RotateCw size={13} /> {t('settings.custom')}
               </Button>
             </div>
           </Section>
@@ -464,13 +466,13 @@ export const AdminPanel: React.FC<Props> = ({
       {showCustomizeConfirm && (
         <div className="modal-overlay" onClick={() => setShowCustomizeConfirm(false)}>
           <div className="modal-content glass animate-fade-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '24rem' }}>
-            <h2 className="modal-title">Customize deck?</h2>
+            <h2 className="modal-title">{t('settings.customizeModal.title')}</h2>
             <p className="modal-subtitle">
-              This will replace your previously saved custom deck with the current preset cards.
+              {t('settings.customizeModal.subtitle')}
             </p>
             <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <Button variant="secondary" onClick={() => setShowCustomizeConfirm(false)}>Cancel</Button>
-              <Button onClick={() => { updateDeck(state.deck || [], 'custom'); setShowCustomizeConfirm(false); }}>Confirm</Button>
+              <Button variant="secondary" onClick={() => setShowCustomizeConfirm(false)}>{t('common.cancel')}</Button>
+              <Button onClick={() => { updateDeck(state.deck || [], 'custom'); setShowCustomizeConfirm(false); }}>{t('common.confirm')}</Button>
             </div>
           </div>
         </div>

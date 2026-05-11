@@ -8,15 +8,18 @@
     "shared"
   ],
   "scripts": {
-    "dev": "npm run dev -w client",
-    "build": "npm run build -w client",
-    "preview": "npm run preview -w client",
-    "deploy": "npm run build -w client && wrangler deploy --cwd client"
+    "dev": "npm run dev -w conclave-client",
+    "build": "npm run build -w conclave-client",
+    "preview": "npm run preview -w conclave-client",
+    "deploy": "npm run build -w conclave-client && wrangler deploy --cwd client"
   },
   "author": "Vincent Hiribarren",
   "license": "MIT",
   "dependencies": {
-    "nanoid": "^5.1.11"
+    "i18next": "^26.1.0",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "nanoid": "^5.1.11",
+    "react-i18next": "^17.0.7"
   },
   "devDependencies": {
     "wrangler": "^4.90.0"

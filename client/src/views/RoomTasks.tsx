@@ -24,8 +24,10 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, Edit2, ListChecks, Plus, Trash2, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import type { Round, Task } from 'conclave-shared';
 import Button from '../components/Button';
+import { LanguageSelector } from '../components/LanguageSelector';
 import { setUserEmoji, setUserName } from '../services/user';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import './RoomTasks.css';
@@ -54,6 +56,7 @@ const getRoundLabel = (task: Task, round: Round) => {
 const RoomTasks = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     actions,
     connectionError,
@@ -119,14 +122,14 @@ const RoomTasks = () => {
       return (
         <div className="tasks-round-state">
           <span className="tasks-status-dot" />
-          Voting in progress
+          {t('tasks.votingInProgress')}
           <strong>{totalVotes}</strong>
         </div>
       );
     }
 
     if (summary.length === 0) {
-      return <p className="tasks-empty">No votes were cast in this round.</p>;
+      return <p className="tasks-empty">{t('tasks.noVotesCast')}</p>;
     }
 
     return (
@@ -151,9 +154,9 @@ const RoomTasks = () => {
     return (
       <div className="page-container animate-fade-in">
         <div className="tasks-error glass">
-          <h2>Room Not Found</h2>
+          <h2>{t('room.roomNotFound')}</h2>
           <p>{connectionError}</p>
-          <Button onClick={() => navigate('/')}>Return Home</Button>
+          <Button onClick={() => navigate('/')}>{t('common.returnHome')}</Button>
         </div>
       </div>
     );
@@ -164,12 +167,12 @@ const RoomTasks = () => {
       {!isJoined && (
         <div className="modal-overlay">
           <div className="modal-content glass animate-fade-in">
-            <h2 className="modal-title">Join Room</h2>
-            <p className="modal-subtitle">Enter your name to view this room.</p>
+            <h2 className="modal-title">{t('room.joinTitle')}</h2>
+            <p className="modal-subtitle">{t('room.joinSubtitleTasks')}</p>
             <form onSubmit={handleJoin} className="landing-form">
               <input
                 type="text"
-                placeholder="Your Name"
+                placeholder={t('room.yourName')}
                 className="premium-input"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -183,7 +186,7 @@ const RoomTasks = () => {
                 onChange={(event) => setMood(event.target.value)}
                 maxLength={4}
               />
-              <Button type="submit">Enter Room</Button>
+              <Button type="submit">{t('common.enterRoom')}</Button>
             </form>
           </div>
         </div>
@@ -194,13 +197,14 @@ const RoomTasks = () => {
           <div className="tasks-header-title">
             <div className="header-logo">C</div>
             <div>
-              <h1>Tasks</h1>
+              <h1>{t('tasks.title')}</h1>
               <p>{state.name || roomId}</p>
             </div>
           </div>
           <div className="tasks-header-actions">
+            <LanguageSelector />
             <button onClick={() => navigate(`/room/${roomId}`)} className="premium-button secondary">
-              <ArrowLeft size={16} /> Back to room
+              <ArrowLeft size={16} /> {t('tasks.backToRoom')}
             </button>
           </div>
         </header>
@@ -209,8 +213,8 @@ const RoomTasks = () => {
           <section className="tasks-list-panel glass">
             <div className="tasks-panel-heading">
               <div>
-                <span className="tasks-kicker">{isAdmin ? 'Room backlog' : 'Room tasks'}</span>
-                <h2>{state.tasks.length} tasks</h2>
+                <span className="tasks-kicker">{isAdmin ? t('tasks.roomBacklog') : t('tasks.roomTasks')}</span>
+                <h2>{t('tasks.taskCount', { count: state.tasks.length })}</h2>
               </div>
             </div>
 
@@ -220,7 +224,7 @@ const RoomTasks = () => {
                   type="text"
                   value={newTaskName}
                   onChange={(event) => setNewTaskName(event.target.value)}
-                  placeholder="Add a task..."
+                  placeholder={t('tasks.addPlaceholder')}
                   className="premium-input"
                 />
                 <button type="submit" className="premium-button" disabled={!newTaskName.trim()}>
@@ -244,11 +248,11 @@ const RoomTasks = () => {
                     <div className="tasks-list-main">
                       <span className="tasks-list-name">{task.name}</span>
                       <span className="tasks-list-meta">
-                        {task.rounds.length} {task.rounds.length === 1 ? 'round' : 'rounds'}
-                        {lastRound?.revealed ? ' · revealed' : ' · open'}
+                        {t('tasks.round', { count: task.rounds.length })}
+                        {lastRound?.revealed ? ` · ${t('tasks.revealed').toLowerCase()}` : ` · ${t('tasks.open').toLowerCase()}`}
                       </span>
                     </div>
-                    {isCurrent && <span className="tasks-current-badge">Current</span>}
+                    {isCurrent && <span className="tasks-current-badge">{t('tasks.current')}</span>}
                   </article>
                 );
               })}
@@ -256,7 +260,7 @@ const RoomTasks = () => {
               {state.tasks.length === 0 && (
                 <div className="tasks-empty-state">
                   <ListChecks size={28} />
-                  <p>No task yet.</p>
+                  <p>{t('tasks.noTaskYet')}</p>
                 </div>
               )}
             </div>
@@ -267,7 +271,7 @@ const RoomTasks = () => {
               <>
                 <div className="tasks-detail-header">
                   <div>
-                    <span className="tasks-kicker">Selected task</span>
+                    <span className="tasks-kicker">{t('tasks.selectedTask')}</span>
                     {editingTaskId === selectedTask.id ? (
                       <form onSubmit={saveRename} className="tasks-rename-form">
                         <input
@@ -294,12 +298,12 @@ const RoomTasks = () => {
                         onClick={() => actions?.adminSetTask(state.currentTaskId === selectedTask.id ? null : selectedTask.id)}
                         className="premium-button"
                       >
-                        {state.currentTaskId === selectedTask.id ? 'Unselect' : 'Select'}
+                        {state.currentTaskId === selectedTask.id ? t('tasks.unselect') : t('tasks.select')}
                       </button>
-                      <button onClick={() => startRename(selectedTask)} className="icon-button" title="Rename task">
+                      <button onClick={() => startRename(selectedTask)} className="icon-button" title={t('tasks.renameTask')}>
                         <Edit2 size={16} />
                       </button>
-                      <button onClick={() => actions?.adminDeleteTask(selectedTask.id)} className="icon-button danger" title="Delete task">
+                      <button onClick={() => actions?.adminDeleteTask(selectedTask.id)} className="icon-button danger" title={t('tasks.deleteTask')}>
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -308,33 +312,33 @@ const RoomTasks = () => {
 
                 <div className="tasks-round-card">
                   <div className="tasks-round-card-header">
-                    <h3>Latest round</h3>
-                    <span>{latestRound ? getRoundLabel(selectedTask, latestRound) : 'No round'}</span>
+                    <h3>{t('tasks.latestRound')}</h3>
+                    <span>{latestRound ? getRoundLabel(selectedTask, latestRound) : t('tasks.noRound')}</span>
                   </div>
-                  {renderRoundSummary(latestRound, 'This task has no round yet.')}
+                  {renderRoundSummary(latestRound, t('tasks.noRoundYet'))}
                 </div>
 
                 <div className="tasks-history">
-                  <h3>Previous rounds</h3>
+                  <h3>{t('tasks.previousRounds')}</h3>
                   {previousRounds.length > 0 ? (
                     previousRounds.map(round => (
                       <div key={round.id} className="tasks-history-item">
                         <div className="tasks-round-card-header">
                           <span>{getRoundLabel(selectedTask, round)}</span>
-                          <span>{round.revealed ? 'Revealed' : 'Open'}</span>
+                          <span>{round.revealed ? t('tasks.revealed') : t('tasks.open')}</span>
                         </div>
-                        {renderRoundSummary(round, 'No votes.')}
+                        {renderRoundSummary(round, t('tasks.noVotes'))}
                       </div>
                     ))
                   ) : (
-                    <p className="tasks-empty">No previous round for this task.</p>
+                    <p className="tasks-empty">{t('tasks.noPreviousRound')}</p>
                   )}
                 </div>
               </>
             ) : (
               <div className="tasks-empty-state tasks-empty-state--large">
                 <ListChecks size={36} />
-                <p>Select or create a task to see rounds.</p>
+                <p>{t('tasks.selectOrCreate')}</p>
               </div>
             )}
           </section>

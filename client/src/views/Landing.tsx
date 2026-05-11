@@ -24,9 +24,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { getUserName, setUserName, getUserEmoji, setUserEmoji, getUserId } from '../services/user';
 import Button from '../components/Button';
+import { LanguageSelector } from '../components/LanguageSelector';
 import './Landing.css';
 import { getHistory, type HistoryEntry } from '../services/history';
 
@@ -39,6 +41,7 @@ const Landing = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [history] = useState<HistoryEntry[]>(getHistory());
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -85,13 +88,14 @@ const Landing = () => {
             Conclave
           </h1>
           <p className="landing-subtitle">
-            Clean poker planning for remote teams.
+            {t('landing.subtitle')}
           </p>
+          <LanguageSelector />
         </div>
 
         <div className="landing-form">
           <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-            Your Profile
+            {t('landing.yourProfile')}
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <button 
@@ -104,7 +108,7 @@ const Landing = () => {
             </button>
             <input
               type="text"
-              placeholder="e.g. Alice"
+              placeholder={t('landing.namePlaceholder')}
               className="premium-input"
               value={userName}
               onChange={(e) => {
@@ -139,27 +143,27 @@ const Landing = () => {
           <form onSubmit={joinRoom} className="landing-form">
             <input
               type="text"
-              placeholder="Enter Room ID"
+              placeholder={t('landing.roomIdPlaceholder')}
               className="premium-input"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
               style={{ textAlign: 'center' }}
             />
             <Button type="submit" disabled={!roomName.trim()}>
-              Join Room
+              {t('landing.joinRoom')}
               <ArrowRight size={18} />
             </Button>
           </form>
           
           <div className="landing-divider">
             <div className="landing-divider-line"></div>
-            <span className="landing-divider-text">or</span>
+            <span className="landing-divider-text">{t('landing.or')}</span>
             <div className="landing-divider-line"></div>
           </div>
 
           <Button onClick={() => setShowCreateModal(true)} disabled={isLoading} variant="secondary">
             <Plus size={18} />
-            {isLoading ? 'Creating...' : 'Create New Room'}
+            {isLoading ? t('landing.creating') : t('landing.createNewRoom')}
           </Button>
         </div>
 
@@ -167,7 +171,7 @@ const Landing = () => {
           <div className="landing-history glass">
             <div className="history-header">
               <History size={16} />
-              <span>Recent Rooms</span>
+              <span>{t('landing.recentRooms')}</span>
             </div>
             <div className="history-list">
               {history.map(entry => (
@@ -194,22 +198,22 @@ const Landing = () => {
         )}
 
         <footer className="landing-footer">
-          <Link to="/about">About, licenses, and data usage</Link>
+          <Link to="/about">{t('landing.footerLink')}</Link>
         </footer>
       </div>
 
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title">Create New Room</h2>
-            <p className="modal-subtitle">Give your room a title (optional).</p>
+            <h2 className="modal-title">{t('landing.createModal.title')}</h2>
+            <p className="modal-subtitle">{t('landing.createModal.subtitle')}</p>
             <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="landing-form">
               <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                Room Title
+                {t('landing.createModal.roomTitle')}
               </div>
               <input
                 type="text"
-                placeholder="e.g. Sprint Planning #42"
+                placeholder={t('landing.createModal.placeholder')}
                 className="premium-input"
                 value={roomTitle}
                 onChange={(e) => setRoomTitle(e.target.value)}
@@ -217,10 +221,10 @@ const Landing = () => {
                 autoFocus
               />
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Creating...' : 'Confirm & Create'}
+                {isLoading ? t('landing.creating') : t('landing.createModal.confirm')}
               </Button>
               <Button type="button" onClick={() => setShowCreateModal(false)} variant="secondary">
-                Cancel
+                {t('common.cancel')}
               </Button>
             </form>
           </div>

@@ -23,6 +23,8 @@
  */
 import { ArrowLeft } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { LanguageSelector } from '../components/LanguageSelector';
 import licenseText from '../../../LICENSE?raw';
 import thirdPartyNotices from '../../../THIRD_PARTY_LICENSES.md?raw';
 import './About.css';
@@ -64,11 +66,12 @@ const license = getLicenseSummary();
 
 const About = () => {
   const location = useLocation();
+  const { t } = useTranslation();
   const from = location.state && typeof location.state === 'object' && 'from' in location.state
     ? location.state.from
     : null;
   const backTarget = typeof from === 'string' && from.startsWith('/') ? from : '/';
-  const backLabel = backTarget.startsWith('/room/') ? 'Back to room' : 'Home';
+  const backLabel = backTarget.startsWith('/room/') ? t('about.backToRoom') : t('about.home');
 
   return (
     <div className="about-page animate-fade-in">
@@ -78,29 +81,30 @@ const About = () => {
           {backLabel}
         </Link>
         <div>
-          <h1 className="about-title">About Conclave</h1>
-          <p className="about-subtitle">Author, license, data notice, and third-party licenses.</p>
+          <h1 className="about-title">{t('about.title')}</h1>
+          <p className="about-subtitle">{t('about.subtitle')}</p>
         </div>
+        <LanguageSelector />
       </header>
 
       <main className="about-content">
         <section className="about-section glass">
-          <h2>Project</h2>
+          <h2>{t('about.project')}</h2>
           <dl className="about-facts">
             <div>
-              <dt>Author</dt>
+              <dt>{t('about.author')}</dt>
               <dd>Vincent Hiribarren</dd>
             </div>
             <div>
-              <dt>License</dt>
+              <dt>{t('about.license')}</dt>
               <dd>{license.title}</dd>
             </div>
             <div>
-              <dt>Copyright</dt>
+              <dt>{t('about.copyright')}</dt>
               <dd>{license.copyright}</dd>
             </div>
             <div>
-              <dt>Repository</dt>
+              <dt>{t('about.repository')}</dt>
               <dd>
                 <a href="https://github.com/vhiribarren/conclave" target="_blank" rel="noreferrer">
                   github.com/vhiribarren/conclave
@@ -111,28 +115,28 @@ const About = () => {
         </section>
 
         <section className="about-section glass">
-          <h2>Usage Terms</h2>
+          <h2>{t('about.usageTerms')}</h2>
           <div className="about-notice-list">
-            <p>This tool is provided as-is, without warranty or support of any kind.</p>
-            <p>The author makes no guarantee regarding data integrity, compatibility across versions, or fitness for any particular purpose.</p>
-            <p>You are responsible for maintaining your own backups. The author shall not be liable for any data loss, corruption, or damages arising from the use of this software.</p>
+            <p>{t('about.usageTerms1')}</p>
+            <p>{t('about.usageTerms2')}</p>
+            <p>{t('about.usageTerms3')}</p>
           </div>
         </section>
 
         <section className="about-section glass">
-          <h2>Data Usage</h2>
+          <h2>{t('about.dataUsage')}</h2>
           <div className="about-notice-list">
-            <p>Room data is stored by the service only for the lifetime of the room.</p>
-            <p>Rooms are deleted after 48 hours of inactivity.</p>
-            <p>Your local profile and recent room history are stored in your web browser local storage.</p>
-            <p>Cloudflare Analytics may be used, but no cookies are used and no per-user data is collected.</p>
+            <p>{t('about.dataUsage1')}</p>
+            <p>{t('about.dataUsage2')}</p>
+            <p>{t('about.dataUsage3')}</p>
+            <p>{t('about.dataUsage4')}</p>
           </div>
         </section>
 
         <section className="about-section glass">
           <div className="about-section-heading">
-            <h2>Third-party Licenses</h2>
-            <span>{notices.length} packages</span>
+            <h2>{t('about.thirdParty')}</h2>
+            <span>{t('about.packages', { count: notices.length })}</span>
           </div>
           <div className="license-list" aria-label="Third-party licenses">
             {notices.map((notice, index) => (

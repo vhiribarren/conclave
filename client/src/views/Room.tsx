@@ -25,6 +25,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
 import PokerCard from '../components/PokerCard';
 import './Room.css';
@@ -35,12 +36,14 @@ import { ParticipantsBoard, type LayoutMode } from '../components/ParticipantsBo
 import { AggregationResult } from '../components/AggregationResult';
 import { TimerDisplay } from '../components/TimerDisplay';
 import { SidebarPanel } from '../components/SidebarPanel';
+import { LanguageSelector } from '../components/LanguageSelector';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 
 
 const Room = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     actions,
     actionsRef,
@@ -156,12 +159,12 @@ const Room = () => {
   const renderOnboardingModal = () => (
     <div className="modal-overlay">
       <div className="modal-content glass animate-fade-in">
-        <h2 className="modal-title">Join Room</h2>
-        <p className="modal-subtitle">Enter your name to start voting.</p>
+        <h2 className="modal-title">{t('room.joinTitle')}</h2>
+        <p className="modal-subtitle">{t('room.joinSubtitle')}</p>
         <form onSubmit={handleJoin} className="landing-form">
           <input
             type="text"
-            placeholder="Your Name"
+            placeholder={t('room.yourName')}
             className="premium-input"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -169,7 +172,7 @@ const Room = () => {
           />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Choose your avatar</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.chooseAvatar')}</span>
             <button
               type="button"
               className="icon-button"
@@ -197,7 +200,7 @@ const Room = () => {
             )}
           </div>
 
-          <Button type="submit">Enter Room</Button>
+          <Button type="submit">{t('common.enterRoom')}</Button>
         </form>
       </div>
     </div>
@@ -207,10 +210,10 @@ const Room = () => {
     return (
       <div className="page-container animate-fade-in">
         <div className="landing-card glass" style={{ textAlign: 'center' }}>
-          <h2 className="modal-title" style={{ color: 'var(--danger-color)' }}>Room Not Found</h2>
+          <h2 className="modal-title" style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</h2>
           <p className="modal-subtitle">{connectionError}</p>
           <Button onClick={() => navigate('/')}>
-            Return Home
+            {t('common.returnHome')}
           </Button>
         </div>
       </div>
@@ -251,7 +254,7 @@ const Room = () => {
                 <div className="room-name-container" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <h1 className="header-title">{state.name || roomId}</h1>
                   {isAdmin && (
-                    <button onClick={startEditingRoomName} className="icon-button-subtle rename-btn" title="Rename Room">
+                    <button onClick={startEditingRoomName} className="icon-button-subtle rename-btn" title={t('room.renameRoom')}>
                       <Edit2 size={12} />
                     </button>
                   )}
@@ -259,20 +262,21 @@ const Room = () => {
               )}
               <div className="header-subtitle">
                 <span className="header-dot"></span>
-                {state.participants.length} online
+                {state.participants.length} {t('common.online')}
               </div>
             </div>
           </div>
 
           <div className="header-actions">
             <>
+              <LanguageSelector />
               <div className="header-separator" />
               <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
                 <button
                   id="layout-btn-circle"
                   className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
                   onClick={() => setLayoutMode('auto')}
-                  title="Vue circulaire"
+                  title={t('room.circleView')}
                   disabled={state.participants.length > 12 || state.participants.length === 0}
                 >
                   <CircleDot size={16} />
@@ -281,31 +285,31 @@ const Room = () => {
                   id="layout-btn-grid"
                   className={`layout-toggle-btn ${layoutMode === 'grid' ? 'active' : ''}`}
                   onClick={() => setLayoutMode('grid')}
-                  title="Vue grille"
+                  title={t('room.gridView')}
                 >
                   <LayoutGrid size={16} />
                 </button>
               </div>
               <div className="header-separator" />
             </>
-            <button onClick={() => setShowUserSettings(true)} className="icon-button" title="User Settings">
+            <button onClick={() => setShowUserSettings(true)} className="icon-button" title={t('room.userSettings')}>
               <UserCog size={18} />
             </button>
-            <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? 'Manage Tasks' : 'View Tasks'}>
+            <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
               <ListChecks size={18} />
             </button>
             {isAdmin && (
-              <button onClick={() => setShowQR(true)} className="icon-button accent" title="Remote Control">
+              <button onClick={() => setShowQR(true)} className="icon-button accent" title={t('room.remoteControl')}>
                 <Smartphone size={18} />
               </button>
             )}
-            <button onClick={() => setShowShareModal(true)} className="icon-button" title="Share Room">
+            <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
               <Share2 size={18} />
             </button>
-            <button onClick={() => navigate('/about', { state: { from: window.location.pathname + window.location.search } })} className="icon-button" title="About">
+            <button onClick={() => navigate('/about', { state: { from: window.location.pathname + window.location.search } })} className="icon-button" title={t('room.about')}>
               <Info size={18} />
             </button>
-            <button onClick={() => navigate('/')} className="icon-button danger" title="Leave">
+            <button onClick={() => navigate('/')} className="icon-button danger" title={t('room.leave')}>
               <LogOut size={18} />
             </button>
           </div>
@@ -325,7 +329,7 @@ const Room = () => {
                 )}
 
                 <div className="task-section">
-                  <h2 className="task-title">{currentTask ? 'Current Task' : 'Quick Vote'}</h2>
+                  <h2 className="task-title">{currentTask ? t('room.currentTask') : t('room.quickVote')}</h2>
                   {currentTask && (
                     <div className="task-box glass">
                       {currentTask.name}
@@ -346,7 +350,7 @@ const Room = () => {
                 {/* Mobile-only: aggregation result below participants */}
                 {isRevealed && (
                   <div className="sidebar-section animate-fade-in">
-                    <span className="sidebar-section-title">📊 Results</span>
+                    <span className="sidebar-section-title">📊 {t('room.results')}</span>
                     <AggregationResult participants={state.participants} deck={state.deck} />
                   </div>
                 )}
@@ -354,7 +358,7 @@ const Room = () => {
                 {/* Mobile-only: voting cards sticky bottom */}
                 {!isRevealed && !isAdmin && (
                   <div className="voting-section glass mobile-voting">
-                    <span className="voting-title">Pick a card</span>
+                    <span className="voting-title">{t('room.pickACard')}</span>
                     <div className="voting-cards">
                       {(state.deck || []).map((card) => (
                         <PokerCard
@@ -372,10 +376,10 @@ const Room = () => {
                 {isAdmin && (
                   <div className="admin-controls glass mobile-admin">
                     <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
-                      Reveal
+                      {t('room.reveal')}
                     </button>
                     <button onClick={handleReset} className="premium-button secondary">
-                      Reset
+                      {t('room.reset')}
                     </button>
                   </div>
                 )}
@@ -391,7 +395,7 @@ const Room = () => {
                 <button
                   className="sidebar-toggle-btn"
                   onClick={() => setSidebarCollapsed((c) => !c)}
-                  title={sidebarCollapsed ? 'Expand panel' : 'Collapse panel'}
+                  title={sidebarCollapsed ? t('room.expandPanel') : t('room.collapsePanel')}
                 >
                   <ChevronRight size={18} />
                 </button>
@@ -414,11 +418,11 @@ const Room = () => {
       {showUserSettings && (
         <div className="modal-overlay" onClick={() => setShowUserSettings(false)}>
           <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-            <h3 className="modal-title">User Settings</h3>
+            <h3 className="modal-title">{t('room.userSettings')}</h3>
             <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }} className="landing-form">
               <input
                 type="text"
-                placeholder="Your Name"
+                placeholder={t('room.yourName')}
                 className="premium-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -426,7 +430,7 @@ const Room = () => {
               />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Change your avatar</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.changeAvatar')}</span>
                 <button
                   type="button"
                   className="icon-button"
@@ -452,9 +456,9 @@ const Room = () => {
                 )}
               </div>
 
-              <button type="submit" className="premium-button">Update Profile</button>
+              <button type="submit" className="premium-button">{t('room.updateProfile')}</button>
             </form>
-            <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">Cancel</button>
+            <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">{t('common.cancel')}</button>
           </div>
         </div>
       )}
@@ -462,8 +466,8 @@ const Room = () => {
       {showShareModal && (
         <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
           <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-            <h3 className="modal-title">Share Room</h3>
-            <p className="modal-subtitle">Invite others to join this session.</p>
+            <h3 className="modal-title">{t('share.title')}</h3>
+            <p className="modal-subtitle">{t('share.subtitle')}</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', margin: '1rem 0' }}>
               <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem' }} className="animate-fade-in">
@@ -471,14 +475,14 @@ const Room = () => {
               </div>
 
               <div style={{ width: '100%', textAlign: 'left' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Room ID</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('share.roomId')}</span>
                 <div className="premium-input" style={{ marginTop: '0.25rem', background: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.9rem' }}>
                   {roomId}
                 </div>
               </div>
 
               <div style={{ width: '100%', textAlign: 'left' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Invite Link</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('share.inviteLink')}</span>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
                   <input
                     type="text"
@@ -494,7 +498,7 @@ const Room = () => {
               </div>
             </div>
 
-            <button onClick={() => setShowShareModal(false)} className="premium-button secondary">Close</button>
+            <button onClick={() => setShowShareModal(false)} className="premium-button secondary">{t('common.close')}</button>
           </div>
         </div>
       )}
@@ -502,8 +506,8 @@ const Room = () => {
       {showQR && (
         <div className="modal-overlay" onClick={() => { setShowQR(false); setIsQRVisible(false); }}>
           <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-            <h3 className="modal-title">Admin Remote Control</h3>
-            <p className="modal-subtitle">Open the remote control in a new window, or scan the QR code with your phone.</p>
+            <h3 className="modal-title">{t('remoteModal.title')}</h3>
+            <p className="modal-subtitle">{t('remoteModal.subtitle')}</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0' }}>
               <a
@@ -513,7 +517,7 @@ const Room = () => {
                 className="premium-button"
                 style={{ textDecoration: 'none' }}
               >
-                <Smartphone size={18} /> Open Remote in New Tab
+                <Smartphone size={18} /> {t('remoteModal.openNewTab')}
               </a>
 
               <button
@@ -521,7 +525,7 @@ const Room = () => {
                 className="premium-button secondary"
                 style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
               >
-                {isQRVisible ? 'Hide QR Code' : 'Show QR Code'}
+                {isQRVisible ? t('remoteModal.hideQR') : t('remoteModal.showQR')}
               </button>
 
               {isQRVisible && (
@@ -531,7 +535,7 @@ const Room = () => {
               )}
             </div>
 
-            <button onClick={() => { setShowQR(false); setIsQRVisible(false); }} className="premium-button secondary">Close</button>
+            <button onClick={() => { setShowQR(false); setIsQRVisible(false); }} className="premium-button secondary">{t('common.close')}</button>
           </div>
         </div>
       )}

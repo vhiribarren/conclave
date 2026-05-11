@@ -126,7 +126,8 @@ Generated with `license-checker --markdown --excludePrivatePackages`; package ve
 [globals](https://github.com/sindresorhus/globals) - MIT
 [hermes-estree](https://github.com/facebook/hermes) - MIT
 [hermes-parser](https://github.com/facebook/hermes) - MIT
-[ignore](https://github.com/kaelzhang/node-ignore) - MIT
+[i18next-browser-languagedetector](https://github.com/i18next/i18next-browser-languageDetector) - MIT
+[i18next](https://github.com/i18next/i18next) - MIT
 [ignore](https://github.com/kaelzhang/node-ignore) - MIT
 [imurmurhash](https://github.com/jensyt/imurmurhash-js) - MIT
 [is-extglob](https://github.com/jonschlinkert/is-extglob) - MIT
@@ -167,6 +168,7 @@ Generated with `license-checker --markdown --excludePrivatePackages`; package ve
 [punycode](https://github.com/mathiasbynens/punycode.js) - MIT
 [qrcode.react](https://github.com/zpao/qrcode.react) - ISC
 [react-dom](https://github.com/facebook/react) - MIT
+[react-i18next](https://github.com/i18next/react-i18next) - MIT
 [react-router-dom](https://github.com/remix-run/react-router) - MIT
 [react-router](https://github.com/remix-run/react-router) - MIT
 [react](https://github.com/facebook/react) - MIT

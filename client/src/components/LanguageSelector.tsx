@@ -21,14 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './i18n'
-import './index.css'
-import App from './App.tsx'
+import { useTranslation } from 'react-i18next';
+import './LanguageSelector.css';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+const LANGUAGES = [
+  { code: 'en', flag: '🇬🇧', label: 'English' },
+  { code: 'fr', flag: '🇫🇷', label: 'Français' },
+] as const;
+
+export const LanguageSelector = () => {
+  const { i18n } = useTranslation();
+  const currentLang = i18n.language?.startsWith('fr') ? 'fr' : 'en';
+
+  return (
+    <div className="language-selector">
+      {LANGUAGES.map((lang) => (
+        <button
+          key={lang.code}
+          className={`language-btn ${currentLang === lang.code ? 'active' : ''}`}
+          onClick={() => i18n.changeLanguage(lang.code)}
+          aria-label={lang.label}
+        >
+          {lang.flag}
+        </button>
+      ))}
+    </div>
+  );
+};
