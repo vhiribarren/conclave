@@ -11,7 +11,7 @@
   },
   "landing": {
     "title": "Conclave",
-    "subtitle": "Simple and elegant planning poker for remote teams.",
+    "subtitle": "Planning poker for remote teams.",
     "yourProfile": "Your profile",
     "namePlaceholder": "e.g. Alice",
     "roomIdPlaceholder": "Enter a room ID",
