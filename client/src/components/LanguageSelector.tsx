@@ -29,18 +29,38 @@ const LANGUAGES = [
   { code: 'fr', flag: '🇫🇷', label: 'Français' },
 ] as const;
 
-export const LanguageSelector = () => {
+export const LanguageSelector = ({ variant = 'pill' }: { variant?: 'pill' | 'menu-item' }) => {
   const { i18n } = useTranslation();
   const currentLang = i18n.language?.startsWith('fr') ? 'fr' : 'en';
 
+  if (variant === 'menu-item') {
+    return (
+      <div className="language-menu-row">
+        {LANGUAGES.map((lang) => (
+          <button
+            key={lang.code}
+            className={`language-menu-option ${currentLang === lang.code ? 'active' : ''}`}
+            onClick={() => i18n.changeLanguage(lang.code)}
+            aria-label={lang.label}
+          >
+            <span className="language-menu-flag">{lang.flag}</span>
+            <span className="language-menu-label">{lang.label}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="language-selector">
+    <div className="language-pill" role="radiogroup" aria-label="Language">
       {LANGUAGES.map((lang) => (
         <button
           key={lang.code}
-          className={`language-btn ${currentLang === lang.code ? 'active' : ''}`}
+          className={`language-pill-btn ${currentLang === lang.code ? 'active' : ''}`}
           onClick={() => i18n.changeLanguage(lang.code)}
           aria-label={lang.label}
+          role="radio"
+          aria-checked={currentLang === lang.code}
         >
           {lang.flag}
         </button>

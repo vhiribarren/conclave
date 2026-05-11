@@ -72,6 +72,7 @@ const Room = () => {
   const [sidebarWidth, setSidebarWidth] = useState(380);
   const isResizing = useRef(false);
   const sidebarRef = useRef<HTMLElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(() =>
     window.innerWidth <= 768 ? 'grid' : 'auto'
   );
@@ -91,6 +92,22 @@ const Room = () => {
       setMyVote(null);
     }
   }, [currentRound?.id]);
+
+  // Close mobile menu on outside click/touch
+  useEffect(() => {
+    if (!showMobileMenu) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setShowMobileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [showMobileMenu]);
 
   // Sidebar resize logic
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
@@ -277,7 +294,6 @@ const Room = () => {
           <div className="header-actions">
             <div className="header-actions-desktop">
               <LanguageSelector />
-              <div className="header-separator" />
               <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
                 <button
                   id="layout-btn-circle"
@@ -320,43 +336,39 @@ const Room = () => {
               </button>
             </div>
 
-            {/* Mobile: only share + overflow menu */}
+            {/* Mobile: share + tasks always visible, rest in overflow */}
             <div className="header-actions-mobile">
               <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
                 <Share2 size={18} />
               </button>
-              <div className="mobile-menu-wrapper">
+              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
+                <ListChecks size={18} />
+              </button>
+              <div className="mobile-menu-wrapper" ref={mobileMenuRef}>
                 <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="icon-button" title="Menu">
                   <MoreVertical size={18} />
                 </button>
                 {showMobileMenu && (
-                  <>
-                    <div className="mobile-menu-backdrop" onClick={() => setShowMobileMenu(false)} />
-                    <div className="mobile-menu glass animate-fade-in">
-                      <button onClick={() => { setShowUserSettings(true); setShowMobileMenu(false); }}>
-                        <UserCog size={16} /> {t('room.userSettings')}
+                  <div className="mobile-menu glass animate-fade-in">
+                    <button onClick={() => { setShowUserSettings(true); setShowMobileMenu(false); }}>
+                      <UserCog size={16} /> {t('room.userSettings')}
+                    </button>
+                    {isAdmin && (
+                      <button onClick={() => { setShowQR(true); setShowMobileMenu(false); }}>
+                        <Smartphone size={16} /> {t('room.remoteControl')}
                       </button>
-                      <button onClick={() => { navigate(`/room/${roomId}/tasks`); setShowMobileMenu(false); }}>
-                        <ListChecks size={16} /> {isAdmin ? t('room.manageTasks') : t('room.viewTasks')}
-                      </button>
-                      {isAdmin && (
-                        <button onClick={() => { setShowQR(true); setShowMobileMenu(false); }}>
-                          <Smartphone size={16} /> {t('room.remoteControl')}
-                        </button>
-                      )}
-                      <button onClick={() => { navigate('/about', { state: { from: window.location.pathname + window.location.search } }); setShowMobileMenu(false); }}>
-                        <Info size={16} /> {t('room.about')}
-                      </button>
-                      <div className="mobile-menu-separator" />
-                      <div className="mobile-menu-lang">
-                        <LanguageSelector />
-                      </div>
-                      <div className="mobile-menu-separator" />
-                      <button className="mobile-menu-danger" onClick={() => { navigate('/'); setShowMobileMenu(false); }}>
-                        <LogOut size={16} /> {t('room.leave')}
-                      </button>
-                    </div>
-                  </>
+                    )}
+                    <button onClick={() => { navigate('/about', { state: { from: window.location.pathname + window.location.search } }); setShowMobileMenu(false); }}>
+                      <Info size={16} /> {t('room.about')}
+                    </button>
+                    <div className="mobile-menu-separator" />
+                    <LanguageSelector variant="menu-item" />
+                    <div className="mobile-menu-separator" />
+
+                    <button className="mobile-menu-danger" onClick={() => { navigate('/'); setShowMobileMenu(false); }}>
+                      <LogOut size={16} /> {t('room.leave')}
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
