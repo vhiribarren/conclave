@@ -23,7 +23,7 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks, MoreVertical } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
@@ -76,6 +76,7 @@ const Room = () => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [isEditingRoomName, setIsEditingRoomName] = useState(false);
   const [tempRoomName, setTempRoomName] = useState('');
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isCircleLayout = layoutMode === 'auto' && state.participants.length <= 12 && state.participants.length > 0;
 
   // Reset local vote when the round changes (e.g. admin reset)
@@ -268,7 +269,7 @@ const Room = () => {
           </div>
 
           <div className="header-actions">
-            <>
+            <div className="header-actions-desktop">
               <LanguageSelector />
               <div className="header-separator" />
               <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
@@ -291,27 +292,68 @@ const Room = () => {
                 </button>
               </div>
               <div className="header-separator" />
-            </>
-            <button onClick={() => setShowUserSettings(true)} className="icon-button" title={t('room.userSettings')}>
-              <UserCog size={18} />
-            </button>
-            <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
-              <ListChecks size={18} />
-            </button>
-            {isAdmin && (
-              <button onClick={() => setShowQR(true)} className="icon-button accent" title={t('room.remoteControl')}>
-                <Smartphone size={18} />
+              <button onClick={() => setShowUserSettings(true)} className="icon-button" title={t('room.userSettings')}>
+                <UserCog size={18} />
               </button>
-            )}
-            <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
-              <Share2 size={18} />
-            </button>
-            <button onClick={() => navigate('/about', { state: { from: window.location.pathname + window.location.search } })} className="icon-button" title={t('room.about')}>
-              <Info size={18} />
-            </button>
-            <button onClick={() => navigate('/')} className="icon-button danger" title={t('room.leave')}>
-              <LogOut size={18} />
-            </button>
+              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
+                <ListChecks size={18} />
+              </button>
+              {isAdmin && (
+                <button onClick={() => setShowQR(true)} className="icon-button accent" title={t('room.remoteControl')}>
+                  <Smartphone size={18} />
+                </button>
+              )}
+              <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
+                <Share2 size={18} />
+              </button>
+              <button onClick={() => navigate('/about', { state: { from: window.location.pathname + window.location.search } })} className="icon-button" title={t('room.about')}>
+                <Info size={18} />
+              </button>
+              <button onClick={() => navigate('/')} className="icon-button danger" title={t('room.leave')}>
+                <LogOut size={18} />
+              </button>
+            </div>
+
+            {/* Mobile: only share + overflow menu */}
+            <div className="header-actions-mobile">
+              <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
+                <Share2 size={18} />
+              </button>
+              <div className="mobile-menu-wrapper">
+                <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="icon-button" title="Menu">
+                  <MoreVertical size={18} />
+                </button>
+                {showMobileMenu && (
+                  <>
+                    <div className="mobile-menu-backdrop" onClick={() => setShowMobileMenu(false)} />
+                    <div className="mobile-menu glass animate-fade-in">
+                      <button onClick={() => { setShowUserSettings(true); setShowMobileMenu(false); }}>
+                        <UserCog size={16} /> {t('room.userSettings')}
+                      </button>
+                      <button onClick={() => { navigate(`/room/${roomId}/tasks`); setShowMobileMenu(false); }}>
+                        <ListChecks size={16} /> {isAdmin ? t('room.manageTasks') : t('room.viewTasks')}
+                      </button>
+                      {isAdmin && (
+                        <button onClick={() => { setShowQR(true); setShowMobileMenu(false); }}>
+                          <Smartphone size={16} /> {t('room.remoteControl')}
+                        </button>
+                      )}
+                      <button onClick={() => { navigate('/about', { state: { from: window.location.pathname + window.location.search } }); setShowMobileMenu(false); }}>
+                        <Info size={16} /> {t('room.about')}
+                      </button>
+                      <div className="mobile-menu-separator" />
+                      <div className="mobile-menu-lang">
+                        <LanguageSelector />
+                      </div>
+                      <div className="mobile-menu-separator" />
+                      <button className="mobile-menu-danger" onClick={() => { navigate('/'); setShowMobileMenu(false); }}>
+                        <LogOut size={16} /> {t('room.leave')}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </header>
 

@@ -7,4 +7,107 @@
   flex-direction: column;
   gap: 1.5rem;
   padding: 1rem;
+  padding-bottom: 10rem; /* space for sticky vote bar */
+}
+
+/* ── Sticky vote bar ──────────────────────────────────────────── */
+.remote-vote-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  padding: 0.5rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--surface-border);
+  border-radius: 0;
+  transition: padding 0.25s ease;
+}
+
+.remote-vote-bar.collapsed {
+  padding: 0;
+}
+
+.remote-vote-bar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.remote-vote-bar-toggle:active {
+  color: var(--text-primary);
+}
+
+.remote-vote-bar-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.remote-vote-bar-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 800;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.4rem;
+  border-radius: 0.4rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.remote-vote-bar-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Hide the inline admin vote section in AdminPanel when on remote (it's now in the sticky bar) */
+.remote-container .admin-vote-cards {
+  display: none;
+}
+
+.remote-container .panel-section:has(.admin-vote-cards) {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .remote-container {
+    padding: 0.75rem;
+    padding-bottom: 9rem;
+    gap: 1.25rem;
+  }
+
+  .remote-vote-bar {
+    padding: 0.6rem 0.75rem;
+  }
+
+  .remote-vote-bar-cards {
+    gap: 0.3rem;
+  }
 }

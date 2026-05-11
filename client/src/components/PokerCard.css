@@ -40,6 +40,8 @@
   position: relative;
   overflow: hidden;
   margin: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .poker-card::before {
@@ -77,8 +79,32 @@
 
 @media (max-width: 640px) {
   .poker-card {
-    width: 54px;
-    height: 76px;
-    font-size: 1.2rem;
+    width: 52px;
+    height: 72px;
+    font-size: 1.15rem;
+    border-radius: 10px;
+  }
+
+  .poker-card.selected {
+    transform: translateY(-6px);
+  }
+
+  .poker-card:hover:not(.selected) {
+    transform: translateY(-3px);
+  }
+
+  .poker-card.small {
+    width: 44px;
+    height: 58px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .poker-card {
+    width: 46px;
+    height: 64px;
+    font-size: 1rem;
+    border-radius: 8px;
   }
 }

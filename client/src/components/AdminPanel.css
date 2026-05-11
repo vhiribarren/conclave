@@ -293,3 +293,39 @@
   gap: 0.5rem;
   justify-content: center;
 }
+
+/* ── Mobile responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-tabs {
+    margin-bottom: 0.25rem;
+  }
+
+  .admin-tab {
+    padding: 0.6rem 0.4rem;
+    font-size: 0.78rem;
+  }
+
+  .deck-editor {
+    padding: 0.4rem;
+    gap: 0.3rem;
+  }
+
+  .deck-chip {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .panel-actions {
+    gap: 0.4rem;
+  }
+
+  .panel-actions .premium-button {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  .vote-mode-switch button {
+    min-height: 2.5rem;
+    font-size: 0.8rem;
+  }
+}

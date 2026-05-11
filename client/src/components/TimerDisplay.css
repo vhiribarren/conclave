@@ -35,6 +35,7 @@
   background: rgba(255,255,255,0.6);
   color: var(--text-primary);
   border: 1px solid var(--surface-border);
+  white-space: nowrap;
 }
 .timer-display.urgent {
   background: rgba(253, 230, 138, 0.5);

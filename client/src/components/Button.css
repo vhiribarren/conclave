@@ -37,6 +37,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  min-height: 44px;
+  touch-action: manipulation;
 }
 
 .premium-button:hover:not(:disabled) {

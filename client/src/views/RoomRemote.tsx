@@ -23,10 +23,11 @@
  */
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
 import { AdminPanel } from '../components/AdminPanel';
+import PokerCard from '../components/PokerCard';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import './Room.css';
@@ -49,6 +50,7 @@ const RoomRemote = () => {
     state,
   } = useCurrentRoomSession();
   const [myVote, setMyVote] = useState<string | null>(null);
+  const [voteBarCollapsed, setVoteBarCollapsed] = useState(false);
 
   useEffect(() => {
     if (currentRound?.id) {
@@ -127,8 +129,7 @@ const RoomRemote = () => {
             {isAdmin && actions && (
               <div className="remote-container">
                 <AdminPanel state={state} actions={actions} myVote={myVote} onVote={handleVote} roomId={roomId} isAdmin={true} layout="remote" />
-              </div>
-            )}
+              </div>            )}
             {!isAdmin && (
               <div className="page-container">
                 <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
@@ -138,6 +139,38 @@ const RoomRemote = () => {
             )}
           </main>
         </div>
+
+        {/* Sticky vote bar for admin on mobile */}
+        {isAdmin && !currentRound?.revealed && (
+          <div className={`remote-vote-bar glass ${voteBarCollapsed ? 'collapsed' : ''}`}>
+            <button
+              className="remote-vote-bar-toggle"
+              onClick={() => setVoteBarCollapsed(!voteBarCollapsed)}
+              aria-label={voteBarCollapsed ? 'Expand vote panel' : 'Collapse vote panel'}
+            >
+              <span className="remote-vote-bar-title">
+                {t('admin.yourSecretVote')}
+                {voteBarCollapsed && myVote && (
+                  <span className="remote-vote-bar-current">{myVote}</span>
+                )}
+              </span>
+              {voteBarCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+            {!voteBarCollapsed && (
+              <div className="remote-vote-bar-cards">
+                {(state.deck || []).map((card) => (
+                  <PokerCard
+                    key={card}
+                    value={card}
+                    selected={myVote === card}
+                    small
+                    onClick={() => handleVote(card)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

@@ -288,7 +288,7 @@ export const AdminPanel: React.FC<Props> = ({
               {!isRevealed && layout === 'remote' && (
                 <Section glass>
                   <SectionTitle style={{ textAlign: 'center' }}>{t('admin.yourSecretVote')}</SectionTitle>
-                  <div className="voting-cards">
+                  <div className="voting-cards admin-vote-cards">
                     {(state.deck || []).map((card) => (
                       <PokerCard
                         key={card}

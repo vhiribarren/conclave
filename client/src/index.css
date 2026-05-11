@@ -55,11 +55,16 @@ body {
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
 }
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
@@ -91,6 +96,8 @@ h1,
   outline: none;
   width: 100%;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  /* Prevent iOS zoom on focus */
+  font-size: max(1rem, 16px);
 }
 
 .premium-input:focus {
@@ -194,4 +201,21 @@ h1,
 
 .modal-subtitle {
   color: var(--text-secondary);
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.5rem 1.25rem;
+    border-radius: 16px;
+    gap: 1.25rem;
+    margin: 0.5rem;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+  }
+
+  .modal-overlay {
+    padding: 0.75rem;
+  }
 }

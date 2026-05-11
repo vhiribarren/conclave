@@ -58,7 +58,6 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
     );
   }
 
-  const radius = Math.min(window.innerWidth / 3, 200);
   const angleStep = (2 * Math.PI) / participants.length;
 
   return (
@@ -76,14 +75,14 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
         
         {participants.map((p, i) => {
           const angle = i * angleStep - Math.PI / 2;
-          const x = Math.cos(angle) * radius;
-          const y = Math.sin(angle) * radius;
+          const xPct = 50 + Math.cos(angle) * 38;
+          const yPct = 50 + Math.sin(angle) * 38;
           
           return (
             <div 
               key={p.id}
               className="circle-item"
-              style={{ transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))` }}
+              style={{ top: `${yPct}%`, left: `${xPct}%`, transform: 'translate(-50%, -50%)' }}
             >
               <ParticipantCard participant={p} isRevealed={isRevealed} myName={myName} />
             </div>

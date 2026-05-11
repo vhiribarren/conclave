@@ -26,6 +26,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   transition: var(--transition);
 }
@@ -42,6 +43,10 @@
   justify-content: space-between;
   border-radius: 1rem;
   background: rgba(255,255,255,0.4);
+  gap: 0.75rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
 }
 .header-left {
   display: flex;
@@ -85,6 +90,99 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Desktop actions: visible on large screens */
+.header-actions-desktop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Mobile actions: hidden on large screens */
+.header-actions-mobile {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .header-actions-desktop {
+    display: none;
+  }
+  .header-actions-mobile {
+    display: flex;
+  }
+}
+
+/* ── Mobile overflow menu ─────────────────────────────────────── */
+.mobile-menu-wrapper {
+  position: relative;
+}
+
+.mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+
+.mobile-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 100;
+  min-width: 200px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 12px 40px -8px rgba(15, 23, 42, 0.18);
+}
+
+.mobile-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.7rem 0.75rem;
+  border: none;
+  background: transparent;
+  border-radius: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.mobile-menu button:hover,
+.mobile-menu button:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mobile-menu-danger {
+  color: #ef4444 !important;
+}
+
+.mobile-menu-separator {
+  height: 1px;
+  background: var(--surface-border);
+  margin: 0.25rem 0.5rem;
+}
+
+.mobile-menu-lang {
+  display: flex;
+  justify-content: center;
+  padding: 0.4rem 0;
 }
 .header-separator {
   width: 1px;
@@ -104,6 +202,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 .icon-button:hover {
   background: rgba(0, 0, 0, 0.05);
@@ -321,10 +421,12 @@
   gap: 1rem;
   align-items: center;
   position: sticky;
-  bottom: 1.5rem;
-  background: rgba(255,255,255,0.7);
+  bottom: 1rem;
+  background: rgba(255,255,255,0.85);
   box-shadow: var(--shadow-lg);
   z-index: 10;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 .voting-title {
   font-size: 0.75rem;
@@ -347,8 +449,9 @@
   display: flex;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.85);
   backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255,255,255,0.5);
   box-shadow: var(--shadow-lg);
   border-radius: 1rem;
@@ -366,5 +469,85 @@
   }
   .room-sidebar {
     display: none;
+  }
+}
+
+/* ── Mobile-specific refinements ──────────────────────────────── */
+@media (max-width: 768px) {
+  .header {
+    margin: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+  }
+
+  .header-left {
+    gap: 0.5rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .header-logo {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+    border-radius: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  .room-main {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .task-section {
+    margin-top: 0.5rem;
+  }
+
+  .task-box {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .voting-section {
+    margin: 0 -0.75rem;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1rem;
+    bottom: 0;
+    position: sticky;
+  }
+
+  .voting-cards {
+    gap: 0.5rem;
+  }
+
+  .admin-controls {
+    bottom: 0.75rem;
+    padding: 0.6rem;
+    border-radius: 0.75rem;
+  }
+
+  .admin-controls .premium-button {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .header-title {
+    max-width: 80px;
+  }
+
+  .icon-button {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 0.35rem;
   }
 }
