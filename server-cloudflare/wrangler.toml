@@ -2,11 +2,13 @@ name = "conclave-backend"
 main = "./src/index.ts"
 compatibility_date = "2026-05-10"
 observability.enabled = true
+preview_urls = true
 
 [assets]
 directory = "./client/dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
+run_worker_first = [ "/api/*" ]
 
 [[durable_objects.bindings]]
 name = "CONCLAVE_ROOM"
