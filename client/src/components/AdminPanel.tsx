@@ -60,7 +60,6 @@ export const AdminPanel: React.FC<Props> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showTaskSelector, setShowTaskSelector] = useState(false);
   const [activeTab, setActiveTab] = useState<'control' | 'settings'>('control');
-  const [localDeck, setLocalDeck] = useState<string[] | null>(null);
   const dragSourceIdx = useRef<number | null>(null);
 
   const [savedCustomDeck, setSavedCustomDeck] = useState<string[]>(() => {
@@ -80,7 +79,6 @@ export const AdminPanel: React.FC<Props> = ({
   const isRevealed = currentRound?.revealed ?? false;
 
   const updateDeck = (newDeck: string[], mode: 'preset' | 'custom' = 'custom') => {
-    setLocalDeck(null);
     actions.adminSetDeck(newDeck, mode);
     if (mode === 'custom') {
       setSavedCustomDeck(newDeck);
@@ -102,26 +100,28 @@ export const AdminPanel: React.FC<Props> = ({
     updateDeck(newDeck);
   };
 
+  const dragOverIdx = useRef<number | null>(null);
+
   const handleDragStart = (idx: number) => {
     dragSourceIdx.current = idx;
-    setLocalDeck([...(state.deck || [])]);
+    dragOverIdx.current = idx;
   };
 
-  const handleDragOver = (e: React.DragEvent, idx: number) => {
-    e.preventDefault();
-    if (dragSourceIdx.current === null || dragSourceIdx.current === idx || !localDeck) return;
-    const newDeck = [...localDeck];
-    const item = newDeck.splice(dragSourceIdx.current, 1)[0]!;
-    newDeck.splice(idx, 0, item);
-    setLocalDeck(newDeck);
-    setSavedCustomDeck(newDeck);
-    dragSourceIdx.current = idx;
+  const handleDragOver = (_e: React.DragEvent, idx: number) => {
+    dragOverIdx.current = idx;
   };
 
   const handleDragEnd = () => {
-    if (localDeck) updateDeck(localDeck, 'custom');
-    setLocalDeck(null);
+    const from = dragSourceIdx.current;
+    const to = dragOverIdx.current;
+    if (from !== null && to !== null && from !== to) {
+      const deck = [...(state.deck || [])];
+      const item = deck.splice(from, 1)[0]!;
+      deck.splice(to, 0, item);
+      updateDeck(deck, 'custom');
+    }
     dragSourceIdx.current = null;
+    dragOverIdx.current = null;
   };
 
   // Wrap a section depending on layout mode
@@ -353,15 +353,15 @@ export const AdminPanel: React.FC<Props> = ({
           <Section glass>
             <SectionTitle>🃏 Deck Editor</SectionTitle>
             <div className="deck-editor" onDragOver={(e) => e.preventDefault()}>
-              {(localDeck || state.deck || []).map((card, idx) => {
-                const isCustom = state.deckMode === 'custom' || localDeck !== null;
+              {(state.deck || []).map((card, idx) => {
+                const isCustom = state.deckMode === 'custom';
                 return (
                   <div
-                    key={`card-${idx}-${card}`}
+                    key={`card-${card}-${idx}`}
                     className={`deck-chip ${!isCustom ? 'read-only' : ''}`}
                     draggable={isCustom}
                     onDragStart={() => isCustom && handleDragStart(idx)}
-                    onDragOver={(e) => isCustom && handleDragOver(e, idx)}
+                    onDragOver={(e) => { e.preventDefault(); if (isCustom) handleDragOver(e, idx); }}
                     onDragEnd={isCustom ? handleDragEnd : undefined}
                   >
                     {isCustom && <GripVertical size={13} className="deck-chip-grip" />}
