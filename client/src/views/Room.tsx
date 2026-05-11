@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -65,6 +65,9 @@ const Room = () => {
   const [showEmojiPickerJoin, setShowEmojiPickerJoin] = useState(false);
   const [showEmojiPickerSettings, setShowEmojiPickerSettings] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(380);
+  const isResizing = useRef(false);
+  const sidebarRef = useRef<HTMLElement>(null);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('auto');
   const [showShareModal, setShowShareModal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -78,6 +81,32 @@ const Room = () => {
       setMyVote(null);
     }
   }, [currentRound?.id]);
+
+  // Sidebar resize logic
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizing.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isResizing.current) return;
+      const containerRight = document.documentElement.clientWidth;
+      const newWidth = containerRight - ev.clientX;
+      setSidebarWidth(Math.max(280, Math.min(600, newWidth)));
+    };
+
+    const onMouseUp = () => {
+      isResizing.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, []);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -353,7 +382,12 @@ const Room = () => {
               </main>
 
               {/* ── Right column: sidebar ──────────────────────────────── */}
-              <aside className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+              <aside
+                ref={sidebarRef}
+                className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}
+                style={!sidebarCollapsed ? { width: sidebarWidth } : undefined}
+              >
+                <div className="sidebar-resize-handle" onMouseDown={handleResizeStart} />
                 <button
                   className="sidebar-toggle-btn"
                   onClick={() => setSidebarCollapsed((c) => !c)}
