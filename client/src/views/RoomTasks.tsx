@@ -166,7 +166,7 @@ const RoomTasks = () => {
     <>
       {!isJoined && (
         <div className="modal-overlay">
-          <div className="modal-content glass animate-fade-in">
+          <div className="modal-content animate-fade-in">
             <h2 className="modal-title">{t('room.joinTitle')}</h2>
             <p className="modal-subtitle">{t('room.joinSubtitleTasks')}</p>
             <form onSubmit={handleJoin} className="landing-form">

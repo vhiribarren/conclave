@@ -465,7 +465,7 @@ export const AdminPanel: React.FC<Props> = ({
 
       {showCustomizeConfirm && (
         <div className="modal-overlay" onClick={() => setShowCustomizeConfirm(false)}>
-          <div className="modal-content glass animate-fade-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '24rem' }}>
+          <div className="modal-content animate-fade-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '24rem' }}>
             <h2 className="modal-title">{t('settings.customizeModal.title')}</h2>
             <p className="modal-subtitle">
               {t('settings.customizeModal.subtitle')}

@@ -206,7 +206,7 @@ const Landing = () => {
 
     {showCreateModal && (
       <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+        <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
           <h2 className="modal-title">{t('landing.createModal.title')}</h2>
           <p className="modal-subtitle">{t('landing.createModal.subtitle')}</p>
           <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="landing-form">

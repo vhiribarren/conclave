@@ -158,7 +158,7 @@ const Room = () => {
 
   const renderOnboardingModal = () => (
     <div className="modal-overlay">
-      <div className="modal-content glass animate-fade-in">
+      <div className="modal-content animate-fade-in">
         <h2 className="modal-title">{t('room.joinTitle')}</h2>
         <p className="modal-subtitle">{t('room.joinSubtitle')}</p>
         <form onSubmit={handleJoin} className="landing-form">
@@ -417,7 +417,7 @@ const Room = () => {
 
       {showUserSettings && (
         <div className="modal-overlay" onClick={() => setShowUserSettings(false)}>
-          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
             <h3 className="modal-title">{t('room.userSettings')}</h3>
             <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }} className="landing-form">
               <input
@@ -465,7 +465,7 @@ const Room = () => {
 
       {showShareModal && (
         <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
-          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
             <h3 className="modal-title">{t('share.title')}</h3>
             <p className="modal-subtitle">{t('share.subtitle')}</p>
 
@@ -505,7 +505,7 @@ const Room = () => {
 
       {showQR && (
         <div className="modal-overlay" onClick={() => { setShowQR(false); setIsQRVisible(false); }}>
-          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
             <h3 className="modal-title">{t('remoteModal.title')}</h3>
             <p className="modal-subtitle">{t('remoteModal.subtitle')}</p>
 

@@ -181,6 +181,10 @@ h1,
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
 }
 
 .modal-title {

@@ -43,7 +43,7 @@ export const TaskSelectionDialog: React.FC<Props> = ({ actions, currentTaskId, o
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose}>
-      <div className="task-selector-modal glass animate-fade-in" onClick={event => event.stopPropagation()}>
+      <div className="task-selector-modal animate-fade-in" onClick={event => event.stopPropagation()}>
         <div className="task-selector-header">
           <div>
             <h3>Select task</h3>
