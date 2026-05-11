@@ -127,6 +127,15 @@
   font-weight: 700;
 }
 
+.about-facts a {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.about-facts a:hover {
+  color: var(--accent-hover);
+}
+
 .about-notice-list {
   display: grid;
   gap: 0.75rem;

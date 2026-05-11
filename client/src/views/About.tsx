@@ -99,6 +99,14 @@ const About = () => {
               <dt>Copyright</dt>
               <dd>{license.copyright}</dd>
             </div>
+            <div>
+              <dt>Repository</dt>
+              <dd>
+                <a href="https://github.com/vhiribarren/conclave" target="_blank" rel="noreferrer">
+                  github.com/vhiribarren/conclave
+                </a>
+              </dd>
+            </div>
           </dl>
         </section>
 
