@@ -31,6 +31,7 @@
   gap: 2rem;
   position: relative;
   z-index: 10;
+  overflow: hidden;
 }
 .landing-glow-1,
 .landing-glow-2 {
