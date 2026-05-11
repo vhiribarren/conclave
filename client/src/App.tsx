@@ -26,6 +26,7 @@ import Landing from './views/Landing';
 import Room from './views/Room';
 import RoomSessionLayout from './views/RoomSessionLayout';
 import RoomTasks from './views/RoomTasks';
+import RoomRemote from './views/RoomRemote';
 import About from './views/About';
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
           <Route path="/room/:roomId" element={<RoomSessionLayout />}>
             <Route index element={<Room />} />
             <Route path="tasks" element={<RoomTasks />} />
+            <Route path="remote" element={<RoomRemote />} />
           </Route>
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

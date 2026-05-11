@@ -34,7 +34,6 @@ import { setUserName, setUserEmoji } from '../services/user';
 import { ParticipantsBoard, type LayoutMode } from '../components/ParticipantsBoard';
 import { AggregationResult } from '../components/AggregationResult';
 import { TimerDisplay } from '../components/TimerDisplay';
-import { AdminRemote } from '../components/AdminRemote';
 import { SidebarPanel } from '../components/SidebarPanel';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 
@@ -42,8 +41,6 @@ import { useCurrentRoomSession } from './RoomSessionLayout';
 const Room = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
-  const searchParams = new URLSearchParams(window.location.search);
-  const isRemoteView = searchParams.get('remote') === 'true';
   const {
     actions,
     actionsRef,
@@ -239,41 +236,36 @@ const Room = () => {
           </div>
 
           <div className="header-actions">
-            {/* Layout toggle — only in main (non-remote) view */}
-            {!isRemoteView && (
-              <>
-                <div className="header-separator" />
-                <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
-                  <button
-                    id="layout-btn-circle"
-                    className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
-                    onClick={() => setLayoutMode('auto')}
-                    title="Vue circulaire"
-                    disabled={state.participants.length > 12 || state.participants.length === 0}
-                  >
-                    <CircleDot size={16} />
-                  </button>
-                  <button
-                    id="layout-btn-grid"
-                    className={`layout-toggle-btn ${layoutMode === 'grid' ? 'active' : ''}`}
-                    onClick={() => setLayoutMode('grid')}
-                    title="Vue grille"
-                  >
-                    <LayoutGrid size={16} />
-                  </button>
-                </div>
-                <div className="header-separator" />
-              </>
-            )}
+            <>
+              <div className="header-separator" />
+              <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
+                <button
+                  id="layout-btn-circle"
+                  className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
+                  onClick={() => setLayoutMode('auto')}
+                  title="Vue circulaire"
+                  disabled={state.participants.length > 12 || state.participants.length === 0}
+                >
+                  <CircleDot size={16} />
+                </button>
+                <button
+                  id="layout-btn-grid"
+                  className={`layout-toggle-btn ${layoutMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setLayoutMode('grid')}
+                  title="Vue grille"
+                >
+                  <LayoutGrid size={16} />
+                </button>
+              </div>
+              <div className="header-separator" />
+            </>
             <button onClick={() => setShowUserSettings(true)} className="icon-button" title="User Settings">
               <UserCog size={18} />
             </button>
-            {!isRemoteView && (
-              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? 'Manage Tasks' : 'View Tasks'}>
-                <ListChecks size={18} />
-              </button>
-            )}
-            {isAdmin && !isRemoteView && (
+            <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? 'Manage Tasks' : 'View Tasks'}>
+              <ListChecks size={18} />
+            </button>
+            {isAdmin && (
               <button onClick={() => setShowQR(true)} className="icon-button accent" title="Remote Control">
                 <Smartphone size={18} />
               </button>
@@ -291,12 +283,6 @@ const Room = () => {
         </header>
 
         <div className="room-layout">
-          {isRemoteView && isAdmin && actions ? (
-            // ── Remote / mobile admin view ───────────────────────────────
-            <main className="room-main">
-              <AdminRemote state={state} actions={actions} myVote={myVote} onVote={handleVote} roomId={roomId} />
-            </main>
-          ) : (
             <>
               {/* ── Left column: participants ──────────────────────────── */}
               <main className="room-main">
@@ -387,7 +373,6 @@ const Room = () => {
                 )}
               </aside>
             </>
-          )}
         </div>
       </div>
 
@@ -488,7 +473,7 @@ const Room = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0' }}>
               <a
-                href={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`}
+                href={`${window.location.origin}/room/${roomId}/remote?linkUserId=${userId}&name=${encodeURIComponent(name)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="premium-button"
@@ -507,7 +492,7 @@ const Room = () => {
 
               {isQRVisible && (
                 <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center' }} className="animate-fade-in">
-                  <QRCodeSVG value={`${window.location.origin}/room/${roomId}?remote=true&linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
+                  <QRCodeSVG value={`${window.location.origin}/room/${roomId}/remote?linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
                 </div>
               )}
             </div>

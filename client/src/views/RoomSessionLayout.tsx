@@ -41,10 +41,9 @@ const RoomSessionLayout = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const isRemoteView = searchParams.get('remote') === 'true';
   const linkUserId = searchParams.get('linkUserId');
   const linkName = searchParams.get('name');
-  const session = useRoomSession(roomId, { isRemoteView, linkUserId, linkName });
+  const session = useRoomSession(roomId, { linkUserId, linkName });
 
   return (
     <RoomSessionContext.Provider value={session}>

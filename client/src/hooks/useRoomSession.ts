@@ -40,13 +40,12 @@ const initialRoomState: RoomState = {
 };
 
 interface Options {
-  isRemoteView?: boolean;
   linkUserId?: string | null;
   linkName?: string | null;
 }
 
 export const useRoomSession = (roomId: string | undefined, options: Options = {}) => {
-  const { isRemoteView = false, linkUserId, linkName } = options;
+  const { linkUserId, linkName } = options;
   const [name, setName] = useState(getUserName());
   const [mood, setMood] = useState(getUserEmoji());
   const [isJoined, setIsJoined] = useState(!!getUserName());
@@ -60,10 +59,10 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
     if (linkUserId && linkName) {
       settings.setUserId(linkUserId);
       settings.setUserName(linkName);
-      window.history.replaceState({}, document.title, window.location.pathname + (isRemoteView ? '?remote=true' : ''));
+      window.history.replaceState({}, document.title, window.location.pathname);
       window.location.reload();
     }
-  }, [linkUserId, linkName, isRemoteView]);
+  }, [linkUserId, linkName]);
 
   useEffect(() => {
     let isMounted = true;
