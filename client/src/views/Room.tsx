@@ -23,7 +23,7 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks, MoreVertical } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronRight, ChevronUp, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks, MoreVertical, Settings, Eye, RotateCcw } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
@@ -34,6 +34,7 @@ import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { setUserName, setUserEmoji } from '../services/user';
 import { ParticipantsBoard, type LayoutMode } from '../components/ParticipantsBoard';
 import { AggregationResult } from '../components/AggregationResult';
+import { AdminPanel } from '../components/AdminPanel';
 import { TimerDisplay } from '../components/TimerDisplay';
 import { SidebarPanel } from '../components/SidebarPanel';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -71,13 +72,18 @@ const Room = () => {
   const [sidebarWidth, setSidebarWidth] = useState(380);
   const isResizing = useRef(false);
   const sidebarRef = useRef<HTMLElement>(null);
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>('auto');
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>(() =>
+    window.innerWidth <= 768 ? 'grid' : 'auto'
+  );
+  const isMobile = window.innerWidth <= 768;
+  const effectiveLayoutMode: LayoutMode = isMobile ? 'grid' : layoutMode;
   const [showShareModal, setShowShareModal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [isEditingRoomName, setIsEditingRoomName] = useState(false);
   const [tempRoomName, setTempRoomName] = useState('');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const isCircleLayout = layoutMode === 'auto' && state.participants.length <= 12 && state.participants.length > 0;
+  const [mobileAdminOpen, setMobileAdminOpen] = useState(false);
+  const isCircleLayout = effectiveLayoutMode === 'auto' && state.participants.length <= 12 && state.participants.length > 0;
 
   // Reset local vote when the round changes (e.g. admin reset)
   useEffect(() => {
@@ -384,7 +390,7 @@ const Room = () => {
                   isRevealed={isRevealed}
                   currentTaskName={currentTask?.name || ''}
                   myName={name}
-                  layoutMode={layoutMode}
+                  layoutMode={effectiveLayoutMode}
                   timerEndAt={state.timerEndAt}
                   timerPausedRemainingMs={state.timerPausedRemainingMs}
                 />
@@ -397,7 +403,7 @@ const Room = () => {
                   </div>
                 )}
 
-                {/* Mobile-only: voting cards sticky bottom */}
+                {/* Mobile-only: voting cards sticky bottom (non-admin) */}
                 {!isRevealed && !isAdmin && (
                   <div className="voting-section glass mobile-voting">
                     <span className="voting-title">{t('room.pickACard')}</span>
@@ -414,15 +420,75 @@ const Room = () => {
                   </div>
                 )}
 
-                {/* Mobile-only: admin controls fixed bottom */}
-                {isAdmin && (
-                  <div className="admin-controls glass mobile-admin">
-                    <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
-                      {t('room.reveal')}
-                    </button>
-                    <button onClick={handleReset} className="premium-button secondary">
-                      {t('room.reset')}
-                    </button>
+                {/* Mobile-only: admin bottom bar with expand */}
+                {isAdmin && actions && (
+                  <div className={`mobile-admin-bar ${mobileAdminOpen ? 'expanded' : ''}`}>
+                    {/* Vote cards for admin — always visible */}
+                    {!isRevealed && (
+                      <div className="mobile-admin-vote-section">
+                        <span className="mobile-admin-vote-title">{t('room.pickACard')}</span>
+                        <div className="mobile-admin-vote-cards">
+                          {(state.deck || []).map((card) => (
+                            <PokerCard
+                              key={card}
+                              value={card}
+                              selected={myVote === card}
+                              small
+                              onClick={() => handleVote(card)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick actions: reveal, reset, timer */}
+                    <div className="mobile-admin-bar-header">
+                      <div className="mobile-admin-bar-actions">
+                        <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
+                          <Eye size={15} /> {t('room.reveal')}
+                        </button>
+                        <button onClick={handleReset} className="premium-button secondary">
+                          <RotateCcw size={15} /> {t('room.reset')}
+                        </button>
+                        {!isRevealed && (
+                          state.timerPausedRemainingMs !== null ? (
+                            <button onClick={() => actions.adminResumeTimer()} className="premium-button secondary" title={t('admin.resume')}>
+                              ▶
+                            </button>
+                          ) : state.timerEndAt ? (
+                            <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" title={t('admin.pause')}>
+                              ⏸
+                            </button>
+                          ) : (
+                            <button onClick={() => actions.adminSetTimer(30000)} className="premium-button secondary" title={t('admin.start')}>
+                              ⏱
+                            </button>
+                          )
+                        )}
+                      </div>
+                      <button
+                        className="mobile-admin-bar-toggle"
+                        onClick={() => setMobileAdminOpen(!mobileAdminOpen)}
+                        aria-label={mobileAdminOpen ? 'Close panel' : 'Open panel'}
+                      >
+                        {mobileAdminOpen ? <X size={18} /> : <><Settings size={15} /> <ChevronUp size={15} /></>}
+                      </button>
+                    </div>
+
+                    {/* Expanded: full admin panel */}
+                    {mobileAdminOpen && (
+                      <div className="mobile-admin-bar-content animate-fade-in">
+                        <AdminPanel
+                          state={state}
+                          actions={actions}
+                          isAdmin={true}
+                          myVote={myVote}
+                          onVote={handleVote}
+                          roomId={roomId}
+                          layout="remote"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </main>

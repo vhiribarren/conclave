@@ -441,25 +441,9 @@
   justify-content: center;
   gap: 0.75rem;
 }
-.admin-controls {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: var(--shadow-lg);
-  border-radius: 1rem;
-  z-index: 20;
-}
 @media (min-width: 1025px) {
   .mobile-voting,
-  .mobile-admin {
+  .mobile-admin-bar {
     display: none !important;
   }
 }
@@ -470,6 +454,103 @@
   .room-sidebar {
     display: none;
   }
+}
+
+/* ── Mobile admin bottom bar ──────────────────────────────────── */
+.mobile-admin-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--surface-border);
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-admin-vote-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.75rem 0.4rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.mobile-admin-vote-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.mobile-admin-vote-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.mobile-admin-bar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+}
+
+.mobile-admin-bar-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.mobile-admin-bar-actions .premium-button {
+  flex: 1;
+  padding: 10px 10px;
+  font-size: 0.8rem;
+  min-width: 0;
+}
+
+.mobile-admin-bar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+}
+
+.mobile-admin-bar-toggle:active {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+}
+
+.mobile-admin-bar-content {
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem 1rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+/* Hide inline admin vote section when inside mobile admin bar (already in the bar) */
+.mobile-admin-bar-content .admin-vote-cards {
+  display: none;
+}
+
+.mobile-admin-bar-content .panel-section:has(.admin-vote-cards) {
+  display: none;
 }
 
 /* ── Mobile-specific refinements ──────────────────────────────── */
@@ -526,17 +607,6 @@
 
   .voting-cards {
     gap: 0.5rem;
-  }
-
-  .admin-controls {
-    bottom: 0.75rem;
-    padding: 0.6rem;
-    border-radius: 0.75rem;
-  }
-
-  .admin-controls .premium-button {
-    padding: 10px 16px;
-    font-size: 0.85rem;
   }
 }
 
