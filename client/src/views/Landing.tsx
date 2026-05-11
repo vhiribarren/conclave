@@ -78,6 +78,7 @@ const Landing = () => {
   };
 
   return (
+    <>
     <div className="page-container animate-fade-in">
       <div className="landing-card glass">
         <div className="landing-glow-1"></div>
@@ -201,36 +202,37 @@ const Landing = () => {
           <Link to="/about">{t('landing.footerLink')}</Link>
         </footer>
       </div>
-
-      {showCreateModal && (
-        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-          <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
-            <h2 className="modal-title">{t('landing.createModal.title')}</h2>
-            <p className="modal-subtitle">{t('landing.createModal.subtitle')}</p>
-            <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="landing-form">
-              <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                {t('landing.createModal.roomTitle')}
-              </div>
-              <input
-                type="text"
-                placeholder={t('landing.createModal.placeholder')}
-                className="premium-input"
-                value={roomTitle}
-                onChange={(e) => setRoomTitle(e.target.value)}
-                style={{ textAlign: 'center' }}
-                autoFocus
-              />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? t('landing.creating') : t('landing.createModal.confirm')}
-              </Button>
-              <Button type="button" onClick={() => setShowCreateModal(false)} variant="secondary">
-                {t('common.cancel')}
-              </Button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
+
+    {showCreateModal && (
+      <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+        <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+          <h2 className="modal-title">{t('landing.createModal.title')}</h2>
+          <p className="modal-subtitle">{t('landing.createModal.subtitle')}</p>
+          <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="landing-form">
+            <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+              {t('landing.createModal.roomTitle')}
+            </div>
+            <input
+              type="text"
+              placeholder={t('landing.createModal.placeholder')}
+              className="premium-input"
+              value={roomTitle}
+              onChange={(e) => setRoomTitle(e.target.value)}
+              style={{ textAlign: 'center' }}
+              autoFocus
+            />
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? t('landing.creating') : t('landing.createModal.confirm')}
+            </Button>
+            <Button type="button" onClick={() => setShowCreateModal(false)} variant="secondary">
+              {t('common.cancel')}
+            </Button>
+          </form>
+        </div>
+      </div>
+    )}
+  </>
   );
 };
 

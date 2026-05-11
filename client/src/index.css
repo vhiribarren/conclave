@@ -156,6 +156,8 @@ h1,
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
   background: rgba(0,0,0,0.4);
   animation: overlayFadeIn 0.2s ease-out;
   will-change: opacity;
@@ -173,6 +175,7 @@ h1,
 .modal-content {
   max-width: 28rem;
   width: 100%;
+  margin: auto;
   padding: 2rem;
   text-align: center;
   display: flex;
