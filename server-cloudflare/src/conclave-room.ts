@@ -49,19 +49,16 @@ export class ConclaveRoom extends DurableObject {
     });
   }
 
-  async fetch(request: Request) {
-    const url = new URL(request.url);
-    
-    if (request.method === "POST" && url.pathname === "/init") {
+  async createRoom(adminId: string, roomTitle: string | undefined) {
       console.log("Initializing room...");
-      const data = await request.json() as { name?: string };
       this.state.created = true;
-      this.state.name = data.name;
+      this.state.name = roomTitle;
+      this.state.adminId = adminId;
       await this.ctx.storage.put("state", this.state);
       this.updateAlarm();
-      return new Response("OK");
-    }
+  }
 
+  async fetch(request: Request) {    
     if (!this.state.created) {
       return new Response("Room does not exist", { status: 404 });
     }
@@ -132,10 +129,6 @@ export class ConclaveRoom extends DurableObject {
         
         // Remove old participant if they reconnected
         this.state.participants = this.state.participants.filter((p) => p.id !== sessionId);
-        
-        if (!this.state.adminId) {
-          this.state.adminId = sessionId;
-        }
 
         this.state.participants.push({
           id: sessionId,

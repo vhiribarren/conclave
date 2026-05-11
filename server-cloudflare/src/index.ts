@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-export { ConclaveRoom } from "./conclave-room";
+import { ConclaveRoom } from "./conclave-room";
 import { generateRoomId } from "conclave-shared";
 
+export { ConclaveRoom };
 export interface Env {
-  CONCLAVE_ROOM: DurableObjectNamespace;
+  CONCLAVE_ROOM: DurableObjectNamespace<ConclaveRoom>;
 }
 
 const API_PREFIX = "/api/"
@@ -41,7 +42,7 @@ export default {
     console.log(`Called URL: ${url}`)
 
     if (!pathname.startsWith(API_PREFIX)) {
-        console.log(`${pathname} does not match pattern ${API_PREFIX}, bailing out.`);
+        console.warn(`${pathname} does not match pattern ${API_PREFIX}, bailing out.`);
         return new Response("Resource not managed.", { status: 404 });
     }
 
@@ -59,20 +60,20 @@ export default {
   },
 };
 
-async function apiRoomCreate(durableObject: DurableObjectNamespace, request: Request): Promise<Response> {
-      const { name } = await request.json() as { name?: string };
+async function apiRoomCreate(durableObject: DurableObjectNamespace<ConclaveRoom>, request: Request): Promise<Response> {
+      const { roomTitle, adminId } = await request.json() as { roomTitle?: string, adminId?: string };
+      if (!adminId) {
+        console.warn("apiRoomCreate was called without adminId field");
+        return new Response("Bad request", { status: 400 });
+      }
       const roomId = generateRoomId();
       const id = durableObject.idFromName(roomId);
       const obj = durableObject.get(id);
-      await obj.fetch(new Request("http://do/init", { 
-        method: "POST",
-        body: JSON.stringify({ name }),
-        headers: { "Content-Type": "application/json" }
-      }));
+      await obj.createRoom(adminId, roomTitle);
       return new Response(JSON.stringify({ roomId }));
 }
 
-async function apiWebsocket(durableObject: DurableObjectNamespace, request: Request, url: URL): Promise<Response> {
+async function apiWebsocket(durableObject: DurableObjectNamespace<ConclaveRoom>, request: Request, url: URL): Promise<Response> {
     const roomId = url.searchParams.get("roomId");
     if (!roomId) {
       return new Response("Missing roomId", { status: 400 });

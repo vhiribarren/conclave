@@ -25,7 +25,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
-import { getUserName, setUserName, getUserEmoji, setUserEmoji } from '../services/user';
+import { getUserName, setUserName, getUserEmoji, setUserEmoji, getUserId } from '../services/user';
 import Button from '../components/Button';
 import './Landing.css';
 import { getHistory, type HistoryEntry } from '../services/history';
@@ -51,7 +51,7 @@ const Landing = () => {
       const res = await fetch(`api/rooms/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: roomTitle }),
+        body: JSON.stringify({ roomTitle, adminId: getUserId() }),
       });
       if (res.ok) {
         const data = await res.json();
