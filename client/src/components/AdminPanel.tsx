@@ -67,6 +67,7 @@ export const AdminPanel: React.FC<Props> = ({
     const saved = settings.getDeckCustom();
     return saved ? JSON.parse(saved) : ['1', '2', '3', '5', '8', '13', '?', '☕'];
   });
+  const [showCustomizeConfirm, setShowCustomizeConfirm] = useState(false);
 
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId) ?? null;
   const currentTaskIndex = currentTask ? state.tasks.findIndex(t => t.id === currentTask.id) : -1;
@@ -415,7 +416,7 @@ export const AdminPanel: React.FC<Props> = ({
               <div className="animate-fade-in" style={{ textAlign: 'center', padding: '0.5rem', background: 'rgba(0,0,0,0.03)', borderRadius: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                 <span>This preset is read-only.</span>
                 <Button
-                  onClick={() => updateDeck(state.deck || [], 'custom')}
+                  onClick={() => setShowCustomizeConfirm(true)}
                   variant="secondary"
                   className="sidebar-chip"
                   style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}
@@ -457,6 +458,21 @@ export const AdminPanel: React.FC<Props> = ({
               </Button>
             </div>
           </Section>
+        </div>
+      )}
+
+      {showCustomizeConfirm && (
+        <div className="modal-overlay" onClick={() => setShowCustomizeConfirm(false)}>
+          <div className="modal-content glass animate-fade-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '24rem' }}>
+            <h2 className="modal-title">Customize deck?</h2>
+            <p className="modal-subtitle">
+              This will replace your previously saved custom deck with the current preset cards.
+            </p>
+            <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <Button variant="secondary" onClick={() => setShowCustomizeConfirm(false)}>Cancel</Button>
+              <Button onClick={() => { updateDeck(state.deck || [], 'custom'); setShowCustomizeConfirm(false); }}>Confirm</Button>
+            </div>
+          </div>
         </div>
       )}
 
