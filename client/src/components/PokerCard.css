@@ -71,6 +71,15 @@
   box-shadow: var(--shadow-md);
 }
 
+@media (hover: none) {
+  .poker-card:hover:not(.selected) {
+    border-color: var(--surface-border);
+    color: var(--text-primary);
+    transform: none;
+    box-shadow: var(--shadow-sm);
+  }
+}
+
 .poker-card.small {
   width: 48px;
   height: 64px;
