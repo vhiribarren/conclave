@@ -23,7 +23,7 @@
  */
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import Button from '../components/Button';
 import PokerCard from '../components/PokerCard';
@@ -337,6 +337,9 @@ const Room = () => {
             )}
             <button onClick={() => setShowShareModal(true)} className="icon-button" title="Share Room">
               <Share2 size={18} />
+            </button>
+            <button onClick={() => navigate('/about', { state: { from: window.location.pathname + window.location.search } })} className="icon-button" title="About">
+              <Info size={18} />
             </button>
             <button onClick={() => navigate('/')} className="icon-button danger" title="Leave">
               <LogOut size={18} />

@@ -1,0 +1,202 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2026 Vincent Hiribarren
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+.about-page {
+  width: 100%;
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.about-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.65rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.about-back-link:hover {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text-primary);
+}
+
+.about-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.about-subtitle {
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+.about-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.about-section {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.about-section h2 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.about-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.about-section-heading h2 {
+  margin-bottom: 0;
+}
+
+.about-section-heading span {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.about-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.about-facts div {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--surface-border);
+}
+
+.about-facts dt {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.about-facts dd {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.about-notice-list {
+  display: grid;
+  gap: 0.75rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.license-list {
+  max-height: 28rem;
+  overflow: auto;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.license-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  transition: var(--transition);
+}
+
+.license-row:last-child {
+  border-bottom: none;
+}
+
+.license-row:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.license-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+.license-row strong {
+  color: var(--accent-color);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .about-page {
+    padding: 1rem;
+  }
+
+  .about-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .about-title {
+    font-size: 1.7rem;
+  }
+
+  .about-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .license-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+  }
+}

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Plus, ArrowRight, History, Clock, Crown } from 'lucide-react';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { getUserName, setUserName, getUserEmoji, setUserEmoji, getUserId } from '../services/user';
@@ -192,6 +192,10 @@ const Landing = () => {
             </div>
           </div>
         )}
+
+        <footer className="landing-footer">
+          <Link to="/about">About, licenses, and data usage</Link>
+        </footer>
       </div>
 
       {showCreateModal && (

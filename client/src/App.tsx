@@ -24,6 +24,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './views/Landing';
 import Room from './views/Room';
+import About from './views/About';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/about" element={<About />} />
           <Route path="/room/:roomId" element={<Room />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

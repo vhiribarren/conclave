@@ -94,11 +94,19 @@
   gap: 0.75rem;
 }
 .landing-footer {
-  margin-top: 2rem;
   color: var(--text-secondary);
   font-size: 0.85rem;
   display: flex;
-  gap: 1.5rem;
+  justify-content: center;
+}
+.landing-footer a {
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+}
+.landing-footer a:hover {
+  color: var(--accent-color);
 }
 .landing-history {
   margin-top: 1.5rem;
