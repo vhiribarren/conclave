@@ -242,6 +242,24 @@ export class ConclaveRoom extends DurableObject {
         this.broadcastState();
         break;
 
+      case "ADMIN_RENAME_TASK":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_RENAME_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          return;
+        }
+        if (!data.taskId || !data.name) {
+          console.error("ADMIN_RENAME_TASK: Missing taskId or name");
+          return;
+        }
+        {
+          const task = this.state.tasks.find(t => t.id === data.taskId);
+          if (task) {
+            task.name = data.name;
+          }
+        }
+        this.broadcastState();
+        break;
+
       case "ADMIN_SET_TASK":
         if (!this.isAdmin(ws)) {
           console.error(`ADMIN_SET_TASK: Unauthorized access from session ${attachment.sessionId}`);

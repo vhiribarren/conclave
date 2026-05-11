@@ -1,0 +1,115 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2026 Vincent Hiribarren
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+.task-selector-modal {
+  width: min(100% - 2rem, 54rem);
+  max-height: min(86vh, 46rem);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+
+.task-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.task-selector-header h3 {
+  font-size: 1.25rem;
+}
+
+.task-selector-header p,
+.task-selector-item small,
+.task-selector-empty {
+  color: var(--text-secondary);
+}
+
+.task-selector-header p {
+  margin-top: 0.2rem;
+  font-size: 0.9rem;
+}
+
+.task-selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.task-selector-item {
+  width: 100%;
+  padding: 0.85rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.task-selector-item:hover,
+.task-selector-item.active {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.task-selector-item span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.task-selector-item small {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+}
+
+.task-selector-empty {
+  padding: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .task-selector-modal {
+    width: calc(100% - 1rem);
+    max-height: 86vh;
+    padding: 0.8rem;
+  }
+
+  .task-selector-item {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}

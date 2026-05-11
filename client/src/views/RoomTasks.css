@@ -1,0 +1,373 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2026 Vincent Hiribarren
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+.tasks-page {
+  min-height: 100vh;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tasks-page.blurred {
+  filter: blur(12px);
+  transform: scale(0.98);
+  opacity: 0.7;
+}
+
+.tasks-header {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 1rem;
+}
+
+.tasks-header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.tasks-header h1 {
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.tasks-header p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tasks-header-actions {
+  flex-shrink: 0;
+}
+
+.tasks-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 1rem;
+  min-height: 0;
+  flex: 1;
+}
+
+.tasks-list-panel,
+.tasks-detail-panel {
+  border-radius: 1rem;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.tasks-list-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tasks-detail-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tasks-panel-heading,
+.tasks-detail-header,
+.tasks-round-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tasks-kicker {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tasks-add-form,
+.tasks-rename-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tasks-add-form .premium-button {
+  align-self: stretch;
+  min-width: 3rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.tasks-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--surface-border);
+  background: rgba(255, 255, 255, 0.42);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tasks-list-item:hover,
+.tasks-list-item.selected {
+  border-color: rgba(99, 102, 241, 0.45);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.tasks-list-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tasks-list-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tasks-list-meta,
+.tasks-current-badge,
+.tasks-round-card-header span,
+.tasks-result-meta {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.tasks-current-badge {
+  color: var(--accent-hover);
+  background: rgba(99, 102, 241, 0.12);
+  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.tasks-detail-header h2 {
+  font-size: 1.65rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.tasks-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.tasks-round-card,
+.tasks-history-item {
+  padding: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.tasks-round-card h3,
+.tasks-history h3 {
+  font-size: 1rem;
+}
+
+.tasks-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tasks-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.tasks-result-row {
+  display: grid;
+  grid-template-columns: minmax(2.8rem, auto) minmax(80px, 1fr) 4.5rem;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tasks-vote-value {
+  min-width: 2.6rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.65rem;
+  background: white;
+  border: 1px solid var(--surface-border);
+  font-weight: 800;
+  text-align: center;
+}
+
+.tasks-result-bar {
+  height: 0.55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.16);
+}
+
+.tasks-result-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-color), #0ea5e9);
+}
+
+.tasks-result-meta {
+  text-align: right;
+  font-weight: 700;
+}
+
+.tasks-round-state {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  color: var(--text-secondary);
+}
+
+.tasks-round-state strong {
+  color: var(--text-primary);
+  margin-left: auto;
+}
+
+.tasks-status-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
+}
+
+.tasks-empty,
+.tasks-empty-state,
+.tasks-error {
+  color: var(--text-secondary);
+}
+
+.tasks-empty {
+  padding-top: 0.75rem;
+}
+
+.tasks-empty-state {
+  min-height: 10rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  border: 1px dashed rgba(100, 116, 139, 0.25);
+  border-radius: 0.85rem;
+}
+
+.tasks-empty-state--large {
+  min-height: 22rem;
+}
+
+.tasks-error {
+  width: min(100%, 28rem);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  .tasks-page {
+    padding: 0.75rem;
+  }
+
+  .tasks-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tasks-header-actions .premium-button {
+    width: 100%;
+  }
+
+  .tasks-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tasks-list {
+    max-height: 42vh;
+  }
+
+  .tasks-detail-header {
+    flex-direction: column;
+  }
+
+  .tasks-detail-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .tasks-detail-actions .premium-button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .tasks-list-panel,
+  .tasks-detail-panel {
+    padding: 0.8rem;
+  }
+
+  .tasks-add-form,
+  .tasks-rename-form {
+    align-items: stretch;
+  }
+
+  .tasks-result-row {
+    grid-template-columns: minmax(2.6rem, auto) 1fr;
+  }
+
+  .tasks-result-bar {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}

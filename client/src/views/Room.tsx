@@ -21,24 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronRight, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import Button from '../components/Button';
 import PokerCard from '../components/PokerCard';
 import './Room.css';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
-import { ConclaveSocket, type RoomState, type ConclaveActions } from '../services/conclave';
-import { getUserId, getUserName, setUserName, getUserEmoji, setUserEmoji } from '../services/user';
-import { addToHistory } from '../services/history';
+import { setUserName, setUserEmoji } from '../services/user';
 import { ParticipantsBoard, type LayoutMode } from '../components/ParticipantsBoard';
 import { AggregationResult } from '../components/AggregationResult';
 import { TimerDisplay } from '../components/TimerDisplay';
 import { AdminRemote } from '../components/AdminRemote';
 import { SidebarPanel } from '../components/SidebarPanel';
-import { settings } from '../services/settings';
+import { useCurrentRoomSession } from './RoomSessionLayout';
 
 
 const Room = () => {
@@ -46,39 +44,27 @@ const Room = () => {
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(window.location.search);
   const isRemoteView = searchParams.get('remote') === 'true';
-  const linkUserId = searchParams.get('linkUserId');
-  const linkName = searchParams.get('name');
-
-  useEffect(() => {
-    if (linkUserId && linkName) {
-      settings.setUserId(linkUserId);
-      settings.setUserName(linkName);
-      // Clean up URL to prevent sharing identity further
-      window.history.replaceState({}, document.title, window.location.pathname + (isRemoteView ? '?remote=true' : ''));
-      window.location.reload(); // Reload to pick up new ID from services
-    }
-  }, [linkUserId, linkName, isRemoteView]);
-
-  const [name, setName] = useState(getUserName());
-  const [mood, setMood] = useState(getUserEmoji());
-  const [isJoined, setIsJoined] = useState(!!getUserName());
-  const userId = getUserId();
-  const [state, setState] = useState<RoomState>({
-    participants: [],
-    tasks: [],
-    currentTaskId: null,
-    deck: [],
-    deckMode: 'preset',
-    timerEndAt: null,
-    timerPausedRemainingMs: null,
-    adminId: null,
-    unassociatedRound: { id: '', votes: {}, revealed: false }
-  });
+  const {
+    actions,
+    actionsRef,
+    connectionError,
+    currentRound,
+    currentTask,
+    isAdmin,
+    isJoined,
+    isRevealed,
+    mood,
+    name,
+    setIsJoined,
+    setMood,
+    setName,
+    state,
+    userId,
+  } = useCurrentRoomSession();
   const [myVote, setMyVote] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [isQRVisible, setIsQRVisible] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
-  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [showEmojiPickerJoin, setShowEmojiPickerJoin] = useState(false);
   const [showEmojiPickerSettings, setShowEmojiPickerSettings] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -87,54 +73,6 @@ const Room = () => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [isEditingRoomName, setIsEditingRoomName] = useState(false);
   const [tempRoomName, setTempRoomName] = useState('');
-  const actionsRef = useRef<ConclaveActions | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    let socketActions: ConclaveActions | null = null;
-
-    if (isJoined && roomId && !linkUserId) {
-      // Small delay to let previous connections close properly (Strict Mode)
-      const timeoutId = setTimeout(() => {
-        if (!isMounted) return;
-
-        console.log(`Connecting to room ${roomId}...`);
-        socketActions = ConclaveSocket.connect(roomId, userId, name, mood, (newState) => {
-          if (isMounted) {
-            setState(newState);
-            setConnectionError(null);
-            if (roomId) {
-              const isUserAdmin = newState.participants.find(p => p.id === userId)?.isAdmin;
-              addToHistory(roomId, newState.name, isUserAdmin);
-            }
-          }
-        }, (error) => {
-          if (isMounted) {
-            setConnectionError(error);
-          }
-        });
-        actionsRef.current = socketActions;
-      }, 100);
-
-      return () => {
-        isMounted = false;
-        clearTimeout(timeoutId);
-        if (socketActions) {
-          console.log("Disconnecting...");
-          socketActions.userDisconnect();
-          actionsRef.current = null;
-        }
-      };
-    }
-  }, [isJoined, roomId, name, mood]);
-
-  const isAdmin = state.participants.find(p => p.id === userId)?.isAdmin;
-
-  const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
-  const currentRound = currentTask
-    ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
-    : state.unassociatedRound;
-  const isRevealed = currentRound?.revealed || false;
   const isCircleLayout = layoutMode === 'auto' && state.participants.length <= 12 && state.participants.length > 0;
 
   // Reset local vote when the round changes (e.g. admin reset)
@@ -330,6 +268,11 @@ const Room = () => {
             <button onClick={() => setShowUserSettings(true)} className="icon-button" title="User Settings">
               <UserCog size={18} />
             </button>
+            {!isRemoteView && (
+              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? 'Manage Tasks' : 'View Tasks'}>
+                <ListChecks size={18} />
+              </button>
+            )}
             {isAdmin && !isRemoteView && (
               <button onClick={() => setShowQR(true)} className="icon-button accent" title="Remote Control">
                 <Smartphone size={18} />
@@ -348,10 +291,10 @@ const Room = () => {
         </header>
 
         <div className="room-layout">
-          {isRemoteView && isAdmin && actionsRef.current ? (
+          {isRemoteView && isAdmin && actions ? (
             // ── Remote / mobile admin view ───────────────────────────────
             <main className="room-main">
-              <AdminRemote state={state} actions={actionsRef.current} myVote={myVote} onVote={handleVote} />
+              <AdminRemote state={state} actions={actions} myVote={myVote} onVote={handleVote} roomId={roomId} />
             </main>
           ) : (
             <>
@@ -432,15 +375,18 @@ const Room = () => {
                 >
                   <ChevronRight size={18} />
                 </button>
-                <SidebarPanel
-                  state={state}
-                  actions={actionsRef.current!}
-                  isAdmin={!!isAdmin}
-                  myVote={myVote}
-                  onVote={handleVote}
-                  isRevealed={isRevealed}
-                  hasCurrentTask={!!currentTask}
-                />
+                {actions && (
+                  <SidebarPanel
+                    state={state}
+                    actions={actions}
+                    isAdmin={!!isAdmin}
+                    myVote={myVote}
+                    onVote={handleVote}
+                    isRevealed={isRevealed}
+                    hasCurrentTask={!!currentTask}
+                    roomId={roomId}
+                  />
+                )}
               </aside>
             </>
           )}

@@ -66,6 +66,7 @@ export type SocketMessage =
   | { type: 'ADMIN_RESET' }
   | { type: 'ADMIN_SET_TASK'; taskId: string | null }
   | { type: 'ADMIN_ADD_TASK'; name: string }
+  | { type: 'ADMIN_RENAME_TASK'; taskId: string; name: string }
   | { type: 'ADMIN_DELETE_TASK'; taskId: string }
   | { type: 'ADMIN_SET_DECK'; deck: string[]; mode: 'preset' | 'custom' }
   | { type: 'ADMIN_SET_TIMER'; durationMs: number | null }

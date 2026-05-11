@@ -22,11 +22,13 @@
  * SOFTWARE.
  */
 import React, { useState, useRef } from 'react';
-import { Eye, RotateCcw, Plus, Settings, Play, X, Trash2, Layout, Pause, RotateCw, GripVertical, Smile } from 'lucide-react';
+import { Eye, RotateCcw, Settings, Play, X, Layout, Pause, RotateCw, GripVertical, Smile, ListChecks } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import PokerCard from './PokerCard';
 import { AggregationResult } from './AggregationResult';
+import { TaskSelectionDialog } from './TaskSelectionDialog';
 import './SidebarPanel.css';
 import { settings } from '../services/settings';
 
@@ -38,6 +40,7 @@ interface Props {
   onVote: (card: string) => void;
   isRevealed: boolean;
   hasCurrentTask: boolean;
+  roomId?: string;
 }
 
 export const SidebarPanel: React.FC<Props> = ({
@@ -47,13 +50,15 @@ export const SidebarPanel: React.FC<Props> = ({
   myVote,
   onVote,
   isRevealed,
+  roomId,
 }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'control' | 'settings'>(isAdmin ? 'control' : 'control');
-  const [newTaskName, setNewTaskName] = useState('');
   const [customTimerValue, setCustomTimerValue] = useState('30');
   const [selectedDurationMs, setSelectedDurationMs] = useState(30000);
   const [newCardValue, setNewCardValue] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showTaskSelector, setShowTaskSelector] = useState(false);
   const [localDeck, setLocalDeck] = useState<string[] | null>(null);
   const dragSourceIdx = useRef<number | null>(null);
 
@@ -69,14 +74,6 @@ export const SidebarPanel: React.FC<Props> = ({
     if (mode === 'custom') {
       setSavedCustomDeck(newDeck);
       settings.setDeckCustom(JSON.stringify(newDeck));
-    }
-  };
-
-  const handleAddTask = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newTaskName.trim()) {
-      actions.adminAddTask(newTaskName.trim());
-      setNewTaskName('');
     }
   };
 
@@ -126,6 +123,12 @@ export const SidebarPanel: React.FC<Props> = ({
     setCustomTimerValue(seconds.toString());
   };
 
+  const currentTask = state.tasks.find(task => task.id === state.currentTaskId) || null;
+  const currentTaskIndex = currentTask ? state.tasks.findIndex(task => task.id === currentTask.id) : -1;
+  const nextTask = state.currentTaskId === null
+    ? state.tasks[0] || null
+    : state.tasks[currentTaskIndex + 1] || null;
+
   const handleSetTimer = () => {
     if (selectedDurationMs > 0) {
       actions.adminSetTimer(selectedDurationMs);
@@ -169,6 +172,18 @@ export const SidebarPanel: React.FC<Props> = ({
                   />
                 ))}
               </div>
+            </div>
+          )}
+
+          {!isAdmin && roomId && (
+            <div className="sidebar-section">
+              <span className="sidebar-section-title">📋 Tasks</span>
+              <button
+                onClick={() => navigate(`/room/${roomId}/tasks`)}
+                className="premium-button secondary"
+              >
+                <ListChecks size={15} /> View tasks
+              </button>
             </div>
           )}
 
@@ -236,22 +251,50 @@ export const SidebarPanel: React.FC<Props> = ({
 
               <div className="sidebar-section">
                 <span className="sidebar-section-title">📋 Select Task</span>
-                <div className="task-list" style={{ maxHeight: '35vh' }}>
-                  {state.tasks.map((task) => (
-                    <div
-                      key={task.id}
-                      onClick={() => actions?.adminSetTask(state.currentTaskId === task.id ? null : task.id)}
-                      className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
-                    >
-                      {task.name}
-                    </div>
-                  ))}
-                  {state.tasks.length === 0 && (
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '0.5rem' }}>
-                      No tasks yet. Go to Settings.
-                    </p>
-                  )}
+                <div className="vote-mode-switch" role="group" aria-label="Vote mode">
+                  <button
+                    type="button"
+                    className={state.currentTaskId === null ? 'active' : ''}
+                    onClick={() => actions.adminSetTask(null)}
+                  >
+                    Adhoc vote
+                  </button>
+                  <button
+                    type="button"
+                    className={state.currentTaskId !== null ? 'active' : ''}
+                    onClick={() => {
+                      if (state.currentTaskId === null && state.tasks[0]) {
+                        actions.adminSetTask(state.tasks[0].id);
+                      }
+                    }}
+                    disabled={state.tasks.length === 0}
+                  >
+                    Task vote
+                  </button>
                 </div>
+                {state.currentTaskId !== null && (
+                  <>
+                    <div className="sidebar-current-task">
+                      <span>{currentTask?.name || 'Task vote'}</span>
+                      <small>{currentTask ? `${currentTask.rounds.length} ${currentTask.rounds.length === 1 ? 'round' : 'rounds'}` : 'No task selected'}</small>
+                    </div>
+                    <div className="sidebar-actions task-session-actions">
+                      <button
+                        onClick={() => nextTask && actions.adminSetTask(nextTask.id)}
+                        className="premium-button"
+                        disabled={!nextTask}
+                      >
+                        Next task
+                      </button>
+                      <button
+                        onClick={() => setShowTaskSelector(true)}
+                        className="premium-button secondary"
+                      >
+                        <ListChecks size={15} /> Select task
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </>
           )}
@@ -259,6 +302,18 @@ export const SidebarPanel: React.FC<Props> = ({
       ) : (
         /* ── SETTINGS TAB ────────────────────────────────────────── */
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+          {roomId && (
+            <div className="sidebar-section">
+              <span className="sidebar-section-title">📋 Tasks Setup</span>
+              <button
+                onClick={() => navigate(`/room/${roomId}/tasks`)}
+                className="premium-button secondary"
+              >
+                <ListChecks size={15} /> Manage tasks
+              </button>
+            </div>
+          )}
 
           <div className="sidebar-section">
             <span className="sidebar-section-title">⏱ Timer Setup</span>
@@ -288,37 +343,6 @@ export const SidebarPanel: React.FC<Props> = ({
                 />
                 <span className="timer-input-unit">s</span>
               </div>
-            </div>
-          </div>
-
-          <div className="sidebar-section">
-            <span className="sidebar-section-title">📋 Task Preparation</span>
-            <form onSubmit={handleAddTask} className="remote-form">
-              <input
-                type="text"
-                value={newTaskName}
-                onChange={(e) => setNewTaskName(e.target.value)}
-                placeholder="Add task..."
-                className="premium-input"
-              />
-              <button type="submit" className="premium-button">
-                <Plus size={15} />
-              </button>
-            </form>
-            <div className="task-list" style={{ maxHeight: '20vh' }}>
-              {state.tasks.map((task) => (
-                <div key={task.id} className="task-item">
-                  <div className="task-item-content">
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); actions?.adminDeleteTask(task.id); }}
-                      className="task-delete-btn"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -413,6 +437,14 @@ export const SidebarPanel: React.FC<Props> = ({
           </div>
 
         </div>
+      )}
+      {showTaskSelector && (
+        <TaskSelectionDialog
+          actions={actions}
+          currentTaskId={state.currentTaskId}
+          onClose={() => setShowTaskSelector(false)}
+          tasks={state.tasks}
+        />
       )}
     </div>
   );

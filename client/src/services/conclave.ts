@@ -30,6 +30,7 @@ export interface ConclaveActions {
   adminReveal: () => void;
   adminReset: () => void;
   adminAddTask: (name: string) => void;
+  adminRenameTask: (taskId: string, name: string) => void;
   adminSetTask: (taskId: string | null) => void;
   adminSetDeck: (deck: string[], mode: 'preset' | 'custom') => void;
   adminSetTimer: (durationMs: number | null) => void;
@@ -100,6 +101,7 @@ export class ConclaveSocket {
       adminReveal: () => send({ type: 'ADMIN_REVEAL' }),
       adminReset: () => send({ type: 'ADMIN_RESET' }),
       adminAddTask: (name) => send({ type: 'ADMIN_ADD_TASK', name }),
+      adminRenameTask: (taskId, name) => send({ type: 'ADMIN_RENAME_TASK', taskId, name }),
       adminSetTask: (taskId) => send({ type: 'ADMIN_SET_TASK', taskId }),
       adminSetDeck: (deck, mode) => send({ type: 'ADMIN_SET_DECK', deck, mode }),
       adminSetTimer: (durationMs) => send({ type: 'ADMIN_SET_TIMER', durationMs }),

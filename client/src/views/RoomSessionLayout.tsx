@@ -21,29 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Landing from './views/Landing';
-import Room from './views/Room';
-import RoomSessionLayout from './views/RoomSessionLayout';
-import RoomTasks from './views/RoomTasks';
-import About from './views/About';
+import { createContext, useContext } from 'react';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { useRoomSession } from '../hooks/useRoomSession';
 
-function App() {
+type RoomSession = ReturnType<typeof useRoomSession>;
+
+const RoomSessionContext = createContext<RoomSession | null>(null);
+
+export const useCurrentRoomSession = () => {
+  const session = useContext(RoomSessionContext);
+  if (!session) {
+    throw new Error('useCurrentRoomSession must be used inside RoomSessionLayout');
+  }
+  return session;
+};
+
+const RoomSessionLayout = () => {
+  const { roomId } = useParams<{ roomId: string }>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const isRemoteView = searchParams.get('remote') === 'true';
+  const linkUserId = searchParams.get('linkUserId');
+  const linkName = searchParams.get('name');
+  const session = useRoomSession(roomId, { isRemoteView, linkUserId, linkName });
+
   return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/room/:roomId" element={<RoomSessionLayout />}>
-            <Route index element={<Room />} />
-            <Route path="tasks" element={<RoomTasks />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </div>
-    </Router>
+    <RoomSessionContext.Provider value={session}>
+      <Outlet />
+    </RoomSessionContext.Provider>
   );
-}
+};
 
-export default App;
+export default RoomSessionLayout;

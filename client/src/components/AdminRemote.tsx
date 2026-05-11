@@ -22,13 +22,15 @@
  * SOFTWARE.
  */
 import React, { useState, useRef } from 'react';
-import { Eye, RotateCcw, Plus, Settings, Play, Pause, X, Trash2, Layout, RotateCw, GripVertical, Smile } from 'lucide-react';
+import { Eye, RotateCcw, Settings, Play, Pause, X, Layout, RotateCw, GripVertical, Smile, ListChecks } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import Button from './Button';
 import PokerCard from './PokerCard';
 import './AdminRemote.css';
 import { AggregationResult } from './AggregationResult';
+import { TaskSelectionDialog } from './TaskSelectionDialog';
 import { settings } from '../services/settings';
 
 interface Props {
@@ -36,15 +38,17 @@ interface Props {
   actions: ConclaveActions;
   myVote: string | null;
   onVote: (card: string) => void;
+  roomId?: string;
 }
 
-export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote }) => {
+export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote, roomId }) => {
+  const navigate = useNavigate();
   const [selectedDurationMs, setSelectedDurationMs] = useState(30000);
   const [newCardValue, setNewCardValue] = useState('');
   const [customTimerValue, setCustomTimerValue] = useState('30');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showTaskSelector, setShowTaskSelector] = useState(false);
   const [activeTab, setActiveTab] = useState<'control' | 'settings'>('control');
-  const [newTaskName, setNewTaskName] = useState('');
   const [localDeck, setLocalDeck] = useState<string[] | null>(null);
   const dragSourceIdx = useRef<number | null>(null);
 
@@ -63,18 +67,14 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
   };
 
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
+  const currentTaskIndex = currentTask ? state.tasks.findIndex(task => task.id === currentTask.id) : -1;
+  const nextTask = state.currentTaskId === null
+    ? state.tasks[0] || null
+    : state.tasks[currentTaskIndex + 1] || null;
   const currentRound = currentTask
     ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
     : state.unassociatedRound;
   const isRevealed = currentRound?.revealed || false;
-
-  const handleAddTask = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newTaskName.trim()) {
-      actions.adminAddTask(newTaskName.trim());
-      setNewTaskName('');
-    }
-  };
 
   const handleAddCard = (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,18 +186,43 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
 
           <div className="remote-box glass">
             <h3 className="remote-section-title">Current Task</h3>
-            <div className="task-list">
-              {state.tasks.map(task => (
-                <div
-                  key={task.id}
-                  onClick={() => actions.adminSetTask(state.currentTaskId === task.id ? null : task.id)}
-                  className={`task-item ${state.currentTaskId === task.id ? 'active' : ''}`}
-                >
-                  {task.name}
-                </div>
-              ))}
-              {state.tasks.length === 0 && <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>No tasks. Go to Settings.</p>}
+            <div className="vote-mode-switch" role="group" aria-label="Vote mode">
+              <button
+                type="button"
+                className={state.currentTaskId === null ? 'active' : ''}
+                onClick={() => actions.adminSetTask(null)}
+              >
+                Adhoc vote
+              </button>
+              <button
+                type="button"
+                className={state.currentTaskId !== null ? 'active' : ''}
+                onClick={() => {
+                  if (state.currentTaskId === null && state.tasks[0]) {
+                    actions.adminSetTask(state.tasks[0].id);
+                  }
+                }}
+                disabled={state.tasks.length === 0}
+              >
+                Task vote
+              </button>
             </div>
+            {state.currentTaskId !== null && (
+              <>
+                <div className="remote-current-task">
+                  <span>{currentTask?.name || 'Task vote'}</span>
+                  <small>{currentTask ? `${currentTask.rounds.length} ${currentTask.rounds.length === 1 ? 'round' : 'rounds'}` : 'No task selected'}</small>
+                </div>
+                <div className="remote-actions task-session-actions">
+                  <Button onClick={() => nextTask && actions.adminSetTask(nextTask.id)} disabled={!nextTask}>
+                    Next task
+                  </Button>
+                  <Button onClick={() => setShowTaskSelector(true)} variant="secondary">
+                    <ListChecks size={16} /> Select task
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
 
           {!isRevealed && (
@@ -220,6 +245,15 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
       ) : (
         /* ── SETTINGS TAB ────────────────────────────────────────── */
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+          {roomId && (
+            <div className="remote-box glass">
+              <h3 className="remote-section-title">Tasks Setup</h3>
+              <Button onClick={() => navigate(`/room/${roomId}/tasks`)} variant="secondary">
+                <ListChecks size={16} /> Manage tasks
+              </Button>
+            </div>
+          )}
 
           <div className="remote-box glass">
             <h3 className="remote-section-title">Timer Duration</h3>
@@ -251,30 +285,6 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
                 />
                 <span className="timer-input-unit">s</span>
               </div>
-            </div>
-          </div>
-
-          <div className="remote-box glass">
-            <h3 className="remote-section-title">Task Management</h3>
-            <form onSubmit={handleAddTask} className="remote-form">
-              <input
-                type="text"
-                value={newTaskName}
-                onChange={(e) => setNewTaskName(e.target.value)}
-                placeholder="New task..."
-                className="premium-input"
-              />
-              <Button type="submit"><Plus size={16} /></Button>
-            </form>
-            <div className="task-list" style={{ marginTop: '0.5rem' }}>
-              {state.tasks.map(task => (
-                <div key={task.id} className="task-item">
-                  <div className="task-item-content">
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.name}</span>
-                    <button onClick={() => actions.adminDeleteTask(task.id)} className="task-delete-btn"><Trash2 size={14} /></button>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -371,6 +381,14 @@ export const AdminRemote: React.FC<Props> = ({ state, actions, myVote, onVote })
           </div>
 
         </div>
+      )}
+      {showTaskSelector && (
+        <TaskSelectionDialog
+          actions={actions}
+          currentTaskId={state.currentTaskId}
+          onClose={() => setShowTaskSelector(false)}
+          tasks={state.tasks}
+        />
       )}
     </div>
   );
