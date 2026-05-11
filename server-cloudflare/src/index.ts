@@ -56,6 +56,7 @@ export default {
       return await apiWebsocket(scopedDurableObject, request, url);
     }
 
+  console.warn(`Resource ${pathname} is not implemented, bailing out.`);
   return new Response("Resource does not exist in this scope", { status: 404 });
   },
 };
