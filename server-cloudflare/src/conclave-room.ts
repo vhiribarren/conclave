@@ -24,10 +24,12 @@
 import { DurableObject } from "cloudflare:workers";
 import type { RoomState, Task, Round } from "conclave-shared";
 import { DEFAULT_DECK } from "conclave-shared";
+import { SqlKvStorage } from "./kv-storage";
 
 const INACTIVITY_ALARM_MS = 48 * 60 * 60 * 1000 // 48H
 
 export class ConclaveRoom extends DurableObject {
+  private kv = new SqlKvStorage(this.ctx.storage.sql);
   private state: RoomState = {
     created: false,
     participants: [],
@@ -44,7 +46,7 @@ export class ConclaveRoom extends DurableObject {
   constructor(ctx: DurableObjectState, env: any) {
     super(ctx, env);
     this.ctx.blockConcurrencyWhile(async () => {
-      const stored = await this.ctx.storage.get<RoomState>("state");
+      const stored = this.kv.get<RoomState>("state");
       if (stored) {
         this.state = stored;
       }
@@ -56,7 +58,7 @@ export class ConclaveRoom extends DurableObject {
       this.state.created = true;
       this.state.name = roomTitle;
       this.state.adminId = adminId;
-      await this.ctx.storage.put("state", this.state);
+      this.kv.put("state", this.state);
       this.updateAlarm();
   }
 
@@ -104,7 +106,7 @@ export class ConclaveRoom extends DurableObject {
     if (attachment && attachment.sessionId) {
       this.state.participants = this.state.participants.filter((p) => p.id !== attachment.sessionId);
       this.broadcastState();
-      this.ctx.storage.put("state", this.state);
+      this.kv.put("state", this.state);
     }
   }
 
@@ -370,7 +372,7 @@ export class ConclaveRoom extends DurableObject {
         this.broadcastState();
         break;
     }
-    await this.ctx.storage.put("state", this.state);
+    this.kv.put("state", this.state);
   }
 
   isAdmin(ws: WebSocket) {
