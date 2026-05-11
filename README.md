@@ -11,6 +11,7 @@ Yet another planning poker tool.
 - Administrator have a special access to vote outside the main screen
 - Card deck can be customized
 - Mobile and desktop friendly
+- Room is deleted after 48H of inactivities
 - Based on Cloudflare Durable Objects on server side
 
 

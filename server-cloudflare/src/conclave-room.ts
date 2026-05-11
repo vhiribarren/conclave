@@ -25,6 +25,8 @@ import { DurableObject } from "cloudflare:workers";
 import type { RoomState, Task, Round } from "conclave-shared";
 import { DEFAULT_DECK } from "conclave-shared";
 
+const INACTIVITY_ALARM_MS = 48 * 60 * 60 * 1000 // 48H
+
 export class ConclaveRoom extends DurableObject {
   private state: RoomState = {
     created: false,
@@ -50,7 +52,7 @@ export class ConclaveRoom extends DurableObject {
   }
 
   async createRoom(adminId: string, roomTitle: string | undefined) {
-      console.log("Initializing room...");
+      console.log(`Creating new room - roomId: ${this.ctx.id.name}, adminId: ${adminId}, roomTitle: ${roomTitle}`);
       this.state.created = true;
       this.state.name = roomTitle;
       this.state.adminId = adminId;
@@ -107,15 +109,14 @@ export class ConclaveRoom extends DurableObject {
   }
 
   private updateAlarm() {
-    // 48 hours from now
-    this.ctx.storage.setAlarm(Date.now() + 48 * 60 * 60 * 1000);
+    this.ctx.storage.setAlarm(Date.now() + INACTIVITY_ALARM_MS);
   }
 
   async alarm() {
-    // Destroy room after 48h of inactivity
+    // Destroy room after inactivity
     await this.ctx.storage.deleteAll();
     for (const ws of this.ctx.getWebSockets()) {
-      ws.close(1000, "Room expired after 48h of inactivity");
+      ws.close(1000, `Room expired after ${INACTIVITY_ALARM_MS/(1000*60*60)}H of inactivity`);
     }
   }
 
