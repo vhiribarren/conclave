@@ -423,8 +423,8 @@ const Room = () => {
                 {/* Mobile-only: admin bottom bar with expand */}
                 {isAdmin && actions && (
                   <div className={`mobile-admin-bar ${mobileAdminOpen ? 'expanded' : ''}`}>
-                    {/* Vote cards for admin — always visible */}
-                    {!isRevealed && (
+                    {/* Vote cards for admin — hidden when panel is expanded */}
+                    {!isRevealed && !mobileAdminOpen && (
                       <div className="mobile-admin-vote-section">
                         <span className="mobile-admin-vote-title">{t('room.pickACard')}</span>
                         <div className="mobile-admin-vote-cards">
