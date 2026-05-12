@@ -31,6 +31,3 @@ class_name = "ConclaveRoom"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = [ "ConclaveRoom" ]
-
-[[routes]]
-custom_domain = true
