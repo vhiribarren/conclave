@@ -59,9 +59,7 @@ export const AggregationResult: React.FC<Props> = ({ participants, deck = [] }) 
   });
 
   return (
-    <div className="aggregation-result glass animate-fade-in">
-      <h3 className="aggregation-title">Results</h3>
-      
+    <div className="aggregation-result animate-fade-in">
       <div className="aggregation-list">
         {sortedVotes.map(([vote, count]) => {
           const percentage = Math.round((count / totalVotes) * 100);

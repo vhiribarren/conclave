@@ -442,9 +442,78 @@
 }
 @media (min-width: 1025px) {
   .mobile-voting,
-  .mobile-admin-bar {
+  .mobile-admin-bar,
+  .mobile-results-section {
     display: none !important;
   }
+}
+
+/* ── Mobile results section ───────────────────────────────────── */
+.mobile-results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* ── Participants + Results horizontal layout (desktop) ────────── */
+.participants-results-row {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.results-panel {
+  display: none;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+@media (min-width: 1025px) {
+  .participants-results-row {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .participants-results-row > :first-child {
+    flex: 1;
+    min-width: 0;
+  }
+  .results-panel {
+    display: flex;
+    width: 260px;
+    flex-shrink: 0;
+    padding: 1rem;
+    background: var(--glass-bg-panel);
+    border-radius: 1rem;
+    border: 1px solid var(--surface-border);
+  }
+  .results-panel.hidden {
+    display: none;
+  }
+}
+
+.results-panel-task-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 1rem;
+}
+
+.results-panel-voting {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.results-panel-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
 }
 @media (max-width: 1024px) {
   .room-layout {

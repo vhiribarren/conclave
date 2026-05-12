@@ -391,28 +391,52 @@ const Room = () => {
                   </div>
                 )}
 
-                <div className="task-section">
-                  <h2 className="task-title">{currentTask ? t('room.currentTask') : t('room.quickVote')}</h2>
-                  {currentTask && (
-                    <div className="task-box glass">
-                      {currentTask.name}
-                    </div>
-                  )}
+                <div className="participants-results-row">
+                  <ParticipantsBoard
+                    participants={state.participants}
+                    isRevealed={isRevealed}
+                    currentTaskName={currentTask?.name || ''}
+                    myName={name}
+                    layoutMode={effectiveLayoutMode}
+                    timerEndAt={state.timerEndAt}
+                    timerPausedRemainingMs={state.timerPausedRemainingMs}
+                  />
+
+                  {/* Right panel: voting cards or results */}
+                  <div className={`results-panel ${isAdmin && !sidebarCollapsed ? 'hidden' : ''}`}>
+                    <span className="sidebar-section-title">{t('room.votingOn')}</span>
+                    <span className="results-panel-task-title">
+                      {currentTask ? currentTask.name : t('admin.adhocVote')}
+                    </span>
+                    {isRevealed ? (
+                      <>
+                        <span className="sidebar-section-title">📊 {t('room.results')}</span>
+                        <AggregationResult participants={state.participants} deck={state.deck} />
+                      </>
+                    ) : !isAdmin ? (
+                      <div className="results-panel-voting">
+                        <span className="sidebar-section-title">🎴 {t('room.pickACard')}</span>
+                        <div className="results-panel-cards">
+                          {(state.deck || []).map((card) => (
+                            <PokerCard
+                              key={card}
+                              value={card}
+                              selected={myVote === card}
+                              small
+                              onClick={() => handleVote(card)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
 
-                <ParticipantsBoard
-                  participants={state.participants}
-                  isRevealed={isRevealed}
-                  currentTaskName={currentTask?.name || ''}
-                  myName={name}
-                  layoutMode={effectiveLayoutMode}
-                  timerEndAt={state.timerEndAt}
-                  timerPausedRemainingMs={state.timerPausedRemainingMs}
-                />
-
-                {/* Mobile-only: aggregation result below participants */}
+                {/* Mobile-only: task title and results */}
                 {isRevealed && (
-                  <div className="sidebar-section animate-fade-in">
+                  <div className="mobile-results-section animate-fade-in">
+                    <span className="sidebar-section-title">{t('room.votingOn')}</span>
+                    <span className="results-panel-task-title">{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
                     <span className="sidebar-section-title">📊 {t('room.results')}</span>
                     <AggregationResult participants={state.participants} deck={state.deck} />
                   </div>
@@ -510,31 +534,33 @@ const Room = () => {
                 )}
               </main>
 
-              {/* ── Right column: sidebar ──────────────────────────────── */}
-              <aside
-                ref={sidebarRef}
-                className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}
-                style={!sidebarCollapsed ? { width: sidebarWidth } : undefined}
-              >
-                <div className="sidebar-resize-handle" onMouseDown={handleResizeStart} />
-                <button
-                  className="sidebar-toggle-btn"
-                  onClick={() => setSidebarCollapsed((c) => !c)}
-                  title={sidebarCollapsed ? t('room.expandPanel') : t('room.collapsePanel')}
+              {/* ── Right column: sidebar (admin only) ─────────────────── */}
+              {isAdmin && (
+                <aside
+                  ref={sidebarRef}
+                  className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}
+                  style={!sidebarCollapsed ? { width: sidebarWidth } : undefined}
                 >
-                  <ChevronRight size={18} />
-                </button>
-                {actions && (
-                  <SidebarPanel
-                    state={state}
-                    actions={actions}
-                    isAdmin={!!isAdmin}
-                    myVote={myVote}
-                    onVote={handleVote}
-                    roomId={roomId}
-                  />
-                )}
-              </aside>
+                  <div className="sidebar-resize-handle" onMouseDown={handleResizeStart} />
+                  <button
+                    className="sidebar-toggle-btn"
+                    onClick={() => setSidebarCollapsed((c) => !c)}
+                    title={sidebarCollapsed ? t('room.expandPanel') : t('room.collapsePanel')}
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                  {actions && (
+                    <SidebarPanel
+                      state={state}
+                      actions={actions}
+                      isAdmin={!!isAdmin}
+                      myVote={myVote}
+                      onVote={handleVote}
+                      roomId={roomId}
+                    />
+                  )}
+                </aside>
+              )}
             </>
         </div>
       </div>

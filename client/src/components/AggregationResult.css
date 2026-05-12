@@ -22,14 +22,18 @@
  * SOFTWARE.
  */
  .aggregation-result {
-  padding: 1.5rem;
+  padding: 0;
   width: 100%;
   max-width: 42rem;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  background: var(--glass-bg-strong);
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .aggregation-title {
   font-weight: 800;
