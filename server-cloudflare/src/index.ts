@@ -29,10 +29,6 @@ export interface Env {
   CONCLAVE_ROOM: DurableObjectNamespace<ConclaveRoom>;
 }
 
-const API_PREFIX = "/api/"
-const API_ROOM_CREATE = `${API_PREFIX}rooms/create`;
-const API_WEBSOCKET = `${API_PREFIX}ws`;
-
 export default {
   async fetch(request: Request, env: Env) {
     const method = request.method;
@@ -41,23 +37,24 @@ export default {
 
     console.log(`Called URL: ${url}`)
 
-    if (!pathname.startsWith(API_PREFIX)) {
-        console.warn(`${pathname} does not match pattern ${API_PREFIX}, bailing out.`);
-        return new Response("Resource not managed.", { status: 404 });
-    }
-
     // TODO: scope to EU jurisdiction
     const scopedDurableObject = env.CONCLAVE_ROOM;
 
-    if (method === "POST" && pathname === API_ROOM_CREATE) {
+    if (method === "POST" && pathname === "/api/rooms") {
       return await apiRoomCreate(scopedDurableObject, request);
     }
-    if (pathname === API_WEBSOCKET) {
-      return await apiWebsocket(scopedDurableObject, request, url);
+
+    const wsMatch = pathname.match(/^\/api\/rooms\/(?<roomId>[^/]+)\/ws$/);
+    if (wsMatch) {
+      const roomId = wsMatch?.groups?.roomId;
+      if (!roomId) {
+        return new Response("Bad request", { status: 400 });
+      }
+      return await apiWebsocket(scopedDurableObject, request, roomId);
     }
 
-  console.warn(`Resource ${pathname} is not implemented, bailing out.`);
-  return new Response("Resource does not exist in this scope", { status: 404 });
+    console.warn(`Resource ${pathname} is not implemented, bailing out.`);
+    return new Response("Resource does not exist.", { status: 404 });
   },
 };
 
@@ -74,11 +71,7 @@ async function apiRoomCreate(durableObject: DurableObjectNamespace<ConclaveRoom>
       return new Response(JSON.stringify({ roomId }));
 }
 
-async function apiWebsocket(durableObject: DurableObjectNamespace<ConclaveRoom>, request: Request, url: URL): Promise<Response> {
-    const roomId = url.searchParams.get("roomId");
-    if (!roomId) {
-      return new Response("Missing roomId", { status: 400 });
-    }
+async function apiWebsocket(durableObject: DurableObjectNamespace<ConclaveRoom>, request: Request, roomId: string): Promise<Response> {
     const id = durableObject.idFromName(roomId);
     const obj = durableObject.get(id);
     return obj.fetch(request);

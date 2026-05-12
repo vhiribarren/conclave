@@ -51,7 +51,7 @@ const Landing = () => {
     }
     try {
       setIsLoading(true);
-      const res = await fetch(`api/rooms/create`, {
+      const res = await fetch(`/api/rooms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomTitle, adminId: getUserId() }),

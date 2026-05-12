@@ -54,7 +54,7 @@ export class ConclaveSocket {
     onError: (error: string) => void
   ): ConclaveActions {
 
-    const wsUrl = `/api/ws?roomId=${roomId}`;
+    const wsUrl = `/api/rooms/${roomId}/ws`;
 
     const ws = new WebSocket(wsUrl);
 
