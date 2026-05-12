@@ -49,7 +49,7 @@
 }
 
 .about-back-link:hover {
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--glass-bg-hover);
   color: var(--text-primary);
 }
 
@@ -73,7 +73,7 @@
 
 .about-section {
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--glass-bg-hover);
 }
 
 .about-section h2 {
@@ -110,7 +110,7 @@
 .about-facts div {
   padding: 1rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--glass-bg-subtle);
   border: 1px solid var(--surface-border);
 }
 
@@ -148,7 +148,7 @@
   overflow: auto;
   border: 1px solid var(--surface-border);
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-bg);
 }
 
 .license-row {
@@ -159,7 +159,7 @@
   padding: 0.75rem 1rem;
   color: var(--text-primary);
   text-decoration: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid var(--surface-border);
   transition: var(--transition);
 }
 
@@ -168,7 +168,7 @@
 }
 
 .license-row:hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--glass-bg-strong);
 }
 
 .license-row span {

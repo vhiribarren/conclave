@@ -42,7 +42,7 @@
   align-items: center;
   justify-content: space-between;
   border-radius: 1rem;
-  background: rgba(255,255,255,0.4);
+  background: var(--glass-bg);
   gap: 0.75rem;
   flex-shrink: 0;
   position: relative;
@@ -58,7 +58,7 @@
   height: 2.5rem;
   border-radius: 0.75rem;
   background: linear-gradient(135deg, var(--accent-color), #9333ea);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px var(--accent-glow);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,8 +83,8 @@
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 8px rgba(52,211,153,0.8);
+  background: var(--color-success-dot);
+  box-shadow: 0 0 8px var(--color-success-dot-glow);
 }
 .header-actions {
   display: flex;
@@ -134,7 +134,7 @@
   flex-direction: column;
   gap: 0.125rem;
   border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--glass-bg-backdrop);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--surface-border);
@@ -160,11 +160,11 @@
 
 .mobile-menu button:hover,
 .mobile-menu button:active {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
 }
 
 .mobile-menu-danger {
-  color: #ef4444 !important;
+  color: var(--color-danger-text) !important;
 }
 
 .mobile-menu-separator {
@@ -194,17 +194,17 @@
   min-height: 44px;
 }
 .icon-button:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
   color: var(--text-primary);
 }
 .icon-button.accent {
   color: var(--accent-color);
 }
 .icon-button.danger {
-  color: #ef4444;
+  color: var(--color-danger-text);
 }
 .icon-button.success {
-  color: #10b981;
+  color: var(--color-success);
 }
 .icon-button-subtle {
   padding: 0.25rem;
@@ -221,7 +221,7 @@
 }
 .icon-button-subtle:hover {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
   color: var(--accent-color);
 }
 .room-name-container .rename-btn {
@@ -251,7 +251,7 @@
   min-width: 280px;
   max-width: 600px;
   border-left: 1px solid var(--surface-border);
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--glass-bg-panel);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   display: flex;
@@ -299,7 +299,7 @@
   flex-shrink: 0;
 }
 .sidebar-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-bg-hover);
   color: var(--accent-color);
 }
 .sidebar-toggle-btn svg {
@@ -344,7 +344,7 @@
   gap: 0.125rem;
   padding: 0.2rem;
   border-radius: 0.6rem;
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--neutral-tint);
   border: 1px solid var(--surface-border);
   align-self: flex-end;
   margin-right: 0;
@@ -365,13 +365,13 @@
 }
 .layout-toggle-btn:hover:not(:disabled):not(.active) {
   opacity: 0.7;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-bg-hover);
 }
 .layout-toggle-btn.active {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--glass-bg-strong);
   color: var(--accent-color);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px var(--neutral-shadow-light);
 }
 .layout-toggle-btn:disabled {
   opacity: 0.2;
@@ -398,7 +398,7 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
-  background: rgba(255,255,255,0.5);
+  background: var(--glass-bg-hover);
 }
 .voting-section {
   padding: 1.5rem;
@@ -411,7 +411,7 @@
   align-items: center;
   position: sticky;
   bottom: 1rem;
-  background: rgba(255,255,255,0.85);
+  background: var(--glass-bg-heavy);
   box-shadow: var(--shadow-lg);
   z-index: 10;
   backdrop-filter: blur(16px);
@@ -450,7 +450,7 @@
   position: sticky;
   bottom: 0;
   z-index: 30;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--glass-bg-backdrop);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-top: 1px solid var(--surface-border);
@@ -510,7 +510,7 @@
   gap: 0.25rem;
   padding: 0.5rem;
   border: none;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
   border-radius: 0.5rem;
   cursor: pointer;
   color: var(--text-secondary);
@@ -523,7 +523,7 @@
 }
 
 .mobile-admin-bar-toggle:active {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--neutral-tint-hover);
   color: var(--text-primary);
 }
 

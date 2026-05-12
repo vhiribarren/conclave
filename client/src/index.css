@@ -25,6 +25,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 :root {
+  /* ── Core palette ─────────────────────────────────────────────── */
   --bg-color: #f0f4f8;
   --surface-color: rgba(255, 255, 255, 0.6);
   --surface-border: rgba(255, 255, 255, 0.4);
@@ -38,6 +39,142 @@
   --shadow-md: 0 8px 24px -4px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   --shadow-lg: 0 20px 40px -8px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
   --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Glass / surface helpers ──────────────────────────────────── */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-bg-strong: rgba(255, 255, 255, 0.6);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.8);
+  --glass-bg-solid: white;
+  --glass-bg-hover: rgba(255, 255, 255, 0.5);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.3);
+  --glass-bg-panel: rgba(255, 255, 255, 0.25);
+  --glass-bg-backdrop: rgba(255, 255, 255, 0.9);
+  --glass-highlight: rgba(255, 255, 255, 0.8);
+  --glass-highlight-full: rgba(255, 255, 255, 1);
+
+  /* ── Neutral tints (for backgrounds, borders, overlays) ──────── */
+  --neutral-tint: rgba(0, 0, 0, 0.05);
+  --neutral-tint-hover: rgba(0, 0, 0, 0.1);
+  --neutral-shadow-subtle: rgba(0, 0, 0, 0.02);
+  --neutral-shadow-light: rgba(0, 0, 0, 0.08);
+  --overlay-bg: rgba(0, 0, 0, 0.4);
+  --scrollbar-thumb: rgba(100, 116, 139, 0.2);
+  --scrollbar-thumb-hover: rgba(100, 116, 139, 0.4);
+
+  /* ── Semantic colors ─────────────────────────────────────────── */
+  --color-danger: #f43f5e;
+  --color-danger-hover: #e11d48;
+  --color-danger-glow: rgba(244, 63, 94, 0.4);
+  --color-danger-text: #ef4444;
+  --color-success: #10b981;
+  --color-success-glow: rgba(16, 185, 129, 0.3);
+  --color-success-dot: #34d399;
+  --color-success-dot-glow: rgba(52, 211, 153, 0.8);
+  --color-warning: #f59e0b;
+  --color-timer-urgent-bg: rgba(253, 230, 138, 0.5);
+  --color-timer-urgent-text: #d97706;
+  --color-timer-urgent-border: #fcd34d;
+  --color-timer-finished-bg: rgba(254, 205, 211, 0.5);
+  --color-timer-finished-text: #e11d48;
+  --color-timer-finished-border: #fda4af;
+
+  /* ── Accent-derived tints ────────────────────────────────────── */
+  --accent-tint: rgba(99, 102, 241, 0.08);
+  --accent-border-light: rgba(99, 102, 241, 0.3);
+  --accent-border-medium: rgba(99, 102, 241, 0.5);
+  --accent-highlight-bg: linear-gradient(135deg, rgba(238, 242, 255, 1), rgba(255, 255, 255, 1));
+
+  /* ── Background decorative gradients ─────────────────────────── */
+  --bg-gradient-1: rgba(99, 102, 241, 0.15);
+  --bg-gradient-2: rgba(236, 72, 153, 0.15);
+
+  /* ── Glow decorations ────────────────────────────────────────── */
+  --glow-accent: rgba(99, 102, 241, 0.2);
+  --glow-purple: rgba(168, 85, 247, 0.2);
+
+  /* ── Chip remove color ───────────────────────────────────────── */
+  --chip-remove: #f43f5e;
+
+  /* ── Dashed border (empty states) ────────────────────────────── */
+  --border-dashed: rgba(100, 116, 139, 0.25);
+  --bar-track: rgba(100, 116, 139, 0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* ── Core palette ───────────────────────────────────────────── */
+    --bg-color: #0f172a;
+    --surface-color: rgba(30, 41, 59, 0.6);
+    --surface-border: rgba(51, 65, 85, 0.6);
+    --accent-color: #818cf8;
+    --accent-hover: #6366f1;
+    --accent-glow: rgba(129, 140, 248, 0.35);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --card-bg: rgba(30, 41, 59, 0.85);
+    --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 20px 40px -8px rgba(0, 0, 0, 0.6);
+
+    /* ── Glass / surface helpers ────────────────────────────────── */
+    --glass-bg: rgba(30, 41, 59, 0.5);
+    --glass-bg-strong: rgba(30, 41, 59, 0.7);
+    --glass-bg-heavy: rgba(30, 41, 59, 0.85);
+    --glass-bg-solid: #1e293b;
+    --glass-bg-hover: rgba(30, 41, 59, 0.6);
+    --glass-bg-subtle: rgba(30, 41, 59, 0.4);
+    --glass-bg-panel: rgba(15, 23, 42, 0.4);
+    --glass-bg-backdrop: rgba(15, 23, 42, 0.92);
+    --glass-highlight: rgba(51, 65, 85, 0.5);
+    --glass-highlight-full: rgba(51, 65, 85, 0.8);
+
+    /* ── Neutral tints ──────────────────────────────────────────── */
+    --neutral-tint: rgba(255, 255, 255, 0.06);
+    --neutral-tint-hover: rgba(255, 255, 255, 0.1);
+    --neutral-shadow-subtle: rgba(0, 0, 0, 0.15);
+    --neutral-shadow-light: rgba(0, 0, 0, 0.3);
+    --overlay-bg: rgba(0, 0, 0, 0.6);
+    --scrollbar-thumb: rgba(148, 163, 184, 0.2);
+    --scrollbar-thumb-hover: rgba(148, 163, 184, 0.4);
+
+    /* ── Semantic colors ───────────────────────────────────────── */
+    --color-danger: #fb7185;
+    --color-danger-hover: #f43f5e;
+    --color-danger-glow: rgba(251, 113, 133, 0.3);
+    --color-danger-text: #fb7185;
+    --color-success: #34d399;
+    --color-success-glow: rgba(52, 211, 153, 0.3);
+    --color-success-dot: #34d399;
+    --color-success-dot-glow: rgba(52, 211, 153, 0.6);
+    --color-warning: #fbbf24;
+    --color-timer-urgent-bg: rgba(120, 83, 9, 0.35);
+    --color-timer-urgent-text: #fbbf24;
+    --color-timer-urgent-border: rgba(251, 191, 36, 0.4);
+    --color-timer-finished-bg: rgba(136, 19, 55, 0.35);
+    --color-timer-finished-text: #fb7185;
+    --color-timer-finished-border: rgba(251, 113, 133, 0.4);
+
+    /* ── Accent-derived tints ──────────────────────────────────── */
+    --accent-tint: rgba(129, 140, 248, 0.12);
+    --accent-border-light: rgba(129, 140, 248, 0.35);
+    --accent-border-medium: rgba(129, 140, 248, 0.5);
+    --accent-highlight-bg: linear-gradient(135deg, rgba(30, 27, 75, 0.8), rgba(30, 41, 59, 1));
+
+    /* ── Background decorative gradients ───────────────────────── */
+    --bg-gradient-1: rgba(99, 102, 241, 0.1);
+    --bg-gradient-2: rgba(236, 72, 153, 0.08);
+
+    /* ── Glow decorations ──────────────────────────────────────── */
+    --glow-accent: rgba(129, 140, 248, 0.15);
+    --glow-purple: rgba(168, 85, 247, 0.15);
+
+    /* ── Chip remove color ─────────────────────────────────────── */
+    --chip-remove: #fb7185;
+
+    /* ── Dashed border (empty states) ──────────────────────────── */
+    --border-dashed: rgba(148, 163, 184, 0.2);
+    --bar-track: rgba(148, 163, 184, 0.15);
+  }
 }
 
 * {
@@ -54,8 +191,8 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--bg-color);
   background-image:
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
+    radial-gradient(circle at 15% 50%, var(--bg-gradient-1), transparent 25%),
+    radial-gradient(circle at 85% 30%, var(--bg-gradient-2), transparent 25%);
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
@@ -90,7 +227,7 @@ h1,
 }
 
 .premium-input {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-bg-heavy);
   border: 1px solid var(--surface-border);
   padding: 14px 18px;
   border-radius: 12px;
@@ -100,20 +237,20 @@ h1,
   transition: var(--transition);
   outline: none;
   width: 100%;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: inset 0 2px 4px var(--neutral-shadow-subtle);
   /* Prevent iOS zoom on focus */
   font-size: max(1rem, 16px);
 }
 
 .premium-input:focus {
-  background: white;
+  background: var(--glass-bg-solid);
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 0 0 4px var(--accent-tint), inset 0 2px 4px var(--neutral-shadow-subtle);
 }
 
 .premium-input.active {
   border-color: var(--accent-color);
-  background: white;
+  background: var(--glass-bg-solid);
   box-shadow: 0 0 0 1px var(--accent-color);
 }
 
@@ -144,12 +281,12 @@ h1,
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.2);
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.4);
+  background: var(--scrollbar-thumb-hover);
 }
 
 .page-container {
@@ -170,7 +307,7 @@ h1,
   justify-content: center;
   padding: 1rem;
   overflow-y: auto;
-  background: rgba(0,0,0,0.4);
+  background: var(--overlay-bg);
   animation: overlayFadeIn 0.2s ease-out;
   will-change: opacity;
 }
@@ -193,7 +330,7 @@ h1,
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background: white;
+  background: var(--glass-bg-solid);
   border: 1px solid var(--surface-border);
   border-radius: 20px;
   box-shadow: var(--shadow-lg);

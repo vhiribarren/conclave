@@ -32,20 +32,20 @@
   border-radius: 0.75rem;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
-  background: rgba(255,255,255,0.6);
+  background: var(--glass-bg-strong);
   color: var(--text-primary);
   border: 1px solid var(--surface-border);
   white-space: nowrap;
 }
 .timer-display.urgent {
-  background: rgba(253, 230, 138, 0.5);
-  color: #d97706;
-  border-color: #fcd34d;
+  background: var(--color-timer-urgent-bg);
+  color: var(--color-timer-urgent-text);
+  border-color: var(--color-timer-urgent-border);
 }
 .timer-display.finished {
-  background: rgba(254, 205, 211, 0.5);
-  color: #e11d48;
-  border-color: #fda4af;
+  background: var(--color-timer-finished-bg);
+  color: var(--color-timer-finished-text);
+  border-color: var(--color-timer-finished-border);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 @keyframes pulse {

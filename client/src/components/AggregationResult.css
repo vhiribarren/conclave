@@ -29,7 +29,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  background: rgba(255,255,255,0.6);
+  background: var(--glass-bg-strong);
 }
 .aggregation-title {
   font-weight: 800;
@@ -48,16 +48,16 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--glass-bg);
   border-radius: 1rem;
   padding: 0.75rem 1rem;
   border: 1px solid var(--surface-border);
   transition: var(--transition);
 }
 .stat-row.winner {
-  background: white;
+  background: var(--glass-bg-solid);
   border-color: var(--accent-color);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 4px 12px var(--accent-glow);
   transform: scale(1.02);
 }
 .stat-card-value {
@@ -79,23 +79,23 @@
 .stat-row.winner .stat-card-value {
   border-color: var(--accent-color);
   color: var(--accent-color);
-  background: white;
+  background: var(--glass-bg-solid);
   font-size: 1.4rem;
 }
 .winner-icon {
   position: absolute;
   top: -0.5rem;
   right: -0.5rem;
-  color: #f59e0b;
-  background: white;
+  color: var(--color-warning);
+  background: var(--glass-bg-solid);
   border-radius: 50%;
   padding: 2px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px var(--neutral-shadow-light);
 }
 .stat-bar-container {
   flex: 1;
   height: 0.75rem;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
   border-radius: 1rem;
   overflow: hidden;
 }

@@ -73,7 +73,7 @@
 /* ── Tabs ───────────────────────────────────────────────────────── */
 .admin-tabs {
   display: flex;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
   padding: 0.25rem;
   border-radius: 0.75rem;
   margin-bottom: 0.5rem;
@@ -97,7 +97,7 @@
 }
 
 .admin-tab.active {
-  background: white;
+  background: var(--glass-bg-solid);
   color: var(--accent-color);
   box-shadow: var(--shadow-sm);
 }
@@ -109,7 +109,7 @@
   gap: 0.25rem;
   padding: 0.25rem;
   border-radius: 0.75rem;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
 }
 
 .vote-mode-switch button {
@@ -127,7 +127,7 @@
 }
 
 .vote-mode-switch button.active {
-  background: white;
+  background: var(--glass-bg-solid);
   color: var(--accent-color);
   box-shadow: var(--shadow-sm);
 }
@@ -145,7 +145,7 @@
   padding: 0.75rem;
   border-radius: 0.75rem;
   border: 1px solid var(--surface-border);
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--glass-bg-subtle);
 }
 
 .panel-current-task span {
@@ -180,13 +180,13 @@
   gap: 0.4rem;
   margin-bottom: 0.75rem;
   padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--glass-bg-subtle);
   border-radius: 0.75rem;
   border: 1px solid var(--surface-border);
 }
 
 .deck-chip {
-  background: white;
+  background: var(--glass-bg-solid);
   border: 1px solid var(--surface-border);
   border-radius: 2rem;
   padding: 0.3rem 0.6rem;
@@ -231,7 +231,7 @@
 }
 
 .deck-chip-remove {
-  color: #f43f5e;
+  color: var(--chip-remove);
   cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.2s;

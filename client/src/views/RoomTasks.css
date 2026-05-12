@@ -142,15 +142,15 @@
   padding: 0.85rem;
   border-radius: 0.75rem;
   border: 1px solid var(--surface-border);
-  background: rgba(255, 255, 255, 0.42);
+  background: var(--glass-bg-subtle);
   cursor: pointer;
   transition: var(--transition);
 }
 
 .tasks-list-item:hover,
 .tasks-list-item.selected {
-  border-color: rgba(99, 102, 241, 0.45);
-  background: rgba(255, 255, 255, 0.74);
+  border-color: var(--accent-border-medium);
+  background: var(--glass-bg-strong);
 }
 
 .tasks-list-main {
@@ -177,7 +177,7 @@
 
 .tasks-current-badge {
   color: var(--accent-hover);
-  background: rgba(99, 102, 241, 0.12);
+  background: var(--accent-tint);
   border-radius: 999px;
   padding: 0.25rem 0.55rem;
   font-weight: 700;
@@ -202,7 +202,7 @@
   padding: 1rem;
   border: 1px solid var(--surface-border);
   border-radius: 0.85rem;
-  background: rgba(255, 255, 255, 0.48);
+  background: var(--glass-bg-subtle);
 }
 
 .tasks-round-card h3,
@@ -234,7 +234,7 @@
   min-width: 2.6rem;
   padding: 0.45rem 0.6rem;
   border-radius: 0.65rem;
-  background: white;
+  background: var(--glass-bg-solid);
   border: 1px solid var(--surface-border);
   font-weight: 800;
   text-align: center;
@@ -244,7 +244,7 @@
   height: 0.55rem;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(100, 116, 139, 0.16);
+  background: var(--bar-track);
 }
 
 .tasks-result-bar span {
@@ -276,8 +276,8 @@
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
+  background: var(--color-success-dot);
+  box-shadow: 0 0 8px var(--color-success-dot-glow);
 }
 
 .tasks-empty,
@@ -298,7 +298,7 @@
   justify-content: center;
   gap: 0.75rem;
   text-align: center;
-  border: 1px dashed rgba(100, 116, 139, 0.25);
+  border: 1px dashed var(--border-dashed);
   border-radius: 0.85rem;
 }
 

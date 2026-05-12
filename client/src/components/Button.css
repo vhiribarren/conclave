@@ -56,30 +56,30 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
-  color: #ef4444;
+  color: var(--color-danger-text);
 }
 
 .premium-button.secondary {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-tint);
   color: var(--text-primary);
 }
 
 .premium-button.secondary:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--neutral-tint-hover);
 }
 
 .premium-button.danger {
-  background: #f43f5e;
-  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
+  background: var(--color-danger);
+  box-shadow: 0 4px 12px var(--color-danger-glow);
 }
 
 .premium-button.danger:hover:not(:disabled) {
-  background: #e11d48;
-  box-shadow: 0 6px 16px rgba(244, 63, 94, 0.4);
+  background: var(--color-danger-hover);
+  box-shadow: 0 6px 16px var(--color-danger-glow);
 }
 
 .premium-button.success {
-  background: #10b981;
+  background: var(--color-success);
   color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px var(--color-success-glow);
 }
