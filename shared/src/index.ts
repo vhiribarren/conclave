@@ -76,7 +76,7 @@ export type SocketMessage =
 
 export type ServerMessage =
   | { type: 'JOINED'; publicId: string }
-  | { type: 'STATE'; payload: RoomState }
+  | { type: 'STATE'; payload: RoomState; serverTime: number }
   | { type: 'error'; message: string };
 
 export * from './id';

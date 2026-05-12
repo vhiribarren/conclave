@@ -128,7 +128,13 @@ export class ConclaveSocket {
         if (data.type === 'JOINED') {
           onJoined(data.publicId);
         } else if (data.type === 'STATE') {
-          onStateUpdate(data.payload);
+          // Adjust timerEndAt from server clock to client clock
+          const payload = data.payload;
+          if (payload.timerEndAt !== null) {
+            const serverTimeOffset = data.serverTime - Date.now();
+            payload.timerEndAt = payload.timerEndAt - serverTimeOffset;
+          }
+          onStateUpdate(payload);
         }
       };
     };

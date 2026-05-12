@@ -437,6 +437,7 @@ export class ConclaveRoom extends DurableObject {
 
     const stateToSend = JSON.stringify({
       type: "STATE",
+      serverTime: Date.now(),
       payload: {
         ...this.state,
         participants: this.state.participants.map((p) => {

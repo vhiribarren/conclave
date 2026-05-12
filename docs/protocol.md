@@ -63,8 +63,8 @@ sequenceDiagram
     Client->>Server: USER_JOIN { userId, name, mood }
     Server->>Server: Resolve userId → publicId (or generate new)
     Server-->>Client: JOINED { publicId }
-    Server-->>Client: STATE { ... }
-    Server-->>Others: STATE { ... }
+    Server-->>Client: STATE { ..., serverTime }
+    Server-->>Others: STATE { ..., serverTime }
 ```
 
 1. The client opens a WebSocket to `/api/rooms/:roomId/ws`
@@ -72,7 +72,7 @@ sequenceDiagram
 3. The server resolves the userId to an existing publicId (reconnection) or generates a new one
 4. The server responds with a `JOINED` message containing the assigned `publicId`
 5. The client stores this publicId in memory and uses it to identify itself in subsequent state updates
-6. The server broadcasts the full room `STATE` to all connected clients
+6. The server broadcasts the full room `STATE` (with `serverTime`) to all connected clients
 
 ## State Broadcast
 
@@ -114,7 +114,7 @@ Vote masking: before reveal, other participants' votes appear as `"✓"` (voted)
 ### Server → Client (`ServerMessage`)
 
 - `JOINED` — sent once after `USER_JOIN`, contains the client's `publicId`
-- `STATE` — full room state broadcast to all clients on every change
+- `STATE` — full room state broadcast to all clients on every change, includes `serverTime` for clock synchronization (see Architecture)
 - `error` — error notification
 
 ## Persistence

@@ -97,6 +97,29 @@ The `conclave-shared` package contains:
 
 It is referenced by both `client` and `server-cloudflare` via npm workspaces.
 
+## Timer Synchronization
+
+The timer uses an absolute timestamp (`timerEndAt`) computed server-side. To ensure all clients display the same countdown value, the clock skew between the server and each client must be compensated.
+
+### Why an absolute timestamp rather than a duration?
+
+The alternative would be to send a remaining duration (`timerRemainingMs`) and let each client start its own countdown. This is simpler, but introduces drift:
+
+- Network latency means each client receives the message at a slightly different time — the timer starts "late" with no way to correct
+- A client that reconnects mid-timer receives a state that was emitted at time T but processes it at T+latency
+
+With an absolute timestamp, the calculation `timerEndAt - Date.now()` always yields a better remaining value, regardless of when the message arrived.
+
+### Correction mechanism
+
+Every `STATE` message includes a `serverTime` field (the server's `Date.now()` at the moment of sending). The client uses it to adjust `timerEndAt`:
+
+1. On receiving a `STATE`, the client computes `serverTimeOffset = serverTime - Date.now()`
+2. It adjusts `timerEndAt` to the local reference frame: `timerEndAt - serverTimeOffset`
+3. The `TimerDisplay` then computes `adjustedTimerEndAt - Date.now()` — the result is correct regardless of clock skew
+
+The offset is recalculated on every received message, so there is no persistent client-side state and no risk of drift on long-lived connections.
+
 ## See Also
 
 - [`docs/protocol.md`](protocol.md) — communication protocol, identity model, and message flow diagrams
