@@ -33,6 +33,7 @@ import PokerCard from './PokerCard';
 import { AggregationResult } from './AggregationResult';
 import { TaskSelectionDialog } from './TaskSelectionDialog';
 import { settings } from '../services/settings';
+import { Modal } from './Modal';
 import './AdminPanel.css';
 
 interface Props {
@@ -493,18 +494,16 @@ export const AdminPanel: React.FC<Props> = ({
       )}
 
       {showCustomizeConfirm && (
-        <div className="modal-overlay" onClick={() => setShowCustomizeConfirm(false)}>
-          <div className="modal-content animate-fade-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '24rem' }}>
-            <h2 className="modal-title">{t('settings.customizeModal.title')}</h2>
-            <p className="modal-subtitle">
-              {t('settings.customizeModal.subtitle')}
-            </p>
-            <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <Button variant="secondary" onClick={() => setShowCustomizeConfirm(false)}>{t('common.cancel')}</Button>
-              <Button onClick={() => { updateDeck(state.deck || [], 'custom'); setShowCustomizeConfirm(false); }}>{t('common.confirm')}</Button>
-            </div>
+        <Modal onClose={() => setShowCustomizeConfirm(false)} maxWidth="24rem">
+          <h2 className="modal-title">{t('settings.customizeModal.title')}</h2>
+          <p className="modal-subtitle">
+            {t('settings.customizeModal.subtitle')}
+          </p>
+          <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+            <Button variant="secondary" onClick={() => setShowCustomizeConfirm(false)}>{t('common.cancel')}</Button>
+            <Button onClick={() => { updateDeck(state.deck || [], 'custom'); setShowCustomizeConfirm(false); }}>{t('common.confirm')}</Button>
           </div>
-        </div>
+        </Modal>
       )}
 
       {showTaskSelector && (
@@ -517,20 +516,18 @@ export const AdminPanel: React.FC<Props> = ({
       )}
 
       {transferTarget && (
-        <div className="modal-overlay" onClick={() => setTransferTarget(null)}>
-          <div className="modal-content animate-fade-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '24rem' }}>
-            <h2 className="modal-title">{t('settings.transferModal.title')}</h2>
-            <p className="modal-subtitle">
-              {t('settings.transferModal.subtitle', { name: transferTarget.name })}
-            </p>
-            <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <Button variant="secondary" onClick={() => setTransferTarget(null)}>{t('common.cancel')}</Button>
-              <Button variant="danger" onClick={() => { actions.adminTransferAdmin(transferTarget.id); setTransferTarget(null); }}>
-                <Crown size={14} /> {t('settings.transferModal.confirm')}
-              </Button>
-            </div>
+        <Modal onClose={() => setTransferTarget(null)} maxWidth="24rem">
+          <h2 className="modal-title">{t('settings.transferModal.title')}</h2>
+          <p className="modal-subtitle">
+            {t('settings.transferModal.subtitle', { name: transferTarget.name })}
+          </p>
+          <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+            <Button variant="secondary" onClick={() => setTransferTarget(null)}>{t('common.cancel')}</Button>
+            <Button variant="danger" onClick={() => { actions.adminTransferAdmin(transferTarget.id); setTransferTarget(null); }}>
+              <Crown size={14} /> {t('settings.transferModal.confirm')}
+            </Button>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

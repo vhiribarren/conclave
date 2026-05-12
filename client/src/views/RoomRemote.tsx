@@ -29,6 +29,7 @@ import Button from '../components/Button';
 import { AdminPanel } from '../components/AdminPanel';
 import PokerCard from '../components/PokerCard';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { Modal } from '../components/Modal';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import './Room.css';
 import './RoomRemote.css';
@@ -86,23 +87,21 @@ const RoomRemote = () => {
   return (
     <>
       {!isJoined && (
-        <div className="modal-overlay">
-          <div className="modal-content animate-fade-in">
-            <h2 className="modal-title">{t('room.joinTitle')}</h2>
-            <p className="modal-subtitle">{t('room.joinSubtitleRemote')}</p>
-            <form onSubmit={handleJoin} className="landing-form">
-              <input
-                type="text"
-                placeholder={t('room.yourName')}
-                className="premium-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoFocus
-              />
-              <Button type="submit">{t('common.enterRoom')}</Button>
-            </form>
-          </div>
-        </div>
+        <Modal>
+          <h2 className="modal-title">{t('room.joinTitle')}</h2>
+          <p className="modal-subtitle">{t('room.joinSubtitleRemote')}</p>
+          <form onSubmit={handleJoin} className="landing-form">
+            <input
+              type="text"
+              placeholder={t('room.yourName')}
+              className="premium-input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+            />
+            <Button type="submit">{t('common.enterRoom')}</Button>
+          </form>
+        </Modal>
       )}
       <div className={`room-container ${!isJoined ? 'blurred' : ''}`}>
         <header className="header glass">

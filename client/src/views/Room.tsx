@@ -38,6 +38,7 @@ import { AdminPanel } from '../components/AdminPanel';
 import { TimerDisplay } from '../components/TimerDisplay';
 import { SidebarPanel } from '../components/SidebarPanel';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { Modal } from '../components/Modal';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 
 
@@ -181,53 +182,51 @@ const Room = () => {
 
 
   const renderOnboardingModal = () => (
-    <div className="modal-overlay">
-      <div className="modal-content animate-fade-in">
-        <h2 className="modal-title">{t('room.joinTitle')}</h2>
-        <p className="modal-subtitle">{t('room.joinSubtitle')}</p>
-        <form onSubmit={handleJoin} className="landing-form">
-          <input
-            type="text"
-            placeholder={t('room.yourName')}
-            className="premium-input"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoFocus
-          />
+    <Modal>
+      <h2 className="modal-title">{t('room.joinTitle')}</h2>
+      <p className="modal-subtitle">{t('room.joinSubtitle')}</p>
+      <form onSubmit={handleJoin} className="landing-form">
+        <input
+          type="text"
+          placeholder={t('room.yourName')}
+          className="premium-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoFocus
+        />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.chooseAvatar')}</span>
-            <button
-              type="button"
-              className="icon-button"
-              style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
-              onClick={() => setShowEmojiPickerJoin(!showEmojiPickerJoin)}
-            >
-              {mood}
-            </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.chooseAvatar')}</span>
+          <button
+            type="button"
+            className="icon-button"
+            style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+            onClick={() => setShowEmojiPickerJoin(!showEmojiPickerJoin)}
+          >
+            {mood}
+          </button>
 
-            {showEmojiPickerJoin && (
-              <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                <EmojiPicker
-                  onEmojiClick={(emojiData) => {
-                    setMood(emojiData.emoji);
-                    setShowEmojiPickerJoin(false);
-                  }}
-                  theme={Theme.LIGHT}
-                  lazyLoadEmojis={true}
-                  searchDisabled={false}
-                  skinTonesDisabled={true}
-                  height={450}
-                  width={350}
-                />
-              </div>
-            )}
-          </div>
+          {showEmojiPickerJoin && (
+            <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              <EmojiPicker
+                onEmojiClick={(emojiData) => {
+                  setMood(emojiData.emoji);
+                  setShowEmojiPickerJoin(false);
+                }}
+                theme={Theme.LIGHT}
+                lazyLoadEmojis={true}
+                searchDisabled={false}
+                skinTonesDisabled={true}
+                height={450}
+                width={350}
+              />
+            </div>
+          )}
+        </div>
 
-          <Button type="submit">{t('common.enterRoom')}</Button>
-        </form>
-      </div>
-    </div>
+        <Button type="submit">{t('common.enterRoom')}</Button>
+      </form>
+    </Modal>
   );
 
   if (connectionError) {
@@ -538,8 +537,7 @@ const Room = () => {
 
 
       {showUserSettings && (
-        <div className="modal-overlay" onClick={() => setShowUserSettings(false)}>
-          <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
+        <Modal onClose={() => setShowUserSettings(false)}>
             <h3 className="modal-title">{t('room.userSettings')}</h3>
             <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }} className="landing-form">
               <input
@@ -581,13 +579,11 @@ const Room = () => {
               <button type="submit" className="premium-button">{t('room.updateProfile')}</button>
             </form>
             <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">{t('common.cancel')}</button>
-          </div>
-        </div>
+        </Modal>
       )}
 
       {showShareModal && (
-        <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
-          <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
+        <Modal onClose={() => setShowShareModal(false)}>
             <h3 className="modal-title">{t('share.title')}</h3>
             <p className="modal-subtitle">{t('share.subtitle')}</p>
 
@@ -621,13 +617,11 @@ const Room = () => {
             </div>
 
             <button onClick={() => setShowShareModal(false)} className="premium-button secondary">{t('common.close')}</button>
-          </div>
-        </div>
+        </Modal>
       )}
 
       {showQR && (
-        <div className="modal-overlay" onClick={() => { setShowQR(false); setIsQRVisible(false); }}>
-          <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
+        <Modal onClose={() => { setShowQR(false); setIsQRVisible(false); }}>
             <h3 className="modal-title">{t('remoteModal.title')}</h3>
             <p className="modal-subtitle">{t('remoteModal.subtitle')}</p>
 
@@ -658,8 +652,7 @@ const Room = () => {
             </div>
 
             <button onClick={() => { setShowQR(false); setIsQRVisible(false); }} className="premium-button secondary">{t('common.close')}</button>
-          </div>
-        </div>
+        </Modal>
       )}
     </>
   );

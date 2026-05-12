@@ -29,6 +29,7 @@ import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { getUserName, setUserName, getUserEmoji, setUserEmoji, getUserId } from '../services/user';
 import Button from '../components/Button';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { Modal } from '../components/Modal';
 import './Landing.css';
 import { getHistory, type HistoryEntry } from '../services/history';
 
@@ -205,8 +206,7 @@ const Landing = () => {
     </div>
 
     {showCreateModal && (
-      <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-        <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()}>
+      <Modal onClose={() => setShowCreateModal(false)}>
           <h2 className="modal-title">{t('landing.createModal.title')}</h2>
           <p className="modal-subtitle">{t('landing.createModal.subtitle')}</p>
           <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="landing-form">
@@ -229,8 +229,7 @@ const Landing = () => {
               {t('common.cancel')}
             </Button>
           </form>
-        </div>
-      </div>
+      </Modal>
     )}
   </>
   );

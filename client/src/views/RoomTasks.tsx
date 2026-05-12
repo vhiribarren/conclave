@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import type { Round, Task } from 'conclave-shared';
 import Button from '../components/Button';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { Modal } from '../components/Modal';
 import { setUserEmoji, setUserName } from '../services/user';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import './RoomTasks.css';
@@ -165,31 +166,29 @@ const RoomTasks = () => {
   return (
     <>
       {!isJoined && (
-        <div className="modal-overlay">
-          <div className="modal-content animate-fade-in">
-            <h2 className="modal-title">{t('room.joinTitle')}</h2>
-            <p className="modal-subtitle">{t('room.joinSubtitleTasks')}</p>
-            <form onSubmit={handleJoin} className="landing-form">
-              <input
-                type="text"
-                placeholder={t('room.yourName')}
-                className="premium-input"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                autoFocus
-              />
-              <input
-                type="text"
-                aria-label="Avatar"
-                className="premium-input"
-                value={mood}
-                onChange={(event) => setMood(event.target.value)}
-                maxLength={4}
-              />
-              <Button type="submit">{t('common.enterRoom')}</Button>
-            </form>
-          </div>
-        </div>
+        <Modal>
+          <h2 className="modal-title">{t('room.joinTitle')}</h2>
+          <p className="modal-subtitle">{t('room.joinSubtitleTasks')}</p>
+          <form onSubmit={handleJoin} className="landing-form">
+            <input
+              type="text"
+              placeholder={t('room.yourName')}
+              className="premium-input"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              autoFocus
+            />
+            <input
+              type="text"
+              aria-label="Avatar"
+              className="premium-input"
+              value={mood}
+              onChange={(event) => setMood(event.target.value)}
+              maxLength={4}
+            />
+            <Button type="submit">{t('common.enterRoom')}</Button>
+          </form>
+        </Modal>
       )}
 
       <div className={`tasks-page ${!isJoined ? 'blurred' : ''}`}>
