@@ -22,14 +22,22 @@
  * SOFTWARE.
  */
 import { DurableObject } from "cloudflare:workers";
-import type { RoomState, Task, Round } from "conclave-shared";
+import type { RoomState, Task, Round, ServerMessage } from "conclave-shared";
 import { DEFAULT_DECK } from "conclave-shared";
 import { SqlKvStorage } from "./kv-storage";
 
 const INACTIVITY_ALARM_MS = 48 * 60 * 60 * 1000 // 48H
 
+/**
+ * Mapping between private userId (known only to the user) and publicId (visible to all participants).
+ * Persisted in SQL so it survives hibernation and DO restarts.
+ */
+type UserIdMapping = Record<string, string>; // userId -> publicId
+
 export class ConclaveRoom extends DurableObject {
   private kv = new SqlKvStorage(this.ctx.storage.sql);
+
+  // State uses publicIds everywhere: participants[].id, adminId, round votes keys
   private state: RoomState = {
     created: false,
     participants: [],
@@ -43,6 +51,9 @@ export class ConclaveRoom extends DurableObject {
     unassociatedRound: { id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false },
   };
 
+  // userId -> publicId mapping, persisted in SQL under key "userIdMapping"
+  private userIdMapping: UserIdMapping = {};
+
   constructor(ctx: DurableObjectState, env: any) {
     super(ctx, env);
     this.ctx.blockConcurrencyWhile(async () => {
@@ -50,15 +61,23 @@ export class ConclaveRoom extends DurableObject {
       if (stored) {
         this.state = stored;
       }
+      const mapping = this.kv.get<UserIdMapping>("userIdMapping");
+      if (mapping) {
+        this.userIdMapping = mapping;
+      }
     });
   }
 
   async createRoom(adminId: string, roomTitle: string | undefined) {
       console.log(`Creating new room - roomId: ${this.ctx.id.name}, adminId: ${adminId}, roomTitle: ${roomTitle}`);
+      // adminId here is the userId from the creator; generate a publicId for them
+      const publicId = this.generatePublicId();
+      this.userIdMapping[adminId] = publicId;
       this.state.created = true;
       this.state.name = roomTitle;
-      this.state.adminId = adminId;
+      this.state.adminId = publicId;
       this.kv.put("state", this.state);
+      this.kv.put("userIdMapping", this.userIdMapping);
       this.updateAlarm();
   }
 
@@ -93,18 +112,18 @@ export class ConclaveRoom extends DurableObject {
     }
   }
 
-  async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean) {
-    this.handleDisconnect(ws);
+  async webSocketClose(_ws: WebSocket, _code: number, _reason: string, _wasClean: boolean) {
+    this.handleDisconnect(_ws);
   }
 
-  async webSocketError(ws: WebSocket, error: unknown) {
-    this.handleDisconnect(ws);
+  async webSocketError(_ws: WebSocket, _error: unknown) {
+    this.handleDisconnect(_ws);
   }
 
   private handleDisconnect(ws: WebSocket) {
-    const attachment = ws.deserializeAttachment() as { sessionId?: string };
-    if (attachment && attachment.sessionId) {
-      this.state.participants = this.state.participants.filter((p) => p.id !== attachment.sessionId);
+    const attachment = ws.deserializeAttachment() as { publicId?: string };
+    if (attachment?.publicId) {
+      this.state.participants = this.state.participants.filter((p) => p.id !== attachment.publicId);
       this.broadcastState();
       this.kv.put("state", this.state);
     }
@@ -123,41 +142,54 @@ export class ConclaveRoom extends DurableObject {
   }
 
   async handleMessage(ws: WebSocket, data: any) {
-    const attachment = (ws.deserializeAttachment() || {}) as { sessionId?: string };
+    const attachment = (ws.deserializeAttachment() || {}) as { publicId?: string };
 
     switch (data.type) {
       case "USER_JOIN":
-        const sessionId = data.userId || Math.random().toString(36).substring(2, 15);
-        ws.serializeAttachment({ ...attachment, sessionId });
+        const userId = data.userId || Math.random().toString(36).substring(2, 15);
+
+        // Resolve or create publicId for this userId
+        let publicId = this.userIdMapping[userId];
+        if (!publicId) {
+          publicId = this.generatePublicId();
+          this.userIdMapping[userId] = publicId;
+          this.kv.put("userIdMapping", this.userIdMapping);
+        }
+
+        // Store publicId in the WebSocket attachment (survives hibernation)
+        ws.serializeAttachment({ publicId });
         
         // Remove old participant if they reconnected
-        this.state.participants = this.state.participants.filter((p) => p.id !== sessionId);
+        this.state.participants = this.state.participants.filter((p) => p.id !== publicId);
 
         this.state.participants.push({
-          id: sessionId,
+          id: publicId,
           name: data.name || "Anonymous",
           mood: data.mood || "🦊",
           vote: null,
-          isAdmin: sessionId === this.state.adminId,
+          isAdmin: publicId === this.state.adminId,
         });
+        ws.send(JSON.stringify({ type: "JOINED", publicId } satisfies ServerMessage));
+
         this.broadcastState();
         break;
 
-      case "USER_UPDATE_PROFILE":
-        const p = this.state.participants.find((p) => p.id === attachment.sessionId);
+      case "USER_UPDATE_PROFILE": {
+        const p = this.state.participants.find((p) => p.id === attachment.publicId);
         if (!p) {
-          console.error(`USER_UPDATE_PROFILE: Participant not found for session ${attachment.sessionId}`);
+          console.error(`USER_UPDATE_PROFILE: Participant not found for publicId ${attachment.publicId}`);
           return;
         }
         p.name = data.name || p.name;
         p.mood = data.mood || p.mood;
         this.broadcastState();
         break;
+      }
 
-      case "USER_VOTE":
-        const participant = this.state.participants.find((p) => p.id === attachment.sessionId);
+      case "USER_VOTE": {
+        const participant = this.state.participants.find((p) => p.id === attachment.publicId);
         if (!participant) {
-          console.error(`USER_VOTE: Participant not found for session ${attachment.sessionId}`);
+          console.error(`USER_VOTE: Participant not found for publicId ${attachment.publicId}`);
           return;
         }
         
@@ -180,33 +212,36 @@ export class ConclaveRoom extends DurableObject {
           this.broadcastState();
         }
         break;
+      }
 
       case "ADMIN_REVEAL":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_REVEAL: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_REVEAL: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
-        let roundToReveal: Round | undefined;
-        if (this.state.currentTaskId) {
-          const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
-          if (task && task.rounds.length > 0) {
-            roundToReveal = task.rounds[task.rounds.length - 1];
+        {
+          let roundToReveal: Round | undefined;
+          if (this.state.currentTaskId) {
+            const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
+            if (task && task.rounds.length > 0) {
+              roundToReveal = task.rounds[task.rounds.length - 1];
+            }
+          } else {
+            roundToReveal = this.state.unassociatedRound;
           }
-        } else {
-          roundToReveal = this.state.unassociatedRound;
-        }
 
-        if (roundToReveal) {
-          roundToReveal.revealed = true;
-          this.state.timerEndAt = null;
-          this.state.timerPausedRemainingMs = null;
-          this.broadcastState();
+          if (roundToReveal) {
+            roundToReveal.revealed = true;
+            this.state.timerEndAt = null;
+            this.state.timerPausedRemainingMs = null;
+            this.broadcastState();
+          }
         }
         break;
 
       case "ADMIN_RESET":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RESET: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_RESET: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (this.state.currentTaskId) {
@@ -224,28 +259,30 @@ export class ConclaveRoom extends DurableObject {
 
       case "ADMIN_ADD_TASK":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_ADD_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_ADD_TASK: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (!data.name) {
           console.error("ADMIN_ADD_TASK: Missing task name");
           return;
         }
-        const newTask: Task = {
-          id: Math.random().toString(36).substring(2, 10),
-          name: data.name,
-          rounds: [{ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false }]
-        };
-        this.state.tasks.push(newTask);
-        if (!this.state.currentTaskId) {
-          this.state.currentTaskId = newTask.id;
+        {
+          const newTask: Task = {
+            id: Math.random().toString(36).substring(2, 10),
+            name: data.name,
+            rounds: [{ id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false }]
+          };
+          this.state.tasks.push(newTask);
+          if (!this.state.currentTaskId) {
+            this.state.currentTaskId = newTask.id;
+          }
         }
         this.broadcastState();
         break;
 
       case "ADMIN_RENAME_TASK":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RENAME_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_RENAME_TASK: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (!data.taskId || !data.name) {
@@ -263,7 +300,7 @@ export class ConclaveRoom extends DurableObject {
 
       case "ADMIN_SET_TASK":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_SET_TASK: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         this.state.currentTaskId = data.taskId;
@@ -274,7 +311,7 @@ export class ConclaveRoom extends DurableObject {
       
       case "ADMIN_DELETE_TASK":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_DELETE_TASK: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_DELETE_TASK: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (!data.taskId) {
@@ -283,7 +320,7 @@ export class ConclaveRoom extends DurableObject {
         }
         this.state.tasks = this.state.tasks.filter(t => t.id !== data.taskId);
         if (this.state.currentTaskId === data.taskId) {
-          this.state.currentTaskId = this.state.tasks.length > 0 ? this.state.tasks[0]?.id : null;
+          this.state.currentTaskId = this.state.tasks.length > 0 ? this.state.tasks[0]?.id ?? null : null;
           this.state.timerEndAt = null;
         }
         this.broadcastState();
@@ -291,7 +328,7 @@ export class ConclaveRoom extends DurableObject {
 
       case "ADMIN_SET_DECK":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_DECK: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_SET_DECK: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (!Array.isArray(data.deck)) {
@@ -305,7 +342,7 @@ export class ConclaveRoom extends DurableObject {
 
       case "ADMIN_SET_TIMER":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_TIMER: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_SET_TIMER: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         this.state.timerPausedRemainingMs = null;
@@ -319,7 +356,7 @@ export class ConclaveRoom extends DurableObject {
 
       case "ADMIN_PAUSE_TIMER":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_PAUSE_TIMER: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_PAUSE_TIMER: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (!this.state.timerEndAt) return;
@@ -330,7 +367,7 @@ export class ConclaveRoom extends DurableObject {
 
       case "ADMIN_RESUME_TIMER":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RESUME_TIMER: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_RESUME_TIMER: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (this.state.timerPausedRemainingMs === null) return;
@@ -341,26 +378,30 @@ export class ConclaveRoom extends DurableObject {
 
       case "ADMIN_TRANSFER_ADMIN":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_TRANSFER_ADMIN: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_TRANSFER_ADMIN: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (!data.targetUserId) {
           console.error("ADMIN_TRANSFER_ADMIN: Missing targetUserId");
           return;
         }
-        const currentAdmin = this.state.participants.find((p) => p.id === attachment.sessionId);
-        const targetUser = this.state.participants.find((p) => p.id === data.targetUserId);
-        if (currentAdmin && targetUser) {
-          this.state.adminId = data.targetUserId;
-          currentAdmin.isAdmin = false;
-          targetUser.isAdmin = true;
-          this.broadcastState();
+        {
+          // data.targetUserId is a publicId sent by the client
+          const targetPublicId = data.targetUserId;
+          const currentAdmin = this.state.participants.find((p) => p.id === attachment.publicId);
+          const targetUser = this.state.participants.find((p) => p.id === targetPublicId);
+          if (currentAdmin && targetUser) {
+            this.state.adminId = targetPublicId;
+            currentAdmin.isAdmin = false;
+            targetUser.isAdmin = true;
+            this.broadcastState();
+          }
         }
         break;
       
       case "ADMIN_RENAME_ROOM":
         if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RENAME_ROOM: Unauthorized access from session ${attachment.sessionId}`);
+          console.error(`ADMIN_RENAME_ROOM: Unauthorized access from publicId ${attachment.publicId}`);
           return;
         }
         if (!data.name) {
@@ -374,9 +415,13 @@ export class ConclaveRoom extends DurableObject {
     this.kv.put("state", this.state);
   }
 
-  isAdmin(ws: WebSocket) {
-    const attachment = ws.deserializeAttachment() as { sessionId?: string };
-    return this.state.participants.find((p) => p.id === attachment?.sessionId)?.isAdmin;
+  private isAdmin(ws: WebSocket): boolean {
+    const attachment = ws.deserializeAttachment() as { publicId?: string };
+    return !!this.state.participants.find((p) => p.id === attachment?.publicId)?.isAdmin;
+  }
+
+  private generatePublicId(): string {
+    return crypto.randomUUID();
   }
 
   broadcastState() {

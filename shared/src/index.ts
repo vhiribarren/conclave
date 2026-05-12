@@ -74,4 +74,9 @@ export type SocketMessage =
   | { type: 'ADMIN_TRANSFER_ADMIN'; targetUserId: string }
   | { type: 'ADMIN_RENAME_ROOM'; name: string };
 
+export type ServerMessage =
+  | { type: 'JOINED'; publicId: string }
+  | { type: 'STATE'; payload: RoomState }
+  | { type: 'error'; message: string };
+
 export * from './id';

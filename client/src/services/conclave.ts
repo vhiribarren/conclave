@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import type { RoomState, SocketMessage } from "conclave-shared";
+import type { RoomState, SocketMessage, ServerMessage } from "conclave-shared";
 
-export type { RoomState, SocketMessage };
+export type { RoomState, SocketMessage, ServerMessage };
 
 export interface ConclaveActions {
   userVote: (vote: string | null) => void;
@@ -50,6 +50,7 @@ export class ConclaveSocket {
     userId: string,
     name: string,
     mood: string,
+    onJoined: (publicId: string) => void,
     onStateUpdate: (state: RoomState) => void,
     onError: (error: string) => void
   ): ConclaveActions {
@@ -90,8 +91,10 @@ export class ConclaveSocket {
     };
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'STATE') {
+      const data: ServerMessage = JSON.parse(event.data);
+      if (data.type === 'JOINED') {
+        onJoined(data.publicId);
+      } else if (data.type === 'STATE') {
         onStateUpdate(data.payload);
       }
     };

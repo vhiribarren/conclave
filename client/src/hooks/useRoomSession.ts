@@ -50,6 +50,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
   const [mood, setMood] = useState(getUserEmoji());
   const [isJoined, setIsJoined] = useState(!!getUserName());
   const [state, setState] = useState<RoomState>(initialRoomState);
+  const [publicId, setPublicId] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [actions, setActions] = useState<ConclaveActions | null>(null);
   const actionsRef = useRef<ConclaveActions | null>(null);
@@ -72,12 +73,15 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
       const timeoutId = setTimeout(() => {
         if (!isMounted) return;
 
-        socketActions = ConclaveSocket.connect(roomId, userId, name, mood, (newState) => {
+        socketActions = ConclaveSocket.connect(roomId, userId, name, mood, (myPublicId) => {
+          if (isMounted) {
+            setPublicId(myPublicId);
+          }
+        }, (newState) => {
           if (isMounted) {
             setState(newState);
             setConnectionError(null);
-            const isUserAdmin = newState.participants.find(p => p.id === userId)?.isAdmin;
-            addToHistory(roomId, newState.name, isUserAdmin);
+            addToHistory(roomId, newState.name, newState.participants.find(p => p.id === publicId)?.isAdmin);
           }
         }, (error) => {
           if (isMounted) {
@@ -100,7 +104,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
     }
   }, [isJoined, roomId, name, mood, userId, linkUserId]);
 
-  const isAdmin = !!state.participants.find(p => p.id === userId)?.isAdmin;
+  const isAdmin = !!state.participants.find(p => p.id === publicId)?.isAdmin;
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
   const currentRound = currentTask
     ? (currentTask.rounds?.length ? currentTask.rounds[currentTask.rounds.length - 1] : null)
@@ -118,6 +122,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
     isRevealed,
     mood,
     name,
+    publicId,
     setIsJoined,
     setMood,
     setName,
