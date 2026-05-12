@@ -123,9 +123,17 @@ export class ConclaveRoom extends DurableObject {
   private handleDisconnect(ws: WebSocket) {
     const attachment = ws.deserializeAttachment() as { publicId?: string };
     if (attachment?.publicId) {
-      this.state.participants = this.state.participants.filter((p) => p.id !== attachment.publicId);
-      this.broadcastState();
-      this.kv.put("state", this.state);
+      // Check if another WebSocket with the same publicId is still connected
+      const hasOtherConnection = this.ctx.getWebSockets().some((other) => {
+        if (other === ws) return false;
+        const otherAttachment = other.deserializeAttachment() as { publicId?: string };
+        return otherAttachment?.publicId === attachment.publicId;
+      });
+      if (!hasOtherConnection) {
+        this.state.participants = this.state.participants.filter((p) => p.id !== attachment.publicId);
+        this.broadcastState();
+        this.kv.put("state", this.state);
+      }
     }
   }
 
