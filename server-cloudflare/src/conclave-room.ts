@@ -167,16 +167,26 @@ export class ConclaveRoom extends DurableObject {
         // Store publicId in the WebSocket attachment (survives hibernation)
         ws.serializeAttachment({ publicId });
         
-        // Remove old participant if they reconnected
-        this.state.participants = this.state.participants.filter((p) => p.id !== publicId);
-
-        this.state.participants.push({
-          id: publicId,
-          name: data.name || "Anonymous",
-          mood: data.mood || "🦊",
-          vote: null,
-          isAdmin: publicId === this.state.adminId,
+        // Check if another WebSocket with this publicId is already connected (multi-device)
+        const hasExistingConnection = this.ctx.getWebSockets().some((other) => {
+          if (other === ws) return false;
+          const otherAttachment = other.deserializeAttachment() as { publicId?: string };
+          return otherAttachment?.publicId === publicId;
         });
+
+        if (hasExistingConnection) {
+          // Multi-device (e.g. desktop + remote) — keep existing participant as-is
+        } else {
+          // Single device reconnect or first join — update participant entry
+          this.state.participants = this.state.participants.filter((p) => p.id !== publicId);
+          this.state.participants.push({
+            id: publicId,
+            name: data.name || "Anonymous",
+            mood: data.mood || "🦊",
+            vote: null,
+            isAdmin: publicId === this.state.adminId,
+          });
+        }
         ws.send(JSON.stringify({ type: "JOINED", publicId } satisfies ServerMessage));
 
         this.broadcastState();
