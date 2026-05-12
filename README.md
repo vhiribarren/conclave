@@ -31,6 +31,7 @@ Workers & Durable Objects.
 See:
 
 - [`docs/architecture.md`](docs/architecture.md) for a detailed breakdown
+- [`docs/protocol.md`](docs/protocol.md) for the communication protocol and identity model
 
 
 ## Live Instance
