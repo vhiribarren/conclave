@@ -2,6 +2,7 @@
 
 Yet another planning poker tool.
 
+![User desktop view during a vote](materials/desktop-user-vote.png)
 
 ## Features
 
