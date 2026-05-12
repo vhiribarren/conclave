@@ -313,19 +313,19 @@ const Room = () => {
                 </button>
               </div>
               <div className="header-separator" />
-              <button onClick={() => setShowUserSettings(true)} className="icon-button" title={t('room.userSettings')}>
-                <UserCog size={18} />
-              </button>
-              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
-                <ListChecks size={18} />
+              <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
+                <Share2 size={18} />
               </button>
               {isAdmin && (
                 <button onClick={() => setShowQR(true)} className="icon-button accent" title={t('room.remoteControl')}>
                   <Smartphone size={18} />
                 </button>
               )}
-              <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
-                <Share2 size={18} />
+              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
+                <ListChecks size={18} />
+              </button>
+              <button onClick={() => setShowUserSettings(true)} className="icon-button" title={t('room.userSettings')}>
+                <UserCog size={18} />
               </button>
               <button onClick={() => navigate('/about', { state: { from: window.location.pathname + window.location.search } })} className="icon-button" title={t('room.about')}>
                 <Info size={18} />

@@ -27,7 +27,6 @@ import { ArrowLeft, Check, Edit2, ListChecks, Plus, Trash2, X } from 'lucide-rea
 import { useTranslation } from 'react-i18next';
 import type { Round, Task } from 'conclave-shared';
 import Button from '../components/Button';
-import { LanguageSelector } from '../components/LanguageSelector';
 import { Modal } from '../components/Modal';
 import { setUserEmoji, setUserName } from '../services/user';
 import { useCurrentRoomSession } from './RoomSessionLayout';
@@ -201,7 +200,6 @@ const RoomTasks = () => {
             </div>
           </div>
           <div className="tasks-header-actions">
-            <LanguageSelector />
             <button onClick={() => navigate(`/room/${roomId}`)} className="premium-button secondary">
               <ArrowLeft size={16} /> {t('tasks.backToRoom')}
             </button>
