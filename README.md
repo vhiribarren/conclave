@@ -5,84 +5,89 @@ Yet another planning poker tool.
 
 ## Features
 
-- No subscription needed
-- Real-time using websockets
-- Vote on specific items, or without selected items
-- Administrator have a special access to vote outside the main screen
-- Card deck can be customized
+- No account, no login, no subscription needed
+- Vote on specific tasks, or ad-hoc without a selected item
+- Vote result aggregation with distribution chart and majority highlight
+- Round history preserved per task
+- Configurable countdown timer
+- Admin remote control via QR code (vote from your phone while presenting)
+- Room sharing via QR code, invite link or room ID
+- Card deck presets (Standard, Fibonacci, T-Shirt) or fully custom
+- Emoji avatars
+- Internationalized (English and French)
+- Automatic dark mode following system preference
+- Circle view or grid view
 - Mobile and desktop friendly
-- Room is deleted after 48H of inactivities
-- Based on Cloudflare Durable Objects on server side
+- Recent rooms history stored locally
+- Room is deleted after 48H of inactivity
+- Admin role can be transferred to another participant
 
 
-## How to access
+## Tech Stack
 
-For now, it is hosted on https://conclave.alea.net
+React, TypeScript, Vite with Cloudflare Wrangler plugin, WebSockets, Cloudflare 
+Workers & Durable Objects.
 
-It may be retired in case of abuse, or if the Cloudflare free plan is not
-good enough for my needs.
+See:
 
-It is provided **as-is**, without warranty or support of any kind. The author(s)
-make no guarantee regarding data integrity, compatibility across versions, or
-fitness for any particular purpose.
-
-**You are responsible for maintaining your own backups.**  The author(s) shall
-not be liable for any data loss, corruption, or damages arising from the use of
-this software.
-
-Data is locally stored in your web browser local storage. Some web analytics are
-present using Cloudflare Analytics, but no cookies are used and no per-user data
-is collected.
+- [`docs/architecture.md`](docs/architecture.md) for a detailed breakdown
 
 
-## How to build
+## Live Instance
 
-### Prerequisites & Technologies
+Hosted at https://conclave.alea.net
 
-This app uses React, TypeScript, Vite, WebSockets, and Cloudflare Durable
-Objects on server side. A low-cost (free?) rendez-vous server is needed, an
-Cloudflare provides that under 100 000 requests without having to provide a
-credit card.
+It may be retired in case of abuse, or if the Cloudflare free plan is no longer
+sufficient. It is provided **as-is**, without warranty or support of any kind.
+The author(s) make no guarantee regarding data integrity, compatibility across
+versions, or fitness for any particular purpose. **You are responsible for 
+maintaining your own backups.** The author(s) shall not be liable for any data 
+loss, corruption, or damages arising from the use of this software.
 
-To start working, you need:
+
+## Development
+
+### Prerequisites
 
 - **Node.js** (v18 or later)
 - **npm** (v9 or later)
 - **Cloudflare Account** (required for production deployment with Durable Objects)
 
-All tests were performed under a MacOS environment.
+All tests were performed under a macOS environment.
 
-### 1. Install Dependencies
-
-From the repo root, install all workspace dependencies in one shot:
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Local Development
+### Local Development
 
-`vite` is configured with a the Cloudflare `wrangler` plugin which prepare the
-client and a local server.
+Vite is configured with the Cloudflare Wrangler plugin which starts both the
+client dev server and a local Durable Objects backend.
 
 ```bash
 npm run dev
 ```
 
-### 3. Building for Production
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-The output with the client and the Cloudflare worker will be in `client/dist`.
+Output (client + Cloudflare Worker) goes to `client/dist`.
 
 
-## How to deploy
+## Deployment
 
-- create a Cloudflare account
-- in Workers & Pages, create a new application
-- configure a new GitHub link, and reference the project or its clone
+> [!IMPORTANT]
+> Current `server-cloudflare/wrangler.toml` file is configured for deployment on 
+> https://conclave.alea.net - you probably need to change that.
+
+1. Create a Cloudflare account
+2. In Workers & Pages, create a new application
+3. Configure a GitHub link referencing this project or a fork
 
 Build configuration:
 
@@ -91,14 +96,12 @@ Build configuration:
 - Root directory: `/`
 
 
-## Architecture
+## Data and privacy
 
-```
-conclave/
-├── client/            # React SPA (Vite + TypeScript)
-├── server-cloudflare/ # Cloudflare Worker + Durable Objects
-└── shared/            # Shared TypeScript types & utilities (workspace package)
-```
+- Data is stored in your browser's local storage (profile, recent rooms, custom deck)
+- Room data lives on the server only for the lifetime of the room (48H max inactivity)
+- Cloudflare Analytics may be used, but no cookies are set and no per-user data or tracker is collected
+
 
 ## License
 
