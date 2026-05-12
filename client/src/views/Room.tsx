@@ -451,6 +451,7 @@ const Room = () => {
                 {/* Mobile-only: voting cards sticky bottom (non-admin) */}
                 {!isRevealed && !isAdmin && (
                   <div className="voting-section glass mobile-voting">
+                    <span className="voting-subtitle">{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
                     <span className="voting-title">{t('room.pickACard')}</span>
                     <div className="voting-cards">
                       {(state.deck || []).map((card) => (
@@ -471,6 +472,7 @@ const Room = () => {
                     {/* Vote cards for admin — hidden when panel is expanded */}
                     {!isRevealed && !mobileAdminOpen && (
                       <div className="mobile-admin-vote-section">
+                        <span className="mobile-admin-vote-subtitle">{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
                         <span className="mobile-admin-vote-title">{t('room.pickACard')}</span>
                         <div className="mobile-admin-vote-cards">
                           {(state.deck || []).map((card) => (

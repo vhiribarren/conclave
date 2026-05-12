@@ -434,6 +434,12 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+.voting-subtitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}
 .voting-cards {
   display: flex;
   flex-wrap: wrap;
@@ -554,6 +560,12 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+.mobile-admin-vote-subtitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
 }
 
 .mobile-admin-vote-cards {
