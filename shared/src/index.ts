@@ -41,7 +41,7 @@ export interface Task {
   rounds: Round[];
 }
 
-export const DEFAULT_DECK = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
+export const DEFAULT_DECK = ['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'];
 
 export interface RoomState {
   created?: boolean;

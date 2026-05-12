@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
+import { DEFAULT_DECK } from 'conclave-shared';
 import Button from './Button';
 import PokerCard from './PokerCard';
 import { AggregationResult } from './AggregationResult';
@@ -431,7 +432,7 @@ export const AdminPanel: React.FC<Props> = ({
 
             <div className="panel-actions panel-actions--wrap" style={{ marginTop: '0.75rem' }}>
               <Button
-                onClick={() => updateDeck(['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'], 'preset')}
+                onClick={() => updateDeck(DEFAULT_DECK, 'preset')}
                 variant={state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'primary' : 'secondary'}
                 className="sidebar-chip"
               >
