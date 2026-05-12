@@ -29,10 +29,14 @@ import './AggregationResult.css';
 interface Props {
   participants: (Participant & { vote: string | null })[];
   deck?: string[];
+  /** When provided (anonymous mode), votes are read from the round instead of participants */
+  roundVotes?: Record<string, string>;
 }
 
-export const AggregationResult: React.FC<Props> = ({ participants, deck = [] }) => {
-  const votes = participants.map(p => p.vote).filter(v => v !== null) as string[];
+export const AggregationResult: React.FC<Props> = ({ participants, deck = [], roundVotes }) => {
+  const votes = roundVotes
+    ? Object.values(roundVotes)
+    : participants.map(p => p.vote).filter(v => v !== null) as string[];
   
   if (votes.length === 0) return null;
 

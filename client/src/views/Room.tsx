@@ -397,7 +397,12 @@ const Room = () => {
                   </div>
                 )}
 
-                <div className="participants-results-row">
+                <div className="participants-results-row" style={{ position: 'relative' }}>
+                  {state.anonymousVoting && (
+                    <div className="anonymous-badge">
+                      🕵️ {t('room.anonymousMode')}
+                    </div>
+                  )}
                   <ParticipantsBoard
                     participants={state.participants}
                     isRevealed={isRevealed}
@@ -417,7 +422,7 @@ const Room = () => {
                     {isRevealed ? (
                       <>
                         <span className="sidebar-section-title">📊 {t('room.results')}</span>
-                        <AggregationResult participants={state.participants} deck={state.deck} />
+                        <AggregationResult participants={state.participants} deck={state.deck} roundVotes={state.anonymousVoting && currentRound?.revealed ? currentRound.votes : undefined} />
                       </>
                     ) : !isAdmin ? (
                       <div className="results-panel-voting">
@@ -444,7 +449,7 @@ const Room = () => {
                     <span className="sidebar-section-title">{t('room.votingOn')}</span>
                     <span className="results-panel-task-title">{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
                     <span className="sidebar-section-title">📊 {t('room.results')}</span>
-                    <AggregationResult participants={state.participants} deck={state.deck} />
+                    <AggregationResult participants={state.participants} deck={state.deck} roundVotes={state.anonymousVoting && currentRound?.revealed ? currentRound.votes : undefined} />
                   </div>
                 )}
 

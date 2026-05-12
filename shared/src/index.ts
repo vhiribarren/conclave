@@ -55,6 +55,7 @@ export interface RoomState {
   timerPausedRemainingMs: number | null;
   adminId: string | null;
   unassociatedRound: Round;
+  anonymousVoting: boolean;
 }
 
 export type SocketMessage = 
@@ -72,7 +73,8 @@ export type SocketMessage =
   | { type: 'ADMIN_PAUSE_TIMER' }
   | { type: 'ADMIN_RESUME_TIMER' }
   | { type: 'ADMIN_TRANSFER_ADMIN'; targetUserId: string }
-  | { type: 'ADMIN_RENAME_ROOM'; name: string };
+  | { type: 'ADMIN_RENAME_ROOM'; name: string }
+  | { type: 'ADMIN_SET_ANONYMOUS_VOTING'; enabled: boolean };
 
 export type ServerMessage =
   | { type: 'JOINED'; publicId: string }

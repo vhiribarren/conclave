@@ -42,6 +42,7 @@ export interface ConclaveActions {
   adminTransferAdmin: (targetUserId: string) => void;
   userUpdateProfile: (name: string, mood: string) => void;
   adminRenameRoom: (name: string) => void;
+  adminSetAnonymousVoting: (enabled: boolean) => void;
   userDisconnect: () => void;
 }
 
@@ -175,6 +176,7 @@ export class ConclaveSocket {
       adminTransferAdmin: (targetUserId) => send({ type: 'ADMIN_TRANSFER_ADMIN', targetUserId }),
       userUpdateProfile: (name, mood) => send({ type: 'USER_UPDATE_PROFILE', name, mood }),
       adminRenameRoom: (name) => send({ type: 'ADMIN_RENAME_ROOM', name }),
+      adminSetAnonymousVoting: (enabled) => send({ type: 'ADMIN_SET_ANONYMOUS_VOTING', enabled }),
       userDisconnect: () => {
         intentionalClose = true;
         destroyed = true;

@@ -55,6 +55,7 @@
     "quickVote": "Vote rapide",
     "votingOn": "Vote en cours sur",
     "results": "Résultats",
+    "anonymousMode": "Vote anonyme",
     "pickACard": "Choisir une carte",
     "reveal": "Révéler",
     "reset": "Réinitialiser",
@@ -112,6 +113,10 @@
     },
     "transferAdmin": "Transférer l'administration",
     "transferAdminDesc": "Transférer les droits d'administration à un autre participant.",
+    "anonymousVoting": "Vote anonyme",
+    "anonymousVotingDesc": "Lorsqu'activé, les votes révélés ne sont pas associés aux participants.",
+    "anonymousVotingOff": "Public",
+    "anonymousVotingOn": "Anonyme",
     "transferTo": "Transférer à {{name}}",
     "transferModal": {
       "title": "Transfer des droits admin",

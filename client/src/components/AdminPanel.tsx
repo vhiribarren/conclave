@@ -210,7 +210,7 @@ export const AdminPanel: React.FC<Props> = ({
               {isRevealed && (
                 <Section glass>
                   {layout === 'sidebar' && <SectionTitle>📊 {t('room.results')}</SectionTitle>}
-                  <AggregationResult participants={state.participants} deck={state.deck} />
+                  <AggregationResult participants={state.participants} deck={state.deck} roundVotes={state.anonymousVoting && currentRound?.revealed ? currentRound.votes : undefined} />
                 </Section>
               )}
 
@@ -461,6 +461,30 @@ export const AdminPanel: React.FC<Props> = ({
               >
                 <RotateCw size={13} /> {t('settings.custom')}
               </Button>
+            </div>
+          </Section>
+
+          {/* ── Anonymous voting ──────────────────────────────────── */}
+          <Section glass>
+            <SectionTitle>🕵️ {t('settings.anonymousVoting')}</SectionTitle>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.5rem' }}>
+              {t('settings.anonymousVotingDesc')}
+            </p>
+            <div className="vote-mode-switch" role="group" aria-label="Anonymous voting">
+              <button
+                type="button"
+                className={!state.anonymousVoting ? 'active' : ''}
+                onClick={() => actions.adminSetAnonymousVoting(false)}
+              >
+                {t('settings.anonymousVotingOff')}
+              </button>
+              <button
+                type="button"
+                className={state.anonymousVoting ? 'active' : ''}
+                onClick={() => actions.adminSetAnonymousVoting(true)}
+              >
+                {t('settings.anonymousVotingOn')}
+              </button>
             </div>
           </Section>
 

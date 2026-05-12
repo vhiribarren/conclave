@@ -55,6 +55,7 @@
     "quickVote": "Quick vote",
     "votingOn": "Voting on",
     "results": "Results",
+    "anonymousMode": "Anonymous voting",
     "pickACard": "Pick a card",
     "reveal": "Reveal",
     "reset": "Reset",
@@ -112,6 +113,10 @@
     },
     "transferAdmin": "Transfer admin",
     "transferAdminDesc": "Hand over admin rights to another participant.",
+    "anonymousVoting": "Anonymous voting",
+    "anonymousVotingDesc": "When enabled, revealed votes are not linked to participants.",
+    "anonymousVotingOff": "Public",
+    "anonymousVotingOn": "Anonymous",
     "transferTo": "Transfer to {{name}}",
     "transferModal": {
       "title": "Transfer admin rights",

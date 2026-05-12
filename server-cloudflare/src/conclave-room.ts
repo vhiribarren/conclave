@@ -49,6 +49,7 @@ export class ConclaveRoom extends DurableObject {
     timerPausedRemainingMs: null,
     adminId: null,
     unassociatedRound: { id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false },
+    anonymousVoting: false,
   };
 
   // userId -> publicId mapping, persisted in SQL under key "userIdMapping"
@@ -429,6 +430,15 @@ export class ConclaveRoom extends DurableObject {
         this.state.name = data.name;
         this.broadcastState();
         break;
+
+      case "ADMIN_SET_ANONYMOUS_VOTING":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_SET_ANONYMOUS_VOTING: Unauthorized access from publicId ${attachment.publicId}`);
+          return;
+        }
+        this.state.anonymousVoting = !!data.enabled;
+        this.broadcastState();
+        break;
     }
     this.kv.put("state", this.state);
   }
@@ -453,16 +463,38 @@ export class ConclaveRoom extends DurableObject {
       currentRound = this.state.unassociatedRound;
     }
 
+    // In anonymous mode after reveal, don't send individual votes — only aggregation matters
+    // Also anonymize round vote keys so the client can't correlate votes to participants
+    const anonymizeRound = (round: Round): Round => {
+      if (!this.state.anonymousVoting || !round.revealed) return round;
+      const values = Object.values(round.votes);
+      const anonymizedVotes: Record<string, string> = {};
+      values.forEach((v, i) => { anonymizedVotes[String(i)] = v; });
+      return { ...round, votes: anonymizedVotes };
+    };
+
     const stateToSend = JSON.stringify({
       type: "STATE",
       serverTime: Date.now(),
       payload: {
         ...this.state,
+        unassociatedRound: anonymizeRound(this.state.unassociatedRound),
+        tasks: this.state.tasks.map(task => ({
+          ...task,
+          rounds: task.rounds.map(r => anonymizeRound(r)),
+        })),
         participants: this.state.participants.map((p) => {
           const vote = currentRound?.votes[p.id] || null;
+          let displayVote: string | null;
+          if (this.state.anonymousVoting) {
+            // Before reveal: show checkmark if voted; after reveal: hide individual votes
+            displayVote = (!currentRound?.revealed && vote) ? "✓" : null;
+          } else {
+            displayVote = currentRound?.revealed ? vote : vote ? "✓" : null;
+          }
           return {
             ...p,
-            vote: currentRound?.revealed ? vote : vote ? "✓" : null,
+            vote: displayVote,
           };
         }),
       },

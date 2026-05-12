@@ -102,6 +102,8 @@ The server sends the full `RoomState` on every mutation. The state contains:
 
 Vote masking: before reveal, other participants' votes appear as `"✓"` (voted) or `null` (not voted). After reveal, actual vote values are shown.
 
+Anonymous voting: when enabled by the admin, individual votes are never associated with participants — even after reveal. The server sends an `anonymousVotes` array (the list of cast votes without attribution) so the client can display aggregated results only.
+
 ## Message Types
 
 ### Client → Server (`SocketMessage`)
@@ -109,7 +111,7 @@ Vote masking: before reveal, other participants' votes appear as `"✓"` (voted)
 - `USER_JOIN` — authenticate and join the room
 - `USER_UPDATE_PROFILE` — change display name or mood
 - `USER_VOTE` — cast or retract a vote
-- `ADMIN_*` — admin-only actions (reveal, reset, manage tasks, deck, timer, transfer admin, rename room)
+- `ADMIN_*` — admin-only actions (reveal, reset, manage tasks, deck, timer, transfer admin, rename room, toggle anonymous voting)
 
 ### Server → Client (`ServerMessage`)
 

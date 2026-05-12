@@ -35,7 +35,8 @@ const initialRoomState: RoomState = {
   timerEndAt: null,
   timerPausedRemainingMs: null,
   adminId: null,
-  unassociatedRound: { id: '', votes: {}, revealed: false }
+  unassociatedRound: { id: '', votes: {}, revealed: false },
+  anonymousVoting: false,
 };
 
 interface Options {

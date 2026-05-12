@@ -22,6 +22,7 @@ Yet another planning poker tool.
 - Recent rooms history stored locally
 - Room is deleted after 48H of inactivity
 - Admin role can be transferred to another participant
+- Anonymous voting mode (votes are revealed without showing who voted what)
 
 
 ## Tech Stack
@@ -51,8 +52,8 @@ loss, corruption, or damages arising from the use of this software.
 
 ### Prerequisites
 
-- **Node.js** (v18 or later)
-- **npm** (v9 or later)
+- **Node.js** (v24.15.0 or later)
+- **npm** (v11.12.1 or later)
 - **Cloudflare Account** (required for production deployment with Durable Objects)
 
 All tests were performed under a macOS environment.
