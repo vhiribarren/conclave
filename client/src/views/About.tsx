@@ -24,7 +24,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from '../components/LanguageSelector';
 import licenseText from '../../../LICENSE?raw';
 import thirdPartyNotices from '../../../THIRD_PARTY_LICENSES.md?raw';
 import './About.css';
@@ -84,7 +83,6 @@ const About = () => {
           <h1 className="about-title">{t('about.title')}</h1>
           <p className="about-subtitle">{t('about.subtitle')}</p>
         </div>
-        <LanguageSelector />
       </header>
 
       <main className="about-content">
