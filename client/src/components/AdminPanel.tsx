@@ -470,7 +470,7 @@ export const AdminPanel: React.FC<Props> = ({
             </p>
             <div className="panel-actions panel-actions--wrap">
               {state.participants
-                .filter(p => !p.isAdmin && !p.isSpectator)
+                .filter(p => !p.isAdmin)
                 .map(p => (
                   <Button
                     key={p.id}
@@ -481,7 +481,7 @@ export const AdminPanel: React.FC<Props> = ({
                     <Crown size={13} /> {p.name}
                   </Button>
                 ))}
-              {state.participants.filter(p => !p.isAdmin && !p.isSpectator).length === 0 && (
+              {state.participants.filter(p => !p.isAdmin).length === 0 && (
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
                   —
                 </span>

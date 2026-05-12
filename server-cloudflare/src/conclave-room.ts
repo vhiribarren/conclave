@@ -139,7 +139,6 @@ export class ConclaveRoom extends DurableObject {
           mood: data.mood || "🦊",
           vote: null,
           isAdmin: sessionId === this.state.adminId,
-          isSpectator: data.isSpectator || false,
         });
         this.broadcastState();
         break;
