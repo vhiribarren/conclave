@@ -25,6 +25,8 @@ import type { RoomState, SocketMessage, ServerMessage } from "conclave-shared";
 
 export type { RoomState, SocketMessage, ServerMessage };
 
+export type ConnectionStatus = 'connected' | 'disconnected' | 'reconnecting';
+
 export interface ConclaveActions {
   userVote: (vote: string | null) => void;
   adminReveal: () => void;
@@ -43,6 +45,7 @@ export interface ConclaveActions {
   userDisconnect: () => void;
 }
 
+const RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 15000];
 
 export class ConclaveSocket {
   static connect(
@@ -52,52 +55,104 @@ export class ConclaveSocket {
     mood: string,
     onJoined: (publicId: string) => void,
     onStateUpdate: (state: RoomState) => void,
-    onError: (error: string) => void
+    onError: (error: string) => void,
+    onConnectionStatus?: (status: ConnectionStatus) => void
   ): ConclaveActions {
 
     const wsUrl = `/api/rooms/${roomId}/ws`;
 
-    const ws = new WebSocket(wsUrl);
+    let ws: WebSocket | null = null;
+    let connected = false;
+    let initialErrorDispatched = false;
+    let intentionalClose = false;
+    let reconnectAttempt = 0;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let destroyed = false;
 
     const send = (message: SocketMessage) => {
-      if (ws.readyState === WebSocket.OPEN) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(message));
       }
     };
 
-    let connected = false;
-    let errorDispatched = false;
-
-    const handleError = (msg: string) => {
-      if (!connected && !errorDispatched) {
-        errorDispatched = true;
-        console.log(msg)
+    const handleInitialError = (msg: string) => {
+      if (!connected && !initialErrorDispatched) {
+        initialErrorDispatched = true;
+        console.log(msg);
         onError(msg);
       }
     };
 
-    ws.onopen = () => {
-      connected = true;
-      send({ type: 'USER_JOIN', userId, name, mood });
+    const scheduleReconnect = () => {
+      if (destroyed || intentionalClose) return;
+      const delay = RECONNECT_DELAYS[Math.min(reconnectAttempt, RECONNECT_DELAYS.length - 1)];
+      reconnectAttempt++;
+      onConnectionStatus?.('reconnecting');
+      console.log(`[ConclaveSocket] Reconnecting in ${delay}ms (attempt ${reconnectAttempt})`);
+      reconnectTimer = setTimeout(() => {
+        if (!destroyed && !intentionalClose) {
+          createSocket();
+        }
+      }, delay);
     };
 
-    ws.onerror = (event) => {
-      console.error('WebSocket error', event);
-      handleError('Room does not exist or connection failed');
+    const createSocket = () => {
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        connected = true;
+        reconnectAttempt = 0;
+        onConnectionStatus?.('connected');
+        send({ type: 'USER_JOIN', userId, name, mood });
+      };
+
+      ws.onerror = (event) => {
+        console.error('WebSocket error', event);
+        handleInitialError('Room does not exist or connection failed');
+      };
+
+      ws.onclose = () => {
+        if (!connected) {
+          handleInitialError('Room does not exist or connection failed');
+          return;
+        }
+        // Connection was established before — attempt reconnection
+        if (!intentionalClose && !destroyed) {
+          onConnectionStatus?.('disconnected');
+          scheduleReconnect();
+        }
+      };
+
+      ws.onmessage = (event) => {
+        const data: ServerMessage = JSON.parse(event.data);
+        if (data.type === 'JOINED') {
+          onJoined(data.publicId);
+        } else if (data.type === 'STATE') {
+          onStateUpdate(data.payload);
+        }
+      };
     };
 
-    ws.onclose = () => {
-      handleError('Room does not exist or connection failed');
-    };
-
-    ws.onmessage = (event) => {
-      const data: ServerMessage = JSON.parse(event.data);
-      if (data.type === 'JOINED') {
-        onJoined(data.publicId);
-      } else if (data.type === 'STATE') {
-        onStateUpdate(data.payload);
+    // Reconnect immediately when the page becomes visible again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && connected && !intentionalClose && !destroyed) {
+        if (ws && ws.readyState !== WebSocket.OPEN && ws.readyState !== WebSocket.CONNECTING) {
+          // Clear any pending reconnect timer and try immediately
+          if (reconnectTimer) {
+            clearTimeout(reconnectTimer);
+            reconnectTimer = null;
+          }
+          reconnectAttempt = 0;
+          onConnectionStatus?.('reconnecting');
+          createSocket();
+        }
       }
     };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Start the initial connection
+    createSocket();
 
     return {
       userVote: (vote) => send({ type: 'USER_VOTE', vote }),
@@ -114,7 +169,18 @@ export class ConclaveSocket {
       adminTransferAdmin: (targetUserId) => send({ type: 'ADMIN_TRANSFER_ADMIN', targetUserId }),
       userUpdateProfile: (name, mood) => send({ type: 'USER_UPDATE_PROFILE', name, mood }),
       adminRenameRoom: (name) => send({ type: 'ADMIN_RENAME_ROOM', name }),
-      userDisconnect: () => ws.close(),
+      userDisconnect: () => {
+        intentionalClose = true;
+        destroyed = true;
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        if (reconnectTimer) {
+          clearTimeout(reconnectTimer);
+          reconnectTimer = null;
+        }
+        if (ws) {
+          ws.close();
+        }
+      },
     };
   }
 }

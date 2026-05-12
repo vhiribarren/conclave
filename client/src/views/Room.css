@@ -85,6 +85,16 @@
   border-radius: 50%;
   background: var(--color-success-dot);
   box-shadow: 0 0 8px var(--color-success-dot-glow);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.header-dot.disconnected {
+  background: var(--danger-color, #e53e3e);
+  box-shadow: 0 0 8px rgba(229, 62, 62, 0.5);
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 .header-actions {
   display: flex;

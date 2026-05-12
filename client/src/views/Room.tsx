@@ -50,6 +50,7 @@ const Room = () => {
     actions,
     actionsRef,
     connectionError,
+    connectionStatus,
     currentRound,
     currentTask,
     isAdmin,
@@ -284,8 +285,11 @@ const Room = () => {
                 </div>
               )}
               <div className="header-subtitle">
-                <span className="header-dot"></span>
-                {state.participants.length} {t('common.online')}
+                <span className={`header-dot ${connectionStatus !== 'connected' ? 'disconnected' : ''}`}></span>
+                {connectionStatus === 'connected'
+                  ? `${state.participants.length} ${t('common.online')}`
+                  : t('common.reconnecting')
+                }
               </div>
             </div>
           </div>

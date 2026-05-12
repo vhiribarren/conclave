@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import { useEffect, useRef, useState } from 'react';
-import { ConclaveSocket, type ConclaveActions, type RoomState } from '../services/conclave';
+import { ConclaveSocket, type ConclaveActions, type RoomState, type ConnectionStatus } from '../services/conclave';
 import { getUserEmoji, getUserId, getUserName } from '../services/user';
 import { addToHistory } from '../services/history';
 import { settings } from '../services/settings';
@@ -52,6 +52,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
   const [state, setState] = useState<RoomState>(initialRoomState);
   const [publicId, setPublicId] = useState<string | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [actions, setActions] = useState<ConclaveActions | null>(null);
   const actionsRef = useRef<ConclaveActions | null>(null);
   const userId = getUserId();
@@ -87,6 +88,10 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
           if (isMounted) {
             setConnectionError(error);
           }
+        }, (status) => {
+          if (isMounted) {
+            setConnectionStatus(status);
+          }
         });
         actionsRef.current = socketActions;
         setActions(socketActions);
@@ -115,6 +120,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
     actions,
     actionsRef,
     connectionError,
+    connectionStatus,
     currentRound,
     currentTask,
     isAdmin,

@@ -42,6 +42,7 @@ const RoomRemote = () => {
     actions,
     actionsRef,
     connectionError,
+    connectionStatus,
     currentRound,
     isAdmin,
     isJoined,
@@ -110,8 +111,11 @@ const RoomRemote = () => {
             <div>
               <h1 className="header-title">{state.name || roomId}</h1>
               <div className="header-subtitle">
-                <span className="header-dot"></span>
-                {state.participants.length} {t('common.online')} · {t('common.remote')}
+                <span className={`header-dot ${connectionStatus !== 'connected' ? 'disconnected' : ''}`}></span>
+                {connectionStatus === 'connected'
+                  ? `${state.participants.length} ${t('common.online')} · ${t('common.remote')}`
+                  : t('common.reconnecting')
+                }
               </div>
             </div>
           </div>
