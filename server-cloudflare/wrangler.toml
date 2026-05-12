@@ -33,5 +33,4 @@ tag = "v1"
 new_sqlite_classes = [ "ConclaveRoom" ]
 
 [[routes]]
-pattern = "conclave.alea.net"
 custom_domain = true
