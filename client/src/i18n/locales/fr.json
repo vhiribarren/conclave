@@ -107,6 +107,14 @@
     "customizeModal": {
       "title": "Personnaliser le jeu ?",
       "subtitle": "Cela remplacera votre deck personnalisé par les cartes du deck actuel."
+    },
+    "transferAdmin": "Transférer l'administration",
+    "transferAdminDesc": "Transférer les droits d'administration à un autre participant.",
+    "transferTo": "Transférer à {{name}}",
+    "transferModal": {
+      "title": "Transfer des droits admin",
+      "subtitle": "Vous êtes sur le point de transférer les droits d'administration à {{name}}. Vous perdrez vos privilèges d'administrateur.",
+      "confirm": "Transférer"
     }
   },
   "tasks": {

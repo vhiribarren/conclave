@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import React, { useState, useRef } from 'react';
-import { Eye, RotateCcw, Settings, Play, Pause, X, Layout, RotateCw, GripVertical, Smile, ListChecks } from 'lucide-react';
+import { Eye, RotateCcw, Settings, Play, Pause, X, Layout, RotateCw, GripVertical, Smile, ListChecks, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
@@ -69,6 +69,7 @@ export const AdminPanel: React.FC<Props> = ({
     return saved ? JSON.parse(saved) : ['1', '2', '3', '5', '8', '13', '?', '☕'];
   });
   const [showCustomizeConfirm, setShowCustomizeConfirm] = useState(false);
+  const [transferTarget, setTransferTarget] = useState<{ id: string; name: string } | null>(null);
 
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId) ?? null;
   const currentTaskIndex = currentTask ? state.tasks.findIndex(t => t.id === currentTask.id) : -1;
@@ -460,6 +461,33 @@ export const AdminPanel: React.FC<Props> = ({
               </Button>
             </div>
           </Section>
+
+          {/* ── Transfer admin ──────────────────────────────────────── */}
+          <Section glass>
+            <SectionTitle>👑 {t('settings.transferAdmin')}</SectionTitle>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.5rem' }}>
+              {t('settings.transferAdminDesc')}
+            </p>
+            <div className="panel-actions panel-actions--wrap">
+              {state.participants
+                .filter(p => !p.isAdmin && !p.isSpectator)
+                .map(p => (
+                  <Button
+                    key={p.id}
+                    variant="secondary"
+                    className="sidebar-chip"
+                    onClick={() => setTransferTarget({ id: p.id, name: p.name })}
+                  >
+                    <Crown size={13} /> {p.name}
+                  </Button>
+                ))}
+              {state.participants.filter(p => !p.isAdmin && !p.isSpectator).length === 0 && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                  —
+                </span>
+              )}
+            </div>
+          </Section>
         </div>
       )}
 
@@ -485,6 +513,23 @@ export const AdminPanel: React.FC<Props> = ({
           onClose={() => setShowTaskSelector(false)}
           tasks={state.tasks}
         />
+      )}
+
+      {transferTarget && (
+        <div className="modal-overlay" onClick={() => setTransferTarget(null)}>
+          <div className="modal-content animate-fade-in" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '24rem' }}>
+            <h2 className="modal-title">{t('settings.transferModal.title')}</h2>
+            <p className="modal-subtitle">
+              {t('settings.transferModal.subtitle', { name: transferTarget.name })}
+            </p>
+            <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <Button variant="secondary" onClick={() => setTransferTarget(null)}>{t('common.cancel')}</Button>
+              <Button variant="danger" onClick={() => { actions.adminTransferAdmin(transferTarget.id); setTransferTarget(null); }}>
+                <Crown size={14} /> {t('settings.transferModal.confirm')}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

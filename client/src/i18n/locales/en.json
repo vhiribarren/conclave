@@ -107,6 +107,14 @@
     "customizeModal": {
       "title": "Customise deck?",
       "subtitle": "This will replace your previously saved custom deck with the current preset cards."
+    },
+    "transferAdmin": "Transfer admin",
+    "transferAdminDesc": "Hand over admin rights to another participant.",
+    "transferTo": "Transfer to {{name}}",
+    "transferModal": {
+      "title": "Transfer admin rights",
+      "subtitle": "You are about to transfer admin rights to {{name}}. You will lose your admin privileges.",
+      "confirm": "Transfer"
     }
   },
   "tasks": {
