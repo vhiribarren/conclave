@@ -453,31 +453,33 @@ const Room = () => {
                       </div>
                     )}
 
-                    {/* Quick actions: reveal, reset, timer */}
+                    {/* Quick actions: reveal, reset, timer — hidden when panel is expanded */}
                     <div className="mobile-admin-bar-header">
-                      <div className="mobile-admin-bar-actions">
-                        <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
-                          <Eye size={15} /> {t('room.reveal')}
-                        </button>
-                        <button onClick={handleReset} className="premium-button secondary">
-                          <RotateCcw size={15} /> {t('room.reset')}
-                        </button>
-                        {!isRevealed && (
-                          state.timerPausedRemainingMs !== null ? (
-                            <button onClick={() => actions.adminResumeTimer()} className="premium-button secondary" title={t('admin.resume')}>
-                              ▶
-                            </button>
-                          ) : state.timerEndAt ? (
-                            <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" title={t('admin.pause')}>
-                              ⏸
-                            </button>
-                          ) : (
-                            <button onClick={() => actions.adminSetTimer(30000)} className="premium-button secondary" title={t('admin.start')}>
-                              ⏱
-                            </button>
-                          )
-                        )}
-                      </div>
+                      {!mobileAdminOpen && (
+                        <div className="mobile-admin-bar-actions">
+                          <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
+                            <Eye size={15} /> {t('room.reveal')}
+                          </button>
+                          <button onClick={handleReset} className="premium-button secondary">
+                            <RotateCcw size={15} /> {t('room.reset')}
+                          </button>
+                          {!isRevealed && (
+                            state.timerPausedRemainingMs !== null ? (
+                              <button onClick={() => actions.adminResumeTimer()} className="premium-button secondary" title={t('admin.resume')}>
+                                ▶
+                              </button>
+                            ) : state.timerEndAt ? (
+                              <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" title={t('admin.pause')}>
+                                ⏸
+                              </button>
+                            ) : (
+                              <button onClick={() => actions.adminSetTimer(30000)} className="premium-button secondary" title={t('admin.start')}>
+                                ⏱
+                              </button>
+                            )
+                          )}
+                        </div>
+                      )}
                       <button
                         className="mobile-admin-bar-toggle"
                         onClick={() => setMobileAdminOpen(!mobileAdminOpen)}
