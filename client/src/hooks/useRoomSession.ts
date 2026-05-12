@@ -25,7 +25,6 @@ import { useEffect, useRef, useState } from 'react';
 import { ConclaveSocket, type ConclaveActions, type RoomState, type ConnectionStatus } from '../services/conclave';
 import { getUserEmoji, getUserId, getUserName } from '../services/user';
 import { addToHistory } from '../services/history';
-import { settings } from '../services/settings';
 
 const initialRoomState: RoomState = {
   participants: [],
@@ -41,11 +40,11 @@ const initialRoomState: RoomState = {
 
 interface Options {
   linkUserId?: string | null;
-  linkName?: string | null;
 }
 
 export const useRoomSession = (roomId: string | undefined, options: Options = {}) => {
-  const { linkUserId, linkName } = options;
+  const { linkUserId } = options;
+  const effectiveUserId = linkUserId || getUserId();
   const [name, setName] = useState(getUserName());
   const [mood, setMood] = useState(getUserEmoji());
   const [isJoined, setIsJoined] = useState(!!getUserName());
@@ -55,26 +54,16 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [actions, setActions] = useState<ConclaveActions | null>(null);
   const actionsRef = useRef<ConclaveActions | null>(null);
-  const userId = getUserId();
-
-  useEffect(() => {
-    if (linkUserId && linkName) {
-      settings.setUserId(linkUserId);
-      settings.setUserName(linkName);
-      window.history.replaceState({}, document.title, window.location.pathname);
-      window.location.reload();
-    }
-  }, [linkUserId, linkName]);
 
   useEffect(() => {
     let isMounted = true;
     let socketActions: ConclaveActions | null = null;
 
-    if (isJoined && roomId && !linkUserId) {
+    if (isJoined && roomId) {
       const timeoutId = setTimeout(() => {
         if (!isMounted) return;
 
-        socketActions = ConclaveSocket.connect(roomId, userId, name, mood, (myPublicId) => {
+        socketActions = ConclaveSocket.connect(roomId, effectiveUserId, name, mood, (myPublicId) => {
           if (isMounted) {
             setPublicId(myPublicId);
           }
@@ -107,7 +96,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
         }
       };
     }
-  }, [isJoined, roomId, name, mood, userId, linkUserId]);
+  }, [isJoined, roomId, name, mood, effectiveUserId]);
 
   const isAdmin = !!state.participants.find(p => p.id === publicId)?.isAdmin;
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
@@ -133,6 +122,6 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
     setMood,
     setName,
     state,
-    userId,
+    userId: effectiveUserId,
   };
 };

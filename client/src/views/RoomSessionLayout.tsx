@@ -37,13 +37,22 @@ export const useCurrentRoomSession = () => {
   return session;
 };
 
+const decodeLinkParam = (encoded: string | null): string | null => {
+  if (!encoded) return null;
+  try {
+    const base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    return atob(base64);
+  } catch {
+    return null;
+  }
+};
+
 const RoomSessionLayout = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const linkUserId = searchParams.get('linkUserId');
-  const linkName = searchParams.get('name');
-  const session = useRoomSession(roomId, { linkUserId, linkName });
+  const linkUserId = decodeLinkParam(searchParams.get('link'));
+  const session = useRoomSession(roomId, { linkUserId });
 
   return (
     <RoomSessionContext.Provider value={session}>

@@ -129,3 +129,43 @@ Vote masking: before reveal, other participants' votes appear as `"✓"` (voted)
 - There is no explicit "room deleted" message in the protocol — clients detect the room disappearance via the WebSocket close event
 - The inactivity timer resets on every incoming message
 - There is currently no way to manually delete a room
+
+## Remote Control (Multi-Device Admin)
+
+The admin can control the room from a secondary device (typically a phone) by scanning a QR code or opening a link.
+
+### Link Format
+
+```
+/room/:roomId/remote?link=<base64url(userId)>
+```
+
+The `link` parameter contains the admin's private `userId` encoded in base64url (URL-safe base64 without padding). This is obfuscation, not encryption — it prevents casual readability in the URL bar but does not provide cryptographic security.
+
+### Security Considerations
+
+**Known limitation**: the userId is a long-lived, global secret. If an attacker recovers it (e.g., by screenshotting the QR code, accessing browser history, or intercepting the URL), they can impersonate the admin in any future room created by that user — not just the current one. This is particularly relevant for teams that use the tool regularly, where the same userId is reused across many sessions.
+
+The base64url encoding is a minimal mitigation against shoulder-surfing, not a defense against a motivated attacker. A more robust approach would be to use a server-issued ephemeral token (scoped to a single room, with a short TTL), so that a leaked link cannot be reused elsewhere. This is not implemented today.
+
+**Current acceptable-risk rationale**:
+- The QR code is displayed on the admin's own screen in a controlled environment
+- The worst-case impact of impersonation is disrupting a planning poker session — there is no sensitive data, no financial transaction, no access control beyond vote management
+
+### Flow
+
+1. The admin clicks "Remote Control" on the desktop — a QR code / link is generated containing the encoded userId
+2. The phone scans the QR code and opens the URL
+3. The client decodes the `link` parameter to recover the userId
+4. The userId is used **only for the WebSocket connection** — it is NOT persisted in the phone's localStorage
+5. The phone's own identity (its native userId) remains untouched
+6. On page refresh, the URL still contains the `link` parameter, so the session survives
+
+### Multi-Connection Handling
+
+When the same userId connects from multiple devices (desktop + phone remote), both WebSockets share the same `publicId`. The server handles this by:
+
+- Allowing multiple WebSockets per publicId (same participant appears once in the list)
+- On disconnect, only removing the participant from the list if **no other WebSocket** with the same publicId remains connected
+
+This prevents the bug where closing the remote would show the admin as disconnected while the desktop is still active.

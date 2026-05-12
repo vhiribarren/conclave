@@ -663,7 +663,7 @@ const Room = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0' }}>
               <a
-                href={`${window.location.origin}/room/${roomId}/remote?linkUserId=${userId}&name=${encodeURIComponent(name)}`}
+                href={`${window.location.origin}/room/${roomId}/remote?link=${btoa(userId).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="premium-button"
@@ -682,7 +682,7 @@ const Room = () => {
 
               {isQRVisible && (
                 <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center' }} className="animate-fade-in">
-                  <QRCodeSVG value={`${window.location.origin}/room/${roomId}/remote?linkUserId=${userId}&name=${encodeURIComponent(name)}`} size={200} />
+                  <QRCodeSVG value={`${window.location.origin}/room/${roomId}/remote?link=${btoa(userId).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`} size={200} />
                 </div>
               )}
             </div>
