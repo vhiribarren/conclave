@@ -123,7 +123,7 @@ const Landing = () => {
           </div>
 
           {showEmojiPicker && (
-            <div style={{ position: 'absolute', zIndex: 100, top: '220px', left: '50%', transform: 'translateX(-50%)' }}>
+            <Modal onClose={() => setShowEmojiPicker(false)}>
               <EmojiPicker 
                 onEmojiClick={(emojiData) => {
                   setMood(emojiData.emoji);
@@ -135,7 +135,7 @@ const Landing = () => {
                 height={400}
                 width={300}
               />
-            </div>
+            </Modal>
           )}
 
           <div className="landing-divider" style={{ margin: '0.5rem 0' }}>
