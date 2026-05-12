@@ -78,8 +78,14 @@ const Room = () => {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(() =>
     window.innerWidth <= 768 ? 'grid' : 'auto'
   );
-  const isMobile = window.innerWidth <= 768;
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
   const effectiveLayoutMode: LayoutMode = isMobile ? 'grid' : layoutMode;
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [showShareModal, setShowShareModal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [isEditingRoomName, setIsEditingRoomName] = useState(false);
