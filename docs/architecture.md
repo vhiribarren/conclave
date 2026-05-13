@@ -120,6 +120,17 @@ Every `STATE` message includes a `serverTime` field (the server's `Date.now()` a
 
 The offset is recalculated on every received message, so there is no persistent client-side state and no risk of drift on long-lived connections.
 
+### Auto-reveal
+
+The admin can enable an "auto-reveal" option (persisted in `localStorage`). When enabled, the admin's client schedules a `setTimeout` based on `timerEndAt`. When the timeout fires, the client automatically sends an `ADMIN_REVEAL` message — no server-side logic is involved.
+
+**Trade-off**: if the admin closes their browser before the timer expires, auto-reveal does not happen. This is acceptable because:
+- It is a convenience feature, not a guarantee
+- The timer is short-lived (typically 15–60 seconds)
+- Any participant can ask the admin to reveal manually
+
+This approach avoids complicating the server's single-alarm model (currently used only for room expiration).
+
 ## See Also
 
 - [`docs/protocol.md`](protocol.md) — communication protocol, identity model, and message flow diagrams

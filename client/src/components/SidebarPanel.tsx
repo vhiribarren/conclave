@@ -33,6 +33,8 @@ interface Props {
   myVote: string | null;
   onVote: (card: string) => void;
   roomId?: string;
+  autoReveal?: boolean;
+  onAutoRevealChange?: (enabled: boolean) => void;
 }
 
 export const SidebarPanel: React.FC<Props> = (props) => (

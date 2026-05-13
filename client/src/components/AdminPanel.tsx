@@ -45,6 +45,8 @@ interface Props {
   roomId?: string;
   /** 'remote' wraps each section in a glass card; 'sidebar' uses a flat list layout */
   layout?: 'remote' | 'sidebar';
+  autoReveal?: boolean;
+  onAutoRevealChange?: (enabled: boolean) => void;
 }
 
 export const AdminPanel: React.FC<Props> = ({
@@ -55,6 +57,8 @@ export const AdminPanel: React.FC<Props> = ({
   onVote,
   roomId,
   layout = 'sidebar',
+  autoReveal = false,
+  onAutoRevealChange,
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -485,6 +489,30 @@ export const AdminPanel: React.FC<Props> = ({
                 onClick={() => actions.adminSetAnonymousVoting(true)}
               >
                 {t('settings.anonymousVotingOn')}
+              </button>
+            </div>
+          </Section>
+
+          {/* ── Auto-reveal ────────────────────────────────────────── */}
+          <Section glass>
+            <SectionTitle>⏱ {t('settings.autoReveal')}</SectionTitle>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.5rem' }}>
+              {t('settings.autoRevealDesc')}
+            </p>
+            <div className="vote-mode-switch" role="group" aria-label="Auto-reveal">
+              <button
+                type="button"
+                className={!autoReveal ? 'active' : ''}
+                onClick={() => onAutoRevealChange?.(false)}
+              >
+                {t('settings.autoRevealOff')}
+              </button>
+              <button
+                type="button"
+                className={autoReveal ? 'active' : ''}
+                onClick={() => onAutoRevealChange?.(true)}
+              >
+                {t('settings.autoRevealOn')}
               </button>
             </div>
           </Section>

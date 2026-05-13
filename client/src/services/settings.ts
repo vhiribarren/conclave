@@ -44,4 +44,6 @@ export const settings = {
     setHistory: (history: string) => _storage.set("history", history),
     getDeckCustom: () => _storage.get("deckCustom"),
     setDeckCustom: (deckCustom: string) => _storage.set("deckCustom", deckCustom),
+    getAutoReveal: () => _storage.get("autoReveal") === 'true',
+    setAutoReveal: (enabled: boolean) => _storage.set("autoReveal", String(enabled)),
 };

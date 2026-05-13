@@ -32,6 +32,7 @@ import './Room.css';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 import { setUserName, setUserEmoji } from '../services/user';
+import { settings } from '../services/settings';
 import { ParticipantsBoard, type LayoutMode } from '../components/ParticipantsBoard';
 import { AggregationResult } from '../components/AggregationResult';
 import { AdminPanel } from '../components/AdminPanel';
@@ -92,6 +93,7 @@ const Room = () => {
   const [tempRoomName, setTempRoomName] = useState('');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [mobileAdminOpen, setMobileAdminOpen] = useState(false);
+  const [autoReveal, setAutoReveal] = useState(() => settings.getAutoReveal());
   const isCircleLayout = effectiveLayoutMode === 'auto' && state.participants.length <= 12 && state.participants.length > 0;
 
   // Reset local vote when the round changes (e.g. admin reset)
@@ -100,6 +102,20 @@ const Room = () => {
       setMyVote(null);
     }
   }, [currentRound?.id]);
+
+  // Auto-reveal when timer expires (admin-only, client-side)
+  useEffect(() => {
+    if (!autoReveal || !isAdmin || isRevealed || !state.timerEndAt) return;
+    const remaining = state.timerEndAt - Date.now();
+    if (remaining <= 0) {
+      actionsRef.current?.adminReveal();
+      return;
+    }
+    const timeout = setTimeout(() => {
+      actionsRef.current?.adminReveal();
+    }, remaining);
+    return () => clearTimeout(timeout);
+  }, [autoReveal, isAdmin, isRevealed, state.timerEndAt]);
 
   // Close mobile menu on outside click/touch
   useEffect(() => {
@@ -164,6 +180,11 @@ const Room = () => {
   const handleReveal = () => actionsRef.current?.adminReveal();
   const handleReset = () => {
     actionsRef.current?.adminReset();
+  };
+
+  const handleAutoRevealChange = (enabled: boolean) => {
+    setAutoReveal(enabled);
+    settings.setAutoReveal(enabled);
   };
 
 
@@ -386,6 +407,11 @@ const Room = () => {
                       🕵️ {t('room.anonymousMode')}
                     </div>
                   )}
+                  {autoReveal && isAdmin && (
+                    <div className="anonymous-badge">
+                      ⏱ {t('room.autoRevealMode')}
+                    </div>
+                  )}
                   <ParticipantsBoard
                     participants={state.participants}
                     isRevealed={isRevealed}
@@ -536,6 +562,8 @@ const Room = () => {
                           onVote={handleVote}
                           roomId={roomId}
                           layout="remote"
+                          autoReveal={autoReveal}
+                          onAutoRevealChange={handleAutoRevealChange}
                         />
                       </div>
                     )}
@@ -566,6 +594,8 @@ const Room = () => {
                       myVote={myVote}
                       onVote={handleVote}
                       roomId={roomId}
+                      autoReveal={autoReveal}
+                      onAutoRevealChange={handleAutoRevealChange}
                     />
                   )}
                 </aside>

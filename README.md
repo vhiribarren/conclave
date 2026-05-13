@@ -11,6 +11,7 @@ Yet another planning poker tool.
 - Vote result aggregation with distribution chart and majority highlight
 - Round history preserved per task
 - Configurable countdown timer
+- Auto-reveal votes when the timer ends (optional)
 - Admin remote control via QR code (vote from your phone while presenting)
 - Room sharing via QR code, invite link or room ID
 - Card deck presets (Standard, Fibonacci, T-Shirt) or fully custom
