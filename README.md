@@ -85,10 +85,6 @@ Output (client + Cloudflare Worker) goes to `client/dist`.
 
 ## Deployment
 
-> [!IMPORTANT]
-> Current `server-cloudflare/wrangler.toml` file is configured for deployment on 
-> https://conclave.alea.net - you probably need to change that.
-
 1. Create a Cloudflare account
 2. In Workers & Pages, create a new application
 3. Configure a GitHub link referencing this project or a fork
