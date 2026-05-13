@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import React, { useState, useRef } from 'react';
-import { Eye, RotateCcw, Settings, Play, Pause, X, Layout, RotateCw, GripVertical, Smile, ListChecks, Crown } from 'lucide-react';
+import { Eye, RotateCcw, Settings, Play, Pause, X, Layout, RotateCw, GripVertical, Smile, ListChecks, Crown, Timer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
@@ -197,12 +197,40 @@ export const AdminPanel: React.FC<Props> = ({
                 {layout === 'remote' && <h2 className="panel-section-title" style={{ color: 'var(--accent-color)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.875rem' }}>{t('admin.actions')}</h2>}
                 {layout === 'sidebar' && <SectionTitle>⚡ {t('admin.actions')}</SectionTitle>}
                 <div className="panel-actions">
-                  <Button onClick={() => actions.adminReveal()} disabled={isRevealed} style={{ flex: 1 }}>
-                    <Eye size={15} /> {t('room.reveal')}
-                  </Button>
-                  <Button onClick={() => actions.adminReset()} variant="secondary">
-                    <RotateCcw size={15} /> {t('room.reset')}
-                  </Button>
+                  {isRevealed ? (
+                    <Button onClick={() => actions.adminReset()} style={{ flex: 1 }}>
+                      <RotateCcw size={15} /> {t('room.newVote')}
+                    </Button>
+                  ) : (
+                    <>
+                      {state.timerPausedRemainingMs !== null ? (
+                        <>
+                          <Button onClick={() => actions.adminResumeTimer()} variant="secondary" title={t('admin.resume')}>
+                            <Play size={15} />
+                          </Button>
+                          <Button onClick={() => actions.adminSetTimer(null)} variant="danger" title={t('admin.timer')}>
+                            <X size={15} />
+                          </Button>
+                        </>
+                      ) : state.timerEndAt ? (
+                        <>
+                          <Button onClick={() => actions.adminPauseTimer()} variant="secondary" title={t('admin.pause')}>
+                            <Pause size={15} />
+                          </Button>
+                          <Button onClick={() => actions.adminSetTimer(null)} variant="danger" title={t('admin.timer')}>
+                            <X size={15} />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button onClick={() => actions.adminSetTimer(selectedDurationMs)} variant="secondary" title={t('admin.start')}>
+                          <Play size={15} /> <Timer size={15} /> {selectedDurationMs / 1000}s
+                        </Button>
+                      )}
+                      <Button onClick={() => actions.adminReveal()} disabled={!state.participants.some(p => p.vote !== null)} style={{ flex: 1 }}>
+                        <Eye size={15} /> {t('room.reveal')}
+                      </Button>
+                    </>
+                  )}
                 </div>
               </Section>
 
@@ -211,33 +239,6 @@ export const AdminPanel: React.FC<Props> = ({
                 <Section glass>
                   {layout === 'sidebar' && <SectionTitle>📊 {t('room.results')}</SectionTitle>}
                   <AggregationResult participants={state.participants} deck={state.deck} roundVotes={state.anonymousVoting && currentRound?.revealed ? currentRound.votes : undefined} />
-                </Section>
-              )}
-
-              {/* ── Timer (voting phase) ────────────────────────────── */}
-              {!isRevealed && (
-                <Section glass>
-                  <SectionTitle>{layout === 'sidebar' ? `⏱ ${t('admin.timer')}` : t('admin.timer')}</SectionTitle>
-                  <div className="panel-actions">
-                    {state.timerPausedRemainingMs !== null ? (
-                      <Button onClick={() => actions.adminResumeTimer()} style={{ flex: 1 }}>
-                        <Play size={15} /> {t('admin.resume')}
-                      </Button>
-                    ) : state.timerEndAt ? (
-                      <Button onClick={() => actions.adminPauseTimer()} variant="secondary" style={{ flex: 1 }}>
-                        <Pause size={15} /> {t('admin.pause')}
-                      </Button>
-                    ) : (
-                      <Button onClick={() => actions.adminSetTimer(selectedDurationMs)} variant="secondary" style={{ flex: 1 }}>
-                        <Play size={15} /> {t('admin.start')} ({selectedDurationMs / 1000}s)
-                      </Button>
-                    )}
-                    {(state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                      <Button onClick={() => actions.adminSetTimer(null)} variant="danger" title="Reset timer">
-                        <RotateCcw size={15} />
-                      </Button>
-                    )}
-                  </div>
                 </Section>
               )}
 

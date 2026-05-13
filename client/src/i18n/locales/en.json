@@ -58,6 +58,7 @@
     "anonymousMode": "Anonymous voting",
     "pickACard": "Pick a card",
     "reveal": "Reveal",
+    "newVote": "New vote",
     "reset": "Reset",
     "updateProfile": "Update profile",
     "expandPanel": "Expand panel",

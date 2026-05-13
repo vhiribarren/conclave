@@ -480,26 +480,39 @@ const Room = () => {
                     <div className="mobile-admin-bar-header">
                       {!mobileAdminOpen && (
                         <div className="mobile-admin-bar-actions">
-                          <button onClick={handleReveal} disabled={isRevealed} className="premium-button">
-                            <Eye size={15} /> {t('room.reveal')}
-                          </button>
-                          <button onClick={handleReset} className="premium-button secondary">
-                            <RotateCcw size={15} /> {t('room.reset')}
-                          </button>
-                          {!isRevealed && (
-                            state.timerPausedRemainingMs !== null ? (
-                              <button onClick={() => actions.adminResumeTimer()} className="premium-button secondary" title={t('admin.resume')}>
-                                ▶
+                          {isRevealed ? (
+                            <button onClick={handleReset} className="premium-button">
+                              <RotateCcw size={15} /> {t('room.newVote')}
+                            </button>
+                          ) : (
+                            <>
+                              {state.timerPausedRemainingMs !== null ? (
+                                <>
+                                  <button onClick={() => actions.adminResumeTimer()} className="premium-button secondary" title={t('admin.resume')}>
+                                    ▶
+                                  </button>
+                                  <button onClick={() => actions.adminSetTimer(null)} className="premium-button secondary" title={t('admin.timer')}>
+                                    ✕
+                                  </button>
+                                </>
+                              ) : state.timerEndAt ? (
+                                <>
+                                  <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" title={t('admin.pause')}>
+                                    ⏸
+                                  </button>
+                                  <button onClick={() => actions.adminSetTimer(null)} className="premium-button secondary" title={t('admin.timer')}>
+                                    ✕
+                                  </button>
+                                </>
+                              ) : (
+                                <button onClick={() => actions.adminSetTimer(30000)} className="premium-button secondary" title={t('admin.start')}>
+                                  ⏱ 30s
+                                </button>
+                              )}
+                              <button onClick={handleReveal} disabled={!state.participants.some(p => p.vote !== null)} className="premium-button">
+                                <Eye size={15} /> {t('room.reveal')}
                               </button>
-                            ) : state.timerEndAt ? (
-                              <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" title={t('admin.pause')}>
-                                ⏸
-                              </button>
-                            ) : (
-                              <button onClick={() => actions.adminSetTimer(30000)} className="premium-button secondary" title={t('admin.start')}>
-                                ⏱
-                              </button>
-                            )
+                            </>
                           )}
                         </div>
                       )}
