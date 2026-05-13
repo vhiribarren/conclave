@@ -506,7 +506,7 @@ const Room = () => {
                                 </>
                               ) : (
                                 <button onClick={() => actions.adminSetTimer(30000)} className="premium-button secondary" title={t('admin.start')}>
-                                  ⏱ 30s
+                                  ▶ ⏱ 30s
                                 </button>
                               )}
                               <button onClick={handleReveal} disabled={!state.participants.some(p => p.vote !== null)} className="premium-button">
