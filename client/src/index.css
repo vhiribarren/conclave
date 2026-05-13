@@ -336,6 +336,13 @@ h1,
   box-shadow: var(--shadow-lg);
 }
 
+.modal-content-transparent {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .modal-title {
   font-size: 1.5rem;
   font-weight: bold;

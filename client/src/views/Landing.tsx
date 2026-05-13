@@ -123,7 +123,7 @@ const Landing = () => {
           </div>
 
           {showEmojiPicker && (
-            <Modal onClose={() => setShowEmojiPicker(false)}>
+            <Modal onClose={() => setShowEmojiPicker(false)} contentClassName="modal-content-transparent">
               <EmojiPicker 
                 onEmojiClick={(emojiData) => {
                   setMood(emojiData.emoji);

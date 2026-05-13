@@ -212,23 +212,6 @@ const Room = () => {
           >
             {mood}
           </button>
-
-          {showEmojiPickerJoin && (
-            <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-              <EmojiPicker
-                onEmojiClick={(emojiData) => {
-                  setMood(emojiData.emoji);
-                  setShowEmojiPickerJoin(false);
-                }}
-                theme={Theme.LIGHT}
-                lazyLoadEmojis={true}
-                searchDisabled={false}
-                skinTonesDisabled={true}
-                height={450}
-                width={350}
-              />
-            </div>
-          )}
         </div>
 
         <Button type="submit">{t('common.enterRoom')}</Button>
@@ -602,21 +585,6 @@ const Room = () => {
                 >
                   {mood}
                 </button>
-
-                {showEmojiPickerSettings && (
-                  <div style={{ position: 'absolute', zIndex: 100, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                    <EmojiPicker
-                      onEmojiClick={(emojiData) => {
-                        setMood(emojiData.emoji);
-                        setShowEmojiPickerSettings(false);
-                      }}
-                      theme={Theme.LIGHT}
-                      lazyLoadEmojis={true}
-                      height={450}
-                      width={350}
-                    />
-                  </div>
-                )}
               </div>
 
               <button type="submit" className="premium-button">{t('room.updateProfile')}</button>
@@ -695,6 +663,39 @@ const Room = () => {
             </div>
 
             <button onClick={() => { setShowQR(false); setIsQRVisible(false); }} className="premium-button secondary">{t('common.close')}</button>
+        </Modal>
+      )}
+
+      {showEmojiPickerJoin && (
+        <Modal onClose={() => setShowEmojiPickerJoin(false)} contentClassName="modal-content-transparent">
+          <EmojiPicker
+            onEmojiClick={(emojiData) => {
+              setMood(emojiData.emoji);
+              setShowEmojiPickerJoin(false);
+            }}
+            theme={Theme.LIGHT}
+            lazyLoadEmojis={true}
+            searchDisabled={false}
+            skinTonesDisabled={true}
+            height={450}
+            width={350}
+          />
+        </Modal>
+      )}
+
+      {showEmojiPickerSettings && (
+        <Modal onClose={() => setShowEmojiPickerSettings(false)} contentClassName="modal-content-transparent">
+          <EmojiPicker
+            onEmojiClick={(emojiData) => {
+              setMood(emojiData.emoji);
+              setShowEmojiPickerSettings(false);
+            }}
+            theme={Theme.LIGHT}
+            lazyLoadEmojis={true}
+            skinTonesDisabled={true}
+            height={450}
+            width={350}
+          />
         </Modal>
       )}
     </>
