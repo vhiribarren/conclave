@@ -23,8 +23,23 @@
  */
 import { generateUserId } from 'conclave-shared';
 import { settings } from './settings';
+import emojiData from 'emoji-picker-react/dist/data/emojis.json';
 
-export const DEFAULT_EMOJIS = ['🦊', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐣', '🦄', '🐝', '🦖', '🐙', '🦋', '🌵', '🍕', '🚀', '🎸', '🕹️', '🧙', '👽'];
+/** Convert a unified code (e.g. "1f600" or "1f468-200d-1f469-200d-1f466") to its emoji string */
+const unifiedToEmoji = (unified: string): string =>
+  String.fromCodePoint(...unified.split('-').map(hex => parseInt(hex, 16)));
+
+/** Categories used for random default emoji selection */
+const AVATAR_CATEGORIES: (keyof typeof emojiData.emojis)[] = [
+  'animals_nature',
+  'food_drink',
+  'activities',
+];
+
+/** Flat list of emojis from selected categories, used as initial random avatar */
+const START_EMOJIS: string[] = AVATAR_CATEGORIES
+  .flatMap(cat => emojiData.emojis[cat])
+  .map((e: { u: string }) => unifiedToEmoji(e.u));
 
 export const getUserId = (): string => {
   let userId = settings.getUserId();
@@ -47,10 +62,10 @@ export const getUserEmoji = (): string => {
   const emoji = settings.getUserMood();
   if (emoji) return emoji;
 
-  const defaultEmoji = DEFAULT_EMOJIS[Math.floor(Math.random() * DEFAULT_EMOJIS.length)] || '🦊';
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const defaultEmoji = START_EMOJIS[Math.floor(Math.random() * START_EMOJIS.length)]!;
   settings.setUserMood(defaultEmoji);
   return defaultEmoji;
 };
 
 export const setUserEmoji = (emoji: string) => settings.setUserMood(emoji);
-export const getAvailableEmojis = () => DEFAULT_EMOJIS;
