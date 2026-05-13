@@ -53,6 +53,7 @@ export interface RoomState {
   deckMode: 'preset' | 'custom';
   timerEndAt: number | null;
   timerPausedRemainingMs: number | null;
+  timerDurationMs: number;
   adminId: string | null;
   unassociatedRound: Round;
   anonymousVoting: boolean;
@@ -74,6 +75,7 @@ export type SocketMessage =
   | { type: 'ADMIN_RESUME_TIMER' }
   | { type: 'ADMIN_TRANSFER_ADMIN'; targetUserId: string }
   | { type: 'ADMIN_RENAME_ROOM'; name: string }
+  | { type: 'ADMIN_SET_TIMER_DURATION'; durationMs: number }
   | { type: 'ADMIN_SET_ANONYMOUS_VOTING'; enabled: boolean };
 
 export type ServerMessage =

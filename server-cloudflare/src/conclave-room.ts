@@ -47,6 +47,7 @@ export class ConclaveRoom extends DurableObject {
     deckMode: 'preset',
     timerEndAt: null,
     timerPausedRemainingMs: null,
+    timerDurationMs: 30000,
     adminId: null,
     unassociatedRound: { id: Math.random().toString(36).substring(2, 10), votes: {}, revealed: false },
     anonymousVoting: false,
@@ -438,6 +439,17 @@ export class ConclaveRoom extends DurableObject {
         }
         this.state.anonymousVoting = !!data.enabled;
         this.broadcastState();
+        break;
+
+      case "ADMIN_SET_TIMER_DURATION":
+        if (!this.isAdmin(ws)) {
+          console.error(`ADMIN_SET_TIMER_DURATION: Unauthorized access from publicId ${attachment.publicId}`);
+          return;
+        }
+        if (typeof data.durationMs === 'number' && data.durationMs > 0) {
+          this.state.timerDurationMs = data.durationMs;
+          this.broadcastState();
+        }
         break;
     }
     this.kv.put("state", this.state);

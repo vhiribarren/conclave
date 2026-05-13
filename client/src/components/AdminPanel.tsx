@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Eye, RotateCcw, Settings, Play, Pause, X, Layout, RotateCw, GripVertical, Smile, ListChecks, Crown, Timer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -62,8 +62,14 @@ export const AdminPanel: React.FC<Props> = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [selectedDurationMs, setSelectedDurationMs] = useState(30000);
-  const [customTimerValue, setCustomTimerValue] = useState('30');
+  const [selectedDurationMs, setSelectedDurationMs] = useState(() => state.timerDurationMs);
+  const [customTimerValue, setCustomTimerValue] = useState(() => String(state.timerDurationMs / 1000));
+
+  // Sync local state when server state changes (e.g. from remote control)
+  useEffect(() => {
+    setSelectedDurationMs(state.timerDurationMs);
+    setCustomTimerValue(String(state.timerDurationMs / 1000));
+  }, [state.timerDurationMs]);
   const [newCardValue, setNewCardValue] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showTaskSelector, setShowTaskSelector] = useState(false);
@@ -333,7 +339,7 @@ export const AdminPanel: React.FC<Props> = ({
               {[15, 30, 45, 60].map(s => (
                 <Button
                   key={s}
-                  onClick={() => { setSelectedDurationMs(s * 1000); setCustomTimerValue(s.toString()); }}
+                  onClick={() => { setSelectedDurationMs(s * 1000); setCustomTimerValue(s.toString()); actions.adminSetTimerDuration(s * 1000); }}
                   variant={selectedDurationMs === s * 1000 ? 'primary' : 'secondary'}
                   className="sidebar-chip"
                 >
@@ -350,7 +356,7 @@ export const AdminPanel: React.FC<Props> = ({
                   onChange={(e) => {
                     setCustomTimerValue(e.target.value);
                     const val = parseInt(e.target.value);
-                    if (!isNaN(val)) setSelectedDurationMs(val * 1000);
+                    if (!isNaN(val) && val > 0) { setSelectedDurationMs(val * 1000); actions.adminSetTimerDuration(val * 1000); }
                   }}
                   placeholder="Custom"
                 />

@@ -34,6 +34,7 @@ const initialRoomState: RoomState = {
   deckMode: 'preset',
   timerEndAt: null,
   timerPausedRemainingMs: null,
+  timerDurationMs: 30000,
   adminId: null,
   unassociatedRound: { id: '', votes: {}, revealed: false },
   anonymousVoting: false,
