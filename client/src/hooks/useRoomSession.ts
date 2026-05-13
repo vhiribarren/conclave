@@ -60,6 +60,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
   useEffect(() => {
     let isMounted = true;
     let socketActions: ConclaveActions | null = null;
+    let resolvedPublicId: string | null = null;
 
     if (isJoined && roomId) {
       const timeoutId = setTimeout(() => {
@@ -67,13 +68,14 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
 
         socketActions = ConclaveSocket.connect(roomId, effectiveUserId, name, mood, (myPublicId) => {
           if (isMounted) {
+            resolvedPublicId = myPublicId;
             setPublicId(myPublicId);
           }
         }, (newState) => {
           if (isMounted) {
             setState(newState);
             setConnectionError(null);
-            addToHistory(roomId, newState.name, newState.participants.find(p => p.id === publicId)?.isAdmin);
+            addToHistory(roomId, newState.name, newState.participants.find(p => p.id === resolvedPublicId)?.isAdmin);
           }
         }, (error) => {
           if (isMounted) {
