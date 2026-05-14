@@ -1,20 +1,58 @@
 /**
  * Key/Value storage layer backed by the Durable Object SQL API.
  *
- * Creates a table on first use and exposes get/put/delete operations
- * that serialize values as JSON, mimicking the legacy KV storage API.
- *
  * Usage:
- *   const kv = new SqlKvStorage(ctx.storage.sql);
- *   kv.put("myKey", { hello: "world" });
- *   const val = kv.get<{ hello: string }>("myKey");
+ *   const storage = new SqlKvStorage(ctx.storage.sql);
  *
- *   // With custom table name:
- *   const kv = new SqlKvStorage(ctx.storage.sql, "settings");
+ *   // On first access, check if data already exists:
+ *   if (!storage.isInitialized()) {
+ *     return new Response("Not found", { status: 404 });
+ *   }
+ *
+ *   // Read/write when you know the store should exist:
+ *   const store = storage.getOrCreateStore();
+ *   const val = store.get<{ hello: string }>("myKey");
+ *   store.put("myKey", { hello: "world" });
  */
 
+/** Read/write access to an existing KV table. */
+export class SqlKvStore {
+  constructor(private readonly sql: SqlStorage, private readonly table: string) {}
+
+  get<T>(key: string): T | undefined {
+    const rows = this.sql.exec(`SELECT value FROM ${this.table} WHERE key = ?`, key).toArray();
+    if (rows.length === 0) return undefined;
+    return JSON.parse(rows[0]!.value as string) as T;
+  }
+
+  put(key: string, value: unknown): void {
+    this.sql.exec(
+      `INSERT OR REPLACE INTO ${this.table} (key, value) VALUES (?, ?)`,
+      key,
+      JSON.stringify(value)
+    );
+  }
+
+  delete(key: string): void {
+    this.sql.exec(`DELETE FROM ${this.table} WHERE key = ?`, key);
+  }
+
+  deleteAll(): void {
+    this.sql.exec(`DELETE FROM ${this.table}`);
+  }
+
+  has(key: string): boolean {
+    return this.sql.exec(`SELECT 1 FROM ${this.table} WHERE key = ?`, key).toArray().length > 0;
+  }
+
+  keys(): string[] {
+    return [...this.sql.exec(`SELECT key FROM ${this.table}`)].map((row) => row.key as string);
+  }
+}
+
+/** Factory that manages the lifecycle of a SQL-backed KV table. */
 export class SqlKvStorage {
-  private initialized = false;
+  private store: SqlKvStore | null = null;
   private readonly table: string;
 
   constructor(private readonly sql: SqlStorage, table: string = "kv") {
@@ -24,51 +62,26 @@ export class SqlKvStorage {
     this.table = table;
   }
 
-  private ensureTable(): void {
-    if (this.initialized) return;
+  /** Returns true if the backing table already exists (no side effects). */
+  isInitialized(): boolean {
+    if (this.store) return true;
+    const rows = this.sql
+      .exec(`SELECT 1 FROM sqlite_master WHERE type='table' AND name=?`, this.table)
+      .toArray();
+    if (rows.length > 0) {
+      this.store = new SqlKvStore(this.sql, this.table);
+      return true;
+    }
+    return false;
+  }
+
+  /** Returns the KV store, creating the backing table if it doesn't exist yet. */
+  getOrCreateStore(): SqlKvStore {
+    if (this.store) return this.store;
     this.sql.exec(
       `CREATE TABLE IF NOT EXISTS ${this.table} (key TEXT PRIMARY KEY, value TEXT)`
     );
-    this.initialized = true;
-  }
-
-  get<T>(key: string): T | undefined {
-    this.ensureTable();
-    const rows = this.sql.exec(`SELECT value FROM ${this.table} WHERE key = ?`, key).toArray();
-    if (rows.length === 0) return undefined;
-    return JSON.parse(rows[0]!.value as string) as T;
-  }
-
-  put(key: string, value: unknown): void {
-    this.ensureTable();
-    this.sql.exec(
-      `INSERT OR REPLACE INTO ${this.table} (key, value) VALUES (?, ?)`,
-      key,
-      JSON.stringify(value)
-    );
-  }
-
-  delete(key: string): void {
-    this.ensureTable();
-    this.sql.exec(`DELETE FROM ${this.table} WHERE key = ?`, key);
-  }
-
-  deleteAll(): void {
-    this.ensureTable();
-    this.sql.exec(`DELETE FROM ${this.table}`);
-  }
-
-  has(key: string): boolean {
-    this.ensureTable();
-    const rows = this.sql
-      .exec(`SELECT 1 FROM ${this.table} WHERE key = ?`, key)
-      .toArray();
-    return rows.length > 0;
-  }
-
-  keys(): string[] {
-    this.ensureTable();
-    const cursor = this.sql.exec(`SELECT key FROM ${this.table}`);
-    return [...cursor].map((row) => row.key as string);
+    this.store = new SqlKvStore(this.sql, this.table);
+    return this.store;
   }
 }

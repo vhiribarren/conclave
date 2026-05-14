@@ -44,7 +44,6 @@ export interface Task {
 export const DEFAULT_DECK = ['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'];
 
 export interface RoomState {
-  created?: boolean;
   name?: string;
   participants: Participant[];
   tasks: Task[];

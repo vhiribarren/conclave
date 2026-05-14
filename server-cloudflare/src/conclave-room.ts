@@ -24,9 +24,11 @@
 import { DurableObject } from "cloudflare:workers";
 import type { RoomState, Task, Round, ServerMessage } from "conclave-shared";
 import { DEFAULT_DECK } from "conclave-shared";
-import { SqlKvStorage } from "./kv-storage";
+import { SqlKvStorage, SqlKvStore } from "./kv-storage";
 
 const INACTIVITY_ALARM_MS = 48 * 60 * 60 * 1000 // 48H
+const KV_STATE = "state";
+const KV_USER_ID_MAPPING = "userIdMapping";
 
 /**
  * Mapping between private userId (known only to the user) and publicId (visible to all participants).
@@ -35,11 +37,10 @@ const INACTIVITY_ALARM_MS = 48 * 60 * 60 * 1000 // 48H
 type UserIdMapping = Record<string, string>; // userId -> publicId
 
 export class ConclaveRoom extends DurableObject {
-  private kv = new SqlKvStorage(this.ctx.storage.sql);
+  private store: SqlKvStore | null = null;
 
   // State uses publicIds everywhere: participants[].id, adminId, round votes keys
   private state: RoomState = {
-    created: false,
     participants: [],
     tasks: [],
     currentTaskId: null,
@@ -59,32 +60,38 @@ export class ConclaveRoom extends DurableObject {
   constructor(ctx: DurableObjectState, env: any) {
     super(ctx, env);
     this.ctx.blockConcurrencyWhile(async () => {
-      const stored = this.kv.get<RoomState>("state");
-      if (stored) {
-        this.state = stored;
+      const kvStorage = new SqlKvStorage(this.ctx.storage.sql);
+      if (!kvStorage.isInitialized()) return;
+      const store = kvStorage.getOrCreateStore();
+      this.store = store;
+      // Store exist, restoring state, notably after websocket hibernate
+      const storedState = store.get<RoomState>(KV_STATE);
+      if (storedState) {
+        this.state = storedState;
       }
-      const mapping = this.kv.get<UserIdMapping>("userIdMapping");
-      if (mapping) {
-        this.userIdMapping = mapping;
+      const storedUserIdMapping = store.get<UserIdMapping>(KV_USER_ID_MAPPING);
+      if (storedUserIdMapping) {
+        this.userIdMapping = storedUserIdMapping;
       }
     });
   }
 
   async createRoom(adminId: string, roomTitle: string | undefined) {
       console.log(`Creating new room - roomId: ${this.ctx.id.name}, adminId: ${adminId}, roomTitle: ${roomTitle}`);
+      const kvStorage = new SqlKvStorage(this.ctx.storage.sql);
+      this.store = kvStorage.getOrCreateStore();
       // adminId here is the userId from the creator; generate a publicId for them
       const publicId = this.generatePublicId();
       this.userIdMapping[adminId] = publicId;
-      this.state.created = true;
       this.state.name = roomTitle;
       this.state.adminId = publicId;
-      this.kv.put("state", this.state);
-      this.kv.put("userIdMapping", this.userIdMapping);
+      this.store.put(KV_STATE, this.state);
+      this.store.put(KV_USER_ID_MAPPING, this.userIdMapping);
       this.updateAlarm();
   }
 
   async fetch(request: Request) {    
-    if (!this.state.created) {
+    if (!this.store) {
       return new Response("Room does not exist", { status: 404 });
     }
 
@@ -134,7 +141,7 @@ export class ConclaveRoom extends DurableObject {
       if (!hasOtherConnection) {
         this.state.participants = this.state.participants.filter((p) => p.id !== attachment.publicId);
         this.broadcastState();
-        this.kv.put("state", this.state);
+        this.store!.put(KV_STATE, this.state);
       }
     }
   }
@@ -163,7 +170,7 @@ export class ConclaveRoom extends DurableObject {
         if (!publicId) {
           publicId = this.generatePublicId();
           this.userIdMapping[userId] = publicId;
-          this.kv.put("userIdMapping", this.userIdMapping);
+          this.store!.put(KV_USER_ID_MAPPING, this.userIdMapping);
         }
 
         // Store publicId in the WebSocket attachment (survives hibernation)
@@ -452,7 +459,7 @@ export class ConclaveRoom extends DurableObject {
         }
         break;
     }
-    this.kv.put("state", this.state);
+    this.store!.put(KV_STATE, this.state);
   }
 
   private isAdmin(ws: WebSocket): boolean {
