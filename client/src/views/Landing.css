@@ -99,6 +99,7 @@
   font-size: 0.85rem;
   display: flex;
   justify-content: center;
+  gap: 1.5rem;
 }
 .landing-footer a {
   color: var(--text-secondary);

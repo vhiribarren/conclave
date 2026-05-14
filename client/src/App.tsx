@@ -28,6 +28,7 @@ import RoomSessionLayout from './views/RoomSessionLayout';
 import RoomTasks from './views/RoomTasks';
 import RoomRemote from './views/RoomRemote';
 import About from './views/About';
+import PrivacyPolicy from './views/PrivacyPolicy';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/room/:roomId" element={<RoomSessionLayout />}>
             <Route index element={<Room />} />
             <Route path="tasks" element={<RoomTasks />} />

@@ -143,6 +143,19 @@
   line-height: 1.6;
 }
 
+.about-license-full {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: var(--glass-bg-subtle);
+  border: 1px solid var(--surface-border);
+}
+
 .license-list {
   max-height: 28rem;
   overflow: auto;

@@ -48,20 +48,17 @@ const parseThirdPartyNotices = () =>
       license: match[3] ?? 'Unknown license',
     }));
 
-const getLicenseSummary = () => {
-  const [title, copyright] = licenseText
+const getLicenseTitle = () => {
+  const [title] = licenseText
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
 
-  return {
-    title: title || 'MIT License',
-    copyright: copyright || 'Copyright (c) 2026 Vincent Hiribarren',
-  };
+  return title || 'MIT License';
 };
 
 const notices = parseThirdPartyNotices();
-const license = getLicenseSummary();
+const licenseTitle = getLicenseTitle();
 
 const About = () => {
   const { t } = useTranslation();
@@ -89,11 +86,7 @@ const About = () => {
             </div>
             <div>
               <dt>{t('about.license')}</dt>
-              <dd>{license.title}</dd>
-            </div>
-            <div>
-              <dt>{t('about.copyright')}</dt>
-              <dd>{license.copyright}</dd>
+              <dd>{licenseTitle}</dd>
             </div>
             <div>
               <dt>{t('about.repository')}</dt>
@@ -112,7 +105,16 @@ const About = () => {
             <p>{t('about.usageTerms1')}</p>
             <p>{t('about.usageTerms2')}</p>
             <p>{t('about.usageTerms3')}</p>
+            <p>{t('about.usageTerms4')}</p>
+            <p>{t('about.usageTerms5')}</p>
+            <p>{t('about.usageTerms6')}</p>
+            <p>{t('about.usageTerms7')}</p>
           </div>
+        </section>
+
+        <section className="about-section glass">
+          <h2>{t('about.licenseText')}</h2>
+          <pre className="about-license-full">{licenseText}</pre>
         </section>
 
         <section className="about-section glass">
@@ -122,6 +124,10 @@ const About = () => {
             <p>{t('about.dataUsage2')}</p>
             <p>{t('about.dataUsage3')}</p>
             <p>{t('about.dataUsage4')}</p>
+            <p>{t('about.dataUsage5')}</p>
+            <p>
+              <Link to="/privacy">{t('about.privacyLink')}</Link>
+            </p>
           </div>
         </section>
 

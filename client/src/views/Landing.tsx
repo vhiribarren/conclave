@@ -201,6 +201,7 @@ const Landing = () => {
 
         <footer className="landing-footer">
           <Link to="/about">{t('landing.footerLink')}</Link>
+          <Link to="/privacy">{t('landing.privacyLink')}</Link>
         </footer>
       </div>
     </div>
