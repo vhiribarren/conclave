@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import { ArrowLeft } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import licenseText from '../../../LICENSE?raw';
 import thirdPartyNotices from '../../../THIRD_PARTY_LICENSES.md?raw';
@@ -64,20 +64,14 @@ const notices = parseThirdPartyNotices();
 const license = getLicenseSummary();
 
 const About = () => {
-  const location = useLocation();
   const { t } = useTranslation();
-  const from = location.state && typeof location.state === 'object' && 'from' in location.state
-    ? location.state.from
-    : null;
-  const backTarget = typeof from === 'string' && from.startsWith('/') ? from : '/';
-  const backLabel = backTarget.startsWith('/room/') ? t('about.backToRoom') : t('about.home');
 
   return (
     <div className="about-page animate-fade-in">
       <header className="about-header glass">
-        <Link to={backTarget} className="about-back-link">
+        <Link to="/" className="about-back-link">
           <ArrowLeft size={18} />
-          {backLabel}
+          {t('about.home')}
         </Link>
         <div>
           <h1 className="about-title">{t('about.title')}</h1>

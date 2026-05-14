@@ -341,7 +341,7 @@ const Room = () => {
               <button onClick={() => setShowUserSettings(true)} className="icon-button" title={t('room.userSettings')}>
                 <UserCog size={18} />
               </button>
-              <button onClick={() => navigate('/about', { state: { from: window.location.pathname + window.location.search } })} className="icon-button" title={t('room.about')}>
+              <button onClick={() => window.open('/about', '_blank')} className="icon-button" title={t('room.about')}>
                 <Info size={18} />
               </button>
               <button onClick={() => navigate('/')} className="icon-button danger" title={t('room.leave')}>
@@ -371,7 +371,7 @@ const Room = () => {
                         <Smartphone size={16} /> {t('room.remoteControl')}
                       </button>
                     )}
-                    <button onClick={() => { navigate('/about', { state: { from: window.location.pathname + window.location.search } }); setShowMobileMenu(false); }}>
+                    <button onClick={() => { window.open('/about', '_blank'); setShowMobileMenu(false); }}>
                       <Info size={16} /> {t('room.about')}
                     </button>
                     <div className="mobile-menu-separator" />

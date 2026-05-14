@@ -56,6 +56,12 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [actions, setActions] = useState<ConclaveActions | null>(null);
   const actionsRef = useRef<ConclaveActions | null>(null);
+  const nameRef = useRef(name);
+  const moodRef = useRef(mood);
+
+  // Keep refs in sync with state for use inside the effect
+  nameRef.current = name;
+  moodRef.current = mood;
 
   useEffect(() => {
     let isMounted = true;
@@ -66,7 +72,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
       const timeoutId = setTimeout(() => {
         if (!isMounted) return;
 
-        socketActions = ConclaveSocket.connect(roomId, effectiveUserId, name, mood, (myPublicId) => {
+        socketActions = ConclaveSocket.connect(roomId, effectiveUserId, nameRef.current, moodRef.current, (myPublicId) => {
           if (isMounted) {
             resolvedPublicId = myPublicId;
             setPublicId(myPublicId);
@@ -100,7 +106,7 @@ export const useRoomSession = (roomId: string | undefined, options: Options = {}
         }
       };
     }
-  }, [isJoined, roomId, name, mood, effectiveUserId]);
+  }, [isJoined, roomId, effectiveUserId]);
 
   const isAdmin = !!state.participants.find(p => p.id === publicId)?.isAdmin;
   const currentTask = state.tasks?.find(t => t.id === state.currentTaskId);
