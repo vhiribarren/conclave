@@ -35,7 +35,7 @@ export default {
     const url = new URL(request.url);
     const pathname = url.pathname;
 
-    console.log(`Called URL: ${url}`)
+    console.debug(`${method} ${pathname}`)
 
     // TODO: scope to EU jurisdiction
     const scopedDurableObject = env.CONCLAVE_ROOM;
@@ -48,12 +48,13 @@ export default {
     if (wsMatch) {
       const roomId = wsMatch?.groups?.roomId;
       if (!roomId) {
+        console.warn(`Missing roomId in WebSocket path: ${pathname}`);
         return new Response("Bad request", { status: 400 });
       }
       return await apiWebsocket(scopedDurableObject, request, roomId);
     }
 
-    console.warn(`Resource ${pathname} is not implemented, bailing out.`);
+    console.warn(`No route matched: ${method} ${pathname}`);
     return new Response("Resource does not exist.", { status: 404 });
   },
 };
@@ -61,13 +62,14 @@ export default {
 async function apiRoomCreate(durableObject: DurableObjectNamespace<ConclaveRoom>, request: Request): Promise<Response> {
       const { roomTitle, adminId } = await request.json() as { roomTitle?: string, adminId?: string };
       if (!adminId) {
-        console.warn("apiRoomCreate was called without adminId field");
+        console.warn("POST /api/rooms: missing adminId field");
         return new Response("Bad request", { status: 400 });
       }
       const roomId = generateRoomId();
       const id = durableObject.idFromName(roomId);
       const obj = durableObject.get(id);
       await obj.createRoom(adminId, roomTitle);
+      console.info(`Room created: ${roomId}`);
       return new Response(JSON.stringify({ roomId }));
 }
 

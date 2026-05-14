@@ -25,6 +25,7 @@ import { DurableObject } from "cloudflare:workers";
 import type { RoomState, Task, Round, ServerMessage } from "conclave-shared";
 import { DEFAULT_DECK } from "conclave-shared";
 import { SqlKvStorage, SqlKvStore } from "./kv-storage";
+import { RoomLogger } from "./logger";
 
 const INACTIVITY_ALARM_MS = 48 * 60 * 60 * 1000 // 48H
 const KV_STATE = "state";
@@ -38,6 +39,7 @@ type UserIdMapping = Record<string, string>; // userId -> publicId
 
 export class ConclaveRoom extends DurableObject {
   private store: SqlKvStore | null = null;
+  private readonly log: RoomLogger;
 
   // State uses publicIds everywhere: participants[].id, adminId, round votes keys
   private state: RoomState = {
@@ -59,12 +61,13 @@ export class ConclaveRoom extends DurableObject {
 
   constructor(ctx: DurableObjectState, env: any) {
     super(ctx, env);
+    const roomId = this.ctx.id.name ?? this.ctx.id.toString().slice(0, 8);
+    this.log = new RoomLogger(roomId);
     this.ctx.blockConcurrencyWhile(async () => {
       const kvStorage = new SqlKvStorage(this.ctx.storage.sql);
       if (!kvStorage.isInitialized()) return;
       const store = kvStorage.getOrCreateStore();
       this.store = store;
-      // Store exist, restoring state, notably after websocket hibernate
       const storedState = store.get<RoomState>(KV_STATE);
       if (storedState) {
         this.state = storedState;
@@ -73,11 +76,12 @@ export class ConclaveRoom extends DurableObject {
       if (storedUserIdMapping) {
         this.userIdMapping = storedUserIdMapping;
       }
+      this.log.info(`State restored - ${this.state.participants.length} participant(s)`);
     });
   }
 
   async createRoom(adminId: string, roomTitle: string | undefined) {
-      console.log(`Creating new room - roomId: ${this.ctx.id.name}, adminId: ${adminId}, roomTitle: ${roomTitle}`);
+      this.log.info(`Creating room - adminId: ${adminId}, title: ${roomTitle ?? "(none)"}`);
       const kvStorage = new SqlKvStorage(this.ctx.storage.sql);
       this.store = kvStorage.getOrCreateStore();
       // adminId here is the userId from the creator; generate a publicId for them
@@ -92,11 +96,13 @@ export class ConclaveRoom extends DurableObject {
 
   async fetch(request: Request) {    
     if (!this.store) {
+      this.log.debug("Fetch on non-existent room, returning 404");
       return new Response("Room does not exist", { status: 404 });
     }
 
     const upgradeHeader = request.headers.get("Upgrade");
     if (!upgradeHeader || upgradeHeader !== "websocket") {
+      this.log.warn("Non-WebSocket request received");
       return new Response("Expected Upgrade: websocket", { status: 426 });
     }
 
@@ -113,10 +119,10 @@ export class ConclaveRoom extends DurableObject {
     this.updateAlarm();
     try {
       const data = JSON.parse(message as string);
-      console.log(`Received message: ${data.type}`);
+      this.log.debug(`Message received: ${data.type}`);
       await this.handleMessage(ws, data);
     } catch (err) {
-      console.error("Error handling message:", err);
+      this.log.error("Failed to handle message:", err);
       ws.send(JSON.stringify({ type: "error", message: "Invalid message format" }));
     }
   }
@@ -139,6 +145,7 @@ export class ConclaveRoom extends DurableObject {
         return otherAttachment?.publicId === attachment.publicId;
       });
       if (!hasOtherConnection) {
+        this.log.info(`Participant disconnected: ${attachment.publicId}`);
         this.state.participants = this.state.participants.filter((p) => p.id !== attachment.publicId);
         this.broadcastState();
         this.store!.put(KV_STATE, this.state);
@@ -151,7 +158,7 @@ export class ConclaveRoom extends DurableObject {
   }
 
   async alarm() {
-    // Destroy room after inactivity
+    this.log.info(`Room expired after ${INACTIVITY_ALARM_MS/(1000*60*60)}H of inactivity, destroying`);
     await this.ctx.storage.deleteAll();
     for (const ws of this.ctx.getWebSockets()) {
       ws.close(1000, `Room expired after ${INACTIVITY_ALARM_MS/(1000*60*60)}H of inactivity`);
@@ -159,7 +166,7 @@ export class ConclaveRoom extends DurableObject {
   }
 
   async handleMessage(ws: WebSocket, data: any) {
-    const attachment = (ws.deserializeAttachment() || {}) as { publicId?: string };
+    const senderPublicId = (ws.deserializeAttachment() as { publicId?: string })?.publicId;
 
     switch (data.type) {
       case "USER_JOIN":
@@ -197,14 +204,15 @@ export class ConclaveRoom extends DurableObject {
           });
         }
         ws.send(JSON.stringify({ type: "JOINED", publicId } satisfies ServerMessage));
+        this.log.info(`User joined: ${publicId} (${data.name || "Anonymous"})`);
 
         this.broadcastState();
         break;
 
       case "USER_UPDATE_PROFILE": {
-        const p = this.state.participants.find((p) => p.id === attachment.publicId);
+        const p = this.state.participants.find((p) => p.id === senderPublicId);
         if (!p) {
-          console.error(`USER_UPDATE_PROFILE: Participant not found for publicId ${attachment.publicId}`);
+          this.log.warn(`USER_UPDATE_PROFILE: Participant not found for publicId ${senderPublicId}`);
           return;
         }
         p.name = data.name || p.name;
@@ -214,9 +222,9 @@ export class ConclaveRoom extends DurableObject {
       }
 
       case "USER_VOTE": {
-        const participant = this.state.participants.find((p) => p.id === attachment.publicId);
+        const participant = this.state.participants.find((p) => p.id === senderPublicId);
         if (!participant) {
-          console.error(`USER_VOTE: Participant not found for publicId ${attachment.publicId}`);
+          this.log.warn(`USER_VOTE: Participant not found for publicId ${senderPublicId}`);
           return;
         }
         
@@ -242,10 +250,7 @@ export class ConclaveRoom extends DurableObject {
       }
 
       case "ADMIN_REVEAL":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_REVEAL: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_REVEAL")) return;
         {
           let roundToReveal: Round | undefined;
           if (this.state.currentTaskId) {
@@ -267,10 +272,7 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_RESET":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RESET: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_RESET")) return;
         if (this.state.currentTaskId) {
           const task = this.state.tasks.find(t => t.id === this.state.currentTaskId);
           if (task) {
@@ -285,12 +287,9 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_ADD_TASK":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_ADD_TASK: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_ADD_TASK")) return;
         if (!data.name) {
-          console.error("ADMIN_ADD_TASK: Missing task name");
+          this.log.warn(`ADMIN_ADD_TASK: Missing task name`);
           return;
         }
         {
@@ -308,12 +307,9 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_RENAME_TASK":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RENAME_TASK: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_RENAME_TASK")) return;
         if (!data.taskId || !data.name) {
-          console.error("ADMIN_RENAME_TASK: Missing taskId or name");
+          this.log.warn(`ADMIN_RENAME_TASK: Missing taskId or name`);
           return;
         }
         {
@@ -326,10 +322,7 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_SET_TASK":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_TASK: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_SET_TASK")) return;
         this.state.currentTaskId = data.taskId;
         this.state.timerEndAt = null;
         this.state.timerPausedRemainingMs = null;
@@ -337,12 +330,9 @@ export class ConclaveRoom extends DurableObject {
         break;
       
       case "ADMIN_DELETE_TASK":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_DELETE_TASK: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_DELETE_TASK")) return;
         if (!data.taskId) {
-          console.error("ADMIN_DELETE_TASK: Missing taskId");
+          this.log.warn(`ADMIN_DELETE_TASK: Missing taskId`);
           return;
         }
         this.state.tasks = this.state.tasks.filter(t => t.id !== data.taskId);
@@ -354,12 +344,9 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_SET_DECK":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_DECK: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_SET_DECK")) return;
         if (!Array.isArray(data.deck)) {
-          console.error("ADMIN_SET_DECK: Invalid deck format");
+          this.log.warn(`ADMIN_SET_DECK: Invalid deck format`);
           return;
         }
         this.state.deck = data.deck;
@@ -368,10 +355,7 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_SET_TIMER":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_TIMER: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_SET_TIMER")) return;
         this.state.timerPausedRemainingMs = null;
         if (data.durationMs === null) {
           this.state.timerEndAt = null;
@@ -382,10 +366,7 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_PAUSE_TIMER":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_PAUSE_TIMER: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_PAUSE_TIMER")) return;
         if (!this.state.timerEndAt) return;
         this.state.timerPausedRemainingMs = Math.max(0, this.state.timerEndAt - Date.now());
         this.state.timerEndAt = null;
@@ -393,10 +374,7 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_RESUME_TIMER":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RESUME_TIMER: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_RESUME_TIMER")) return;
         if (this.state.timerPausedRemainingMs === null) return;
         this.state.timerEndAt = Date.now() + this.state.timerPausedRemainingMs;
         this.state.timerPausedRemainingMs = null;
@@ -404,18 +382,15 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_TRANSFER_ADMIN":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_TRANSFER_ADMIN: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_TRANSFER_ADMIN")) return;
         if (!data.targetUserId) {
-          console.error("ADMIN_TRANSFER_ADMIN: Missing targetUserId");
+          this.log.warn(`ADMIN_TRANSFER_ADMIN: Missing targetUserId`);
           return;
         }
         {
           // data.targetUserId is a publicId sent by the client
           const targetPublicId = data.targetUserId;
-          const currentAdmin = this.state.participants.find((p) => p.id === attachment.publicId);
+          const currentAdmin = this.state.participants.find((p) => p.id === senderPublicId);
           const targetUser = this.state.participants.find((p) => p.id === targetPublicId);
           if (currentAdmin && targetUser) {
             this.state.adminId = targetPublicId;
@@ -427,12 +402,9 @@ export class ConclaveRoom extends DurableObject {
         break;
       
       case "ADMIN_RENAME_ROOM":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_RENAME_ROOM: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_RENAME_ROOM")) return;
         if (!data.name) {
-          console.error("ADMIN_RENAME_ROOM: Missing name");
+          this.log.warn(`ADMIN_RENAME_ROOM: Missing name`);
           return;
         }
         this.state.name = data.name;
@@ -440,19 +412,13 @@ export class ConclaveRoom extends DurableObject {
         break;
 
       case "ADMIN_SET_ANONYMOUS_VOTING":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_ANONYMOUS_VOTING: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_SET_ANONYMOUS_VOTING")) return;
         this.state.anonymousVoting = !!data.enabled;
         this.broadcastState();
         break;
 
       case "ADMIN_SET_TIMER_DURATION":
-        if (!this.isAdmin(ws)) {
-          console.error(`ADMIN_SET_TIMER_DURATION: Unauthorized access from publicId ${attachment.publicId}`);
-          return;
-        }
+        if (!this.assertAdmin(senderPublicId, "ADMIN_SET_TIMER_DURATION")) return;
         if (typeof data.durationMs === 'number' && data.durationMs > 0) {
           this.state.timerDurationMs = data.durationMs;
           this.broadcastState();
@@ -462,9 +428,15 @@ export class ConclaveRoom extends DurableObject {
     this.store!.put(KV_STATE, this.state);
   }
 
-  private isAdmin(ws: WebSocket): boolean {
-    const attachment = ws.deserializeAttachment() as { publicId?: string };
-    return !!this.state.participants.find((p) => p.id === attachment?.publicId)?.isAdmin;
+  private isAdmin(publicId: string | undefined): boolean {
+    return !!this.state.participants.find((p) => p.id === publicId)?.isAdmin;
+  }
+
+  /** Returns true if the publicId belongs to an admin. Logs a warning and returns false otherwise. */
+  private assertAdmin(publicId: string | undefined, action: string): boolean {
+    if (this.isAdmin(publicId)) return true;
+    this.log.warn(`${action}: Unauthorized access from publicId ${publicId}`);
+    return false;
   }
 
   private generatePublicId(): string {
