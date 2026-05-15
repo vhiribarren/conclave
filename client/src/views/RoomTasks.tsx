@@ -201,9 +201,9 @@ const RoomTasks = () => {
             </div>
           </div>
           <div className={styles.headerActions}>
-            <button onClick={() => navigate(`/room/${roomId}`)} className="premium-button secondary">
+            <Button onClick={() => navigate(`/room/${roomId}`)} variant="secondary">
               <ArrowLeft size={16} /> {t('tasks.backToRoom')}
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -224,9 +224,9 @@ const RoomTasks = () => {
                   onChange={(event) => setNewTaskName(event.target.value)}
                   placeholder={t('tasks.addPlaceholder')}
                 />
-                <button type="submit" className="premium-button" disabled={!newTaskName.trim()}>
+                <Button type="submit" disabled={!newTaskName.trim()}>
                   <Plus size={16} />
-                </button>
+                </Button>
               </form>
             )}
 
@@ -290,12 +290,11 @@ const RoomTasks = () => {
                   </div>
                   {isAdmin && (
                     <div className={styles.detailActions}>
-                      <button
+                      <Button
                         onClick={() => actions?.adminSetTask(state.currentTaskId === selectedTask.id ? null : selectedTask.id)}
-                        className="premium-button"
                       >
                         {state.currentTaskId === selectedTask.id ? t('tasks.unselect') : t('tasks.select')}
-                      </button>
+                      </Button>
                       <IconButton onClick={() => startRename(selectedTask)} title={t('tasks.renameTask')}>
                         <Edit2 size={16} />
                       </IconButton>

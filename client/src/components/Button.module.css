@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- .premium-button {
+.button {
   background: var(--accent-color);
   color: white;
   border: none;
@@ -41,17 +41,17 @@
   touch-action: manipulation;
 }
 
-.premium-button:hover:not(:disabled) {
+.button:hover:not(:disabled) {
   background: var(--accent-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px var(--accent-glow);
 }
 
-.premium-button:active:not(:disabled) {
+.button:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.premium-button:disabled {
+.button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
@@ -59,27 +59,33 @@
   color: var(--color-danger-text);
 }
 
-.premium-button.secondary {
+.secondary {
   background: var(--neutral-tint);
   color: var(--text-primary);
 }
 
-.premium-button.secondary:hover {
+.secondary:hover:not(:disabled) {
   background: var(--neutral-tint-hover);
 }
 
-.premium-button.danger {
+.danger {
   background: var(--color-danger);
   box-shadow: 0 4px 12px var(--color-danger-glow);
 }
 
-.premium-button.danger:hover:not(:disabled) {
+.danger:hover:not(:disabled) {
   background: var(--color-danger-hover);
   box-shadow: 0 6px 16px var(--color-danger-glow);
 }
 
-.premium-button.success {
+.success {
   background: var(--color-success);
   color: white;
   box-shadow: 0 4px 12px var(--color-success-glow);
+}
+
+.small {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }

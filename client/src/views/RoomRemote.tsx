@@ -34,8 +34,8 @@ import PokerCard from '../components/PokerCard';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { Modal, ModalTitle, ModalSubtitle } from '../components/Modal';
 import { useCurrentRoomSession } from './RoomSessionLayout';
-import './Room.css';
-import './RoomRemote.css';
+import s from './Room.module.css';
+import rs from './RoomRemote.module.css';
 
 const RoomRemote = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -106,14 +106,14 @@ const RoomRemote = () => {
           </form>
         </Modal>
       )}
-      <div className={`room-container ${!isJoined ? 'blurred' : ''}`}>
-        <header className="header glass">
-          <div className="header-left">
+      <div className={`${s.container} ${!isJoined ? s.blurred : ''}`}>
+        <header className={`${s.header} glass`}>
+          <div className={s.headerLeft}>
             <Logo />
             <div>
-              <h1 className="header-title">{state.name || roomId}</h1>
-              <div className="header-subtitle">
-                <span className={`header-dot ${connectionStatus !== 'connected' ? 'disconnected' : ''}`}></span>
+              <h1 className={s.headerTitle}>{state.name || roomId}</h1>
+              <div className={s.headerSubtitle}>
+                <span className={`${s.headerDot} ${connectionStatus !== 'connected' ? s.disconnected : ''}`}></span>
                 {connectionStatus === 'connected'
                   ? `${state.participants.length} ${t('common.online')} · ${t('common.remote')}`
                   : t('common.reconnecting')
@@ -121,7 +121,7 @@ const RoomRemote = () => {
               </div>
             </div>
           </div>
-          <div className="header-actions">
+          <div className={s.headerActions}>
             <LanguageSelector />
             <IconButton onClick={() => navigate(`/room/${roomId}`)} variant="danger" title={t('room.leaveRemote')}>
               <LogOut size={18} />
@@ -129,15 +129,15 @@ const RoomRemote = () => {
           </div>
         </header>
 
-        <div className="room-layout">
-          <main className="room-main">
+        <div className={s.layout}>
+          <main className={s.main}>
             {isAdmin && actions && (
-              <div className="remote-container">
-                <AdminPanel state={state} actions={actions} myVote={myVote} onVote={handleVote} roomId={roomId} isAdmin={true} layout="remote" />
+              <div className={rs.remoteContainer}>
+                <AdminPanel state={state} actions={actions} myVote={myVote} onVote={handleVote} roomId={roomId} isAdmin={true} layout="remote" hideVoteCards />
               </div>            )}
             {!isAdmin && (
               <div className="page-container">
-                <p className="remote-admin-only-message">
+                <p className={rs.adminOnlyMessage}>
                   {t('room.remoteAdminOnly')}
                 </p>
               </div>
@@ -147,22 +147,22 @@ const RoomRemote = () => {
 
         {/* Sticky vote bar for admin on mobile */}
         {isAdmin && !currentRound?.revealed && (
-          <div className={`remote-vote-bar glass ${voteBarCollapsed ? 'collapsed' : ''}`}>
+          <div className={`${rs.voteBar} glass ${voteBarCollapsed ? rs.collapsed : ''}`}>
             <button
-              className="remote-vote-bar-toggle"
+              className={rs.voteBarToggle}
               onClick={() => setVoteBarCollapsed(!voteBarCollapsed)}
               aria-label={voteBarCollapsed ? 'Expand vote panel' : 'Collapse vote panel'}
             >
-              <span className="remote-vote-bar-title">
+              <span className={rs.voteBarTitle}>
                 {t('admin.yourSecretVote')}
                 {voteBarCollapsed && myVote && (
-                  <span className="remote-vote-bar-current">{myVote}</span>
+                  <span className={rs.voteBarCurrent}>{myVote}</span>
                 )}
               </span>
               {voteBarCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
             {!voteBarCollapsed && (
-              <div className="remote-vote-bar-cards">
+              <div className={rs.voteBarCards}>
                 {(state.deck || []).map((card) => (
                   <PokerCard
                     key={card}

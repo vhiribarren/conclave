@@ -1,4 +1,4 @@
-.remote-container {
+.remoteContainer {
   flex: 1;
   width: 100%;
   max-width: 28rem;
@@ -10,16 +10,8 @@
   padding-bottom: 10rem; /* space for sticky vote bar */
 }
 
-.remote-container .panel-section {
-  padding: 1rem;
-}
-
-.remote-container .admin-panel {
-  gap: 1.5rem;
-}
-
 /* ── Sticky vote bar ──────────────────────────────────────────── */
-.remote-vote-bar {
+.voteBar {
   position: sticky;
   bottom: 0;
   z-index: 30;
@@ -36,11 +28,11 @@
   transition: padding 0.25s ease;
 }
 
-.remote-vote-bar.collapsed {
+.voteBar.collapsed {
   padding: 0;
 }
 
-.remote-vote-bar-toggle {
+.voteBarToggle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,11 +48,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.remote-vote-bar-toggle:active {
+.voteBarToggle:active {
   color: var(--text-primary);
 }
 
-.remote-vote-bar-title {
+.voteBarTitle {
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-secondary);
@@ -71,7 +63,7 @@
   gap: 0.5rem;
 }
 
-.remote-vote-bar-current {
+.voteBarCurrent {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -87,7 +79,7 @@
   text-transform: none;
 }
 
-.remote-vote-bar-cards {
+.voteBarCards {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -95,32 +87,23 @@
   animation: fadeIn 0.2s ease;
 }
 
-/* Hide the inline admin vote section in AdminPanel when on remote (it's now in the sticky bar) */
-.remote-container .admin-vote-cards {
-  display: none;
-}
-
-.remote-container .panel-section:has(.admin-vote-cards) {
-  display: none;
+.adminOnlyMessage {
+  text-align: center;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 480px) {
-  .remote-container {
+  .remoteContainer {
     padding: 0.75rem;
     padding-bottom: 9rem;
     gap: 1.25rem;
   }
 
-  .remote-vote-bar {
+  .voteBar {
     padding: 0.6rem 0.75rem;
   }
 
-  .remote-vote-bar-cards {
+  .voteBarCards {
     gap: 0.3rem;
   }
-}
-
-.remote-admin-only-message {
-  text-align: center;
-  color: var(--text-secondary);
 }

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- .room-container {
+ .container {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -30,7 +30,7 @@
   overflow: hidden;
   transition: var(--transition);
 }
-.room-container.blurred {
+.container.blurred {
   filter: blur(12px);
   transform: scale(0.98);
   opacity: 0.7;
@@ -48,18 +48,18 @@
   position: relative;
   z-index: 50;
 }
-.header-left {
+.headerLeft {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.header-title {
+.headerTitle {
   font-weight: 700;
   color: var(--text-primary);
   font-size: 1rem;
 }
-.header-subtitle {
+.headerSubtitle {
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -67,7 +67,7 @@
   font-weight: 500;
   color: var(--text-secondary);
 }
-.header-dot {
+.headerDot {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
@@ -75,7 +75,7 @@
   box-shadow: 0 0 8px var(--color-success-dot-glow);
   transition: background 0.3s, box-shadow 0.3s;
 }
-.header-dot.disconnected {
+.headerDot.disconnected {
   background: var(--danger-color, #e53e3e);
   box-shadow: 0 0 8px rgba(229, 62, 62, 0.5);
   animation: pulse-dot 1.5s ease-in-out infinite;
@@ -84,7 +84,7 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
-.header-actions {
+.headerActions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -94,34 +94,34 @@
 }
 
 /* Desktop actions: visible on large screens */
-.header-actions-desktop {
+.headerActionsDesktop {
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
 
 /* Mobile actions: hidden on large screens */
-.header-actions-mobile {
+.headerActionsMobile {
   display: none;
   align-items: center;
   gap: 0.25rem;
 }
 
 @media (max-width: 768px) {
-  .header-actions-desktop {
+  .headerActionsDesktop {
     display: none;
   }
-  .header-actions-mobile {
+  .headerActionsMobile {
     display: flex;
   }
 }
 
 /* ── Mobile overflow menu ─────────────────────────────────────── */
-.mobile-menu-wrapper {
+.mobileMenuWrapper {
   position: relative;
 }
 
-.mobile-menu {
+.mobileMenu {
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
@@ -139,7 +139,7 @@
   box-shadow: 0 12px 40px -8px rgba(15, 23, 42, 0.18);
 }
 
-.mobile-menu button {
+.mobileMenu button {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -156,21 +156,21 @@
   text-align: left;
 }
 
-.mobile-menu button:hover,
-.mobile-menu button:active {
+.mobileMenu button:hover,
+.mobileMenu button:active {
   background: var(--neutral-tint);
 }
 
-.mobile-menu-danger {
+.mobileMenuDanger {
   color: var(--color-danger-text) !important;
 }
 
-.mobile-menu-separator {
+.mobileMenuSeparator {
   height: 1px;
   background: var(--surface-border);
   margin: 0.25rem 0.5rem;
 }
-.header-separator {
+.headerSeparator {
   width: 1px;
   height: 1.5rem;
   background: var(--surface-border);
@@ -178,26 +178,26 @@
   margin: 0 0.125rem;
 }
 
-.room-name-container {
+.roomNameContainer {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.room-name-container .rename-btn {
+.roomNameContainer .renameBtn {
   opacity: 0;
   pointer-events: none;
 }
-.room-name-container:hover .rename-btn {
+.roomNameContainer:hover .renameBtn {
   opacity: 1;
   pointer-events: auto;
 }
-.room-layout {
+.layout {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
-.room-main {
+.main {
   flex: 1;
   overflow-y: auto;
   padding: 1rem 1.5rem;
@@ -206,7 +206,7 @@
   gap: 1.5rem;
   min-width: 0;
 }
-.room-sidebar {
+.sidebar {
   width: 380px;
   min-width: 280px;
   max-width: 600px;
@@ -219,13 +219,13 @@
   transition: min-width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
-.room-sidebar.collapsed {
+.sidebar.collapsed {
   width: 44px;
   min-width: 44px;
   max-width: 44px;
 }
 
-.sidebar-resize-handle {
+.sidebarResizeHandle {
   position: absolute;
   left: 0;
   top: 0;
@@ -236,12 +236,12 @@
   transition: background 0.2s;
 }
 
-.sidebar-resize-handle:hover,
-.sidebar-resize-handle.active {
+.sidebarResizeHandle:hover,
+.sidebarResizeHandle.active {
   background: var(--accent-color);
   opacity: 0.4;
 }
-.sidebar-toggle-btn {
+.sidebarToggleBtn {
   position: absolute;
   left: 0;
   top: 0;
@@ -258,22 +258,22 @@
   transition: var(--transition);
   flex-shrink: 0;
 }
-.sidebar-toggle-btn:hover {
+.sidebarToggleBtn:hover {
   background: var(--glass-bg-hover);
   color: var(--accent-color);
 }
-.sidebar-toggle-btn svg {
+.sidebarToggleBtn svg {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.room-sidebar.collapsed .sidebar-toggle-btn svg {
+.sidebar.collapsed .sidebarToggleBtn svg {
   transform: rotate(180deg);
 }
-.sidebar-section {
+.sidebarSection {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
 }
-.sidebar-section-title {
+.sidebarSectionTitle {
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-secondary);
@@ -283,7 +283,7 @@
   justify-content: space-between;
   align-items: center;
 }
-.layout-toggle-container {
+.layoutToggleContainer {
   display: flex;
   align-items: center;
   gap: 0.125rem;
@@ -294,7 +294,7 @@
   align-self: center;
   margin-right: 0;
 }
-.layout-toggle-btn {
+.layoutToggleBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -308,21 +308,21 @@
   opacity: 0.4;
   line-height: 1;
 }
-.layout-toggle-btn:hover:not(:disabled):not(.active) {
+.layoutToggleBtn:hover:not(:disabled):not(.active) {
   opacity: 0.7;
   background: var(--glass-bg-hover);
 }
-.layout-toggle-btn.active {
+.layoutToggleBtn.active {
   opacity: 1;
   background: var(--glass-bg-strong);
   color: var(--accent-color);
   box-shadow: 0 1px 3px var(--neutral-shadow-light);
 }
-.layout-toggle-btn:disabled {
+.layoutToggleBtn:disabled {
   opacity: 0.2;
   cursor: not-allowed;
 }
-.task-section {
+.taskSection {
   width: 100%;
   max-width: 42rem;
   margin: 1rem auto 0;
@@ -331,21 +331,21 @@
   flex-direction: column;
   gap: 0.5rem;
 }
-.task-title {
+.taskTitle {
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.task-box {
+.taskBox {
   padding: 1.5rem;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary);
   background: var(--glass-bg-hover);
 }
-.voting-section {
+.votingSection {
   padding: 1.5rem;
   width: 100%;
   max-width: fit-content;
@@ -362,42 +362,42 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
-.voting-title {
+.votingTitle {
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.voting-subtitle {
+.votingSubtitle {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
 }
-.voting-cards {
+.votingCards {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
 }
 @media (min-width: 1025px) {
-  .mobile-voting,
-  .mobile-admin-bar,
-  .mobile-results-section {
+  .mobileVoting,
+  .mobileAdminBar,
+  .mobileResultsSection {
     display: none !important;
   }
 }
 
 /* ── Mobile results section ───────────────────────────────────── */
-.mobile-results-section {
+.mobileResultsSection {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
 }
 
 /* ── Participants + Results horizontal layout (desktop) ────────── */
-.participants-results-row {
+.participantsResultsRow {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -406,22 +406,22 @@
   position: relative;
 }
 
-.results-panel {
+.resultsPanel {
   display: none;
   flex-direction: column;
   gap: 0.6rem;
 }
 
 @media (min-width: 1025px) {
-  .participants-results-row {
+  .participantsResultsRow {
     flex-direction: row;
     align-items: flex-start;
   }
-  .participants-results-row > :first-child {
+  .participantsResultsRow > :first-child {
     flex: 1;
     min-width: 0;
   }
-  .results-panel {
+  .resultsPanel {
     display: flex;
     width: 260px;
     flex-shrink: 0;
@@ -430,12 +430,12 @@
     border-radius: 1rem;
     border: 1px solid var(--surface-border);
   }
-  .results-panel.hidden {
+  .resultsPanel.hidden {
     display: none;
   }
 }
 
-.results-panel-task-title {
+.resultsPanelTaskTitle {
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-primary);
@@ -445,29 +445,29 @@
   margin-bottom: 1rem;
 }
 
-.results-panel-voting {
+.resultsPanelVoting {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
 }
 
-.results-panel-cards {
+.resultsPanelCards {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
   justify-content: center;
 }
 @media (max-width: 1024px) {
-  .room-layout {
+  .layout {
     flex-direction: column;
   }
-  .room-sidebar {
+  .sidebar {
     display: none;
   }
 }
 
 /* ── Mobile admin bottom bar ──────────────────────────────────── */
-.mobile-admin-bar {
+.mobileAdminBar {
   position: sticky;
   bottom: 0;
   z-index: 30;
@@ -481,7 +481,7 @@
   flex-direction: column;
 }
 
-.mobile-admin-vote-section {
+.mobileAdminVoteSection {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -490,48 +490,48 @@
   border-bottom: 1px solid var(--surface-border);
 }
 
-.mobile-admin-vote-title {
+.mobileAdminVoteTitle {
   font-size: 0.65rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
-.mobile-admin-vote-subtitle {
+.mobileAdminVoteSubtitle {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
 }
 
-.mobile-admin-vote-cards {
+.mobileAdminVoteCards {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.35rem;
 }
 
-.mobile-admin-bar-header {
+.mobileAdminBarHeader {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 0.75rem;
 }
 
-.mobile-admin-bar-actions {
+.mobileAdminBarActions {
   display: flex;
   gap: 0.4rem;
   flex: 1;
 }
 
-.mobile-admin-bar-actions .premium-button {
+.mobileAdminBarActions button {
   flex: 1;
   padding: 10px 10px;
   font-size: 0.8rem;
   min-width: 0;
 }
 
-.mobile-admin-bar-toggle {
+.mobileAdminBarToggle {
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -549,12 +549,12 @@
   justify-content: center;
 }
 
-.mobile-admin-bar-toggle:active {
+.mobileAdminBarToggle:active {
   background: var(--neutral-tint-hover);
   color: var(--text-primary);
 }
 
-.mobile-admin-bar.expanded {
+.mobileAdminBar.expanded {
   position: fixed;
   top: 0;
   left: 0;
@@ -564,39 +564,22 @@
   z-index: 100;
 }
 
-.mobile-admin-bar.expanded .mobile-admin-bar-header {
+.mobileAdminBar.expanded .mobileAdminBarHeader {
   justify-content: flex-end;
   border-bottom: 1px solid var(--surface-border);
 }
 
-.mobile-admin-bar-content {
+.mobileAdminBarContent {
   max-height: 55vh;
   overflow-y: auto;
   padding: 0.5rem 0.75rem 1rem;
   border-top: 1px solid var(--surface-border);
 }
 
-.mobile-admin-bar-content .panel-section {
-  padding: 1rem;
-}
-
-.mobile-admin-bar-content .admin-panel {
-  gap: 1.5rem;
-}
-
-.mobile-admin-bar.expanded .mobile-admin-bar-content {
+.mobileAdminBar.expanded .mobileAdminBarContent {
   max-height: none;
   flex: 1;
   overflow-y: auto;
-}
-
-/* Hide inline admin vote section when inside mobile admin bar (already in the bar) */
-.mobile-admin-bar-content .admin-vote-cards {
-  display: none;
-}
-
-.mobile-admin-bar-content .panel-section:has(.admin-vote-cards) {
-  display: none;
 }
 
 /* ── Mobile-specific refinements ──────────────────────────────── */
@@ -607,13 +590,13 @@
     border-radius: 0.75rem;
   }
 
-  .header-left {
+  .headerLeft {
     gap: 0.5rem;
     min-width: 0;
     flex: 1;
   }
 
-  .header-title {
+  .headerTitle {
     font-size: 0.85rem;
     white-space: nowrap;
     overflow: hidden;
@@ -621,21 +604,21 @@
     max-width: 140px;
   }
 
-  .room-main {
+  .main {
     padding: 0.75rem;
     gap: 1rem;
   }
 
-  .task-section {
+  .taskSection {
     margin-top: 0.5rem;
   }
 
-  .task-box {
+  .taskBox {
     padding: 1rem;
     font-size: 1rem;
   }
 
-  .voting-section {
+  .votingSection {
     margin: 0;
     border-radius: 1rem 1rem 0 0;
     padding: 0.75rem;
@@ -645,19 +628,19 @@
     width: 100%;
   }
 
-  .voting-cards {
+  .votingCards {
     gap: 0.5rem;
   }
 }
 
 @media (max-width: 380px) {
-  .header-title {
+  .headerTitle {
     max-width: 80px;
   }
 }
 
 /* ── Anonymous voting badge ────────────────────────────────────── */
-.anonymous-badge {
+.anonymousBadge {
   position: absolute;
   top: 0.5rem;
   left: 0.5rem;
@@ -675,7 +658,7 @@
 }
 
 /* ── Avatar / emoji picker section ─────────────────────────────── */
-.avatar-section {
+.avatarSection {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -683,13 +666,13 @@
   align-items: center;
 }
 
-.avatar-label {
+.avatarLabel {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
-.avatar-button {
+.avatarButton {
   font-size: 2.5rem;
   padding: 0.5rem;
   background: rgba(255, 255, 255, 0.4);
@@ -699,14 +682,14 @@
 }
 
 /* ── Rename form ───────────────────────────────────────────────── */
-.rename-form {
+.renameForm {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.25rem;
 }
 
-.rename-input {
+.renameInput {
   padding: 0.15rem 0.5rem;
   font-size: 0.9rem;
   height: auto;
@@ -714,13 +697,13 @@
 }
 
 /* ── Timer wrapper ─────────────────────────────────────────────── */
-.timer-wrapper {
+.timerWrapper {
   display: flex;
   justify-content: center;
 }
 
 /* ── Share modal ───────────────────────────────────────────────── */
-.share-content {
+.shareContent {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -728,56 +711,56 @@
   margin: 1rem 0;
 }
 
-.qr-wrapper {
+.qrWrapper {
   background: white;
   padding: 1rem;
   border-radius: 1rem;
 }
 
-.share-field {
+.shareField {
   width: 100%;
   text-align: left;
 }
 
-.share-label {
+.shareLabel {
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
 }
 
-.share-input-mono {
+.shareInputMono {
   margin-top: 0.25rem;
   background: rgba(255, 255, 255, 0.3);
   font-family: monospace;
   font-size: 0.9rem;
 }
 
-.share-link-row {
+.shareLinkRow {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.25rem;
 }
 
-.share-link-input {
+.shareLinkInput {
   font-size: 0.85rem;
   flex: 1;
 }
 
-.copy-button {
+.copyButton {
   padding: 0.5rem 1rem;
   flex-shrink: 0;
 }
 
 /* ── Remote modal ──────────────────────────────────────────────── */
-.remote-warning {
+.remoteWarning {
   color: #e53e3e;
   font-size: 0.8rem;
   font-weight: 600;
   margin: 0.5rem 0;
 }
 
-.remote-content {
+.remoteContent {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -785,11 +768,11 @@
   margin: 1rem 0;
 }
 
-.remote-link {
+.remoteLink {
   text-decoration: none;
 }
 
-.remote-qr-toggle {
+.remoteQrToggle {
   font-size: 0.8rem;
   padding: 0.5rem 1rem;
 }

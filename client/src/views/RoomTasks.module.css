@@ -121,7 +121,7 @@
   gap: 0.5rem;
 }
 
-.addForm .premium-button {
+.addForm button {
   align-self: stretch;
   min-width: 3rem;
   padding-left: 0.8rem;
@@ -331,7 +331,7 @@
     gap: 0.5rem;
   }
 
-  .headerActions .premium-button {
+  .headerActions button {
     width: 100%;
   }
 
@@ -353,7 +353,7 @@
     flex-wrap: wrap;
   }
 
-  .detailActions .premium-button {
+  .detailActions button {
     flex: 1;
   }
 }

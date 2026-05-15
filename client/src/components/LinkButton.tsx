@@ -24,28 +24,25 @@
 import React from 'react';
 import styles from './Button.module.css';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface LinkButtonProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'success';
-  size?: 'default' | 'small';
   children: React.ReactNode;
 }
 
-const Button: React.FC<ButtonProps> = ({
+const LinkButton: React.FC<LinkButtonProps> = ({
   variant = 'primary',
-  size = 'default',
   className = '',
   children,
   ...props
 }) => {
   const variantClass = variant !== 'primary' ? styles[variant] : '';
-  const sizeClass = size !== 'default' ? styles[size] : '';
-  const buttonClass = `${styles.button} ${variantClass} ${sizeClass} ${className}`.trim();
+  const linkClass = `${styles.button} ${variantClass} ${className}`.trim();
 
   return (
-    <button className={buttonClass} {...props}>
+    <a className={linkClass} {...props}>
       {children}
-    </button>
+    </a>
   );
 };
 
-export default Button;
+export default LinkButton;

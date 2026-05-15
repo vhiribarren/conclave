@@ -28,10 +28,11 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
 import IconButton from '../components/IconButton';
+import LinkButton from '../components/LinkButton';
 import Input from '../components/Input';
 import Logo from '../components/Logo';
 import PokerCard from '../components/PokerCard';
-import './Room.css';
+import s from './Room.module.css';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 
 import { setUserName, setUserEmoji } from '../services/user';
@@ -228,11 +229,11 @@ const Room = () => {
           autoFocus
         />
 
-        <div className="avatar-section">
-          <span className="avatar-label">{t('room.chooseAvatar')}</span>
+        <div className={s.avatarSection}>
+          <span className={s.avatarLabel}>{t('room.chooseAvatar')}</span>
           <button
             type="button"
-            className="avatar-button"
+            className={s.avatarButton}
             onClick={() => setShowEmojiPickerJoin(!showEmojiPickerJoin)}
           >
             {mood}
@@ -261,17 +262,17 @@ const Room = () => {
   return (
     <>
       {!isJoined && renderOnboardingModal()}
-      <div className={`room-container ${!isJoined ? 'blurred' : ''}`}>
+      <div className={`${s.container} ${!isJoined ? s.blurred : ''}`}>
         {/* Header */}
-        <header className="header glass">
-          <div className="header-left">
+        <header className={`${s.header} glass`}>
+          <div className={s.headerLeft}>
             <Logo />
             <div>
               {isEditingRoomName ? (
-                <form onSubmit={handleRenameRoom} className="rename-form">
+                <form onSubmit={handleRenameRoom} className={s.renameForm}>
                   <Input
                     type="text"
-                    className="rename-input"
+                    className={s.renameInput}
                     value={tempRoomName}
                     onChange={(e) => setTempRoomName(e.target.value)}
                     autoFocus
@@ -288,17 +289,17 @@ const Room = () => {
                   </IconButton>
                 </form>
               ) : (
-                <div className="room-name-container">
-                  <h1 className="header-title">{state.name || roomId}</h1>
+                <div className={s.roomNameContainer}>
+                  <h1 className={s.headerTitle}>{state.name || roomId}</h1>
                   {isAdmin && (
-                    <IconButton onClick={startEditingRoomName} variant="subtle" className="rename-btn" title={t('room.renameRoom')}>
+                    <IconButton onClick={startEditingRoomName} variant="subtle" className={s.renameBtn} title={t('room.renameRoom')}>
                       <Edit2 size={12} />
                     </IconButton>
                   )}
                 </div>
               )}
-              <div className="header-subtitle">
-                <span className={`header-dot ${connectionStatus !== 'connected' ? 'disconnected' : ''}`}></span>
+              <div className={s.headerSubtitle}>
+                <span className={`${s.headerDot} ${connectionStatus !== 'connected' ? s.disconnected : ''}`}></span>
                 {connectionStatus === 'connected'
                   ? `${state.participants.length} ${t('common.online')}`
                   : t('common.reconnecting')
@@ -307,13 +308,13 @@ const Room = () => {
             </div>
           </div>
 
-          <div className="header-actions">
-            <div className="header-actions-desktop">
+          <div className={s.headerActions}>
+            <div className={s.headerActionsDesktop}>
               <LanguageSelector />
-              <div className="layout-toggle-container">
+              <div className={s.layoutToggleContainer}>
                 <button
                   id="layout-btn-circle"
-                  className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
+                  className={`${s.layoutToggleBtn} ${layoutMode === 'auto' ? s.active : ''}`}
                   onClick={() => setLayoutMode('auto')}
                   title={t('room.circleView')}
                   disabled={state.participants.length > 12 || state.participants.length === 0}
@@ -322,14 +323,14 @@ const Room = () => {
                 </button>
                 <button
                   id="layout-btn-grid"
-                  className={`layout-toggle-btn ${layoutMode === 'grid' ? 'active' : ''}`}
+                  className={`${s.layoutToggleBtn} ${layoutMode === 'grid' ? s.active : ''}`}
                   onClick={() => setLayoutMode('grid')}
                   title={t('room.gridView')}
                 >
                   <LayoutGrid size={16} />
                 </button>
               </div>
-              <div className="header-separator" />
+              <div className={s.headerSeparator} />
               <IconButton onClick={() => setShowShareModal(true)} title={t('room.shareRoom')}>
                 <Share2 size={18} />
               </IconButton>
@@ -358,19 +359,19 @@ const Room = () => {
             </div>
 
             {/* Mobile: share + tasks always visible, rest in overflow */}
-            <div className="header-actions-mobile">
+            <div className={s.headerActionsMobile}>
               <IconButton onClick={() => setShowShareModal(true)} title={t('room.shareRoom')}>
                 <Share2 size={18} />
               </IconButton>
               <IconButton onClick={() => navigate(`/room/${roomId}/tasks`)} variant="accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
                 <ListChecks size={18} />
               </IconButton>
-              <div className="mobile-menu-wrapper" ref={mobileMenuRef}>
+              <div className={s.mobileMenuWrapper} ref={mobileMenuRef}>
                 <IconButton onClick={() => setShowMobileMenu(!showMobileMenu)} title="Menu">
                   <MoreVertical size={18} />
                 </IconButton>
                 {showMobileMenu && (
-                  <div className="mobile-menu glass animate-fade-in">
+                  <div className={`${s.mobileMenu} glass animate-fade-in`}>
                     <button onClick={() => { setShowUserSettings(true); setShowMobileMenu(false); }}>
                       <UserCog size={16} /> {t('room.userSettings')}
                     </button>
@@ -387,11 +388,11 @@ const Room = () => {
                         <HelpCircle size={16} /> {t('help.tooltip')}
                       </button>
                     )}
-                    <div className="mobile-menu-separator" />
+                    <div className={s.mobileMenuSeparator} />
                     <LanguageSelector variant="menu-item" />
-                    <div className="mobile-menu-separator" />
+                    <div className={s.mobileMenuSeparator} />
 
-                    <button className="mobile-menu-danger" onClick={() => { navigate('/'); setShowMobileMenu(false); }}>
+                    <button className={s.mobileMenuDanger} onClick={() => { navigate('/'); setShowMobileMenu(false); }}>
                       <LogOut size={16} /> {t('room.leave')}
                     </button>
                   </div>
@@ -401,12 +402,12 @@ const Room = () => {
           </div>
         </header>
 
-        <div className="room-layout">
+        <div className={s.layout}>
             <>
               {/* ── Left column: participants ──────────────────────────── */}
-              <main className="room-main">
+              <main className={s.main}>
                 {!isCircleLayout && (state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                  <div className="timer-wrapper">
+                  <div className={s.timerWrapper}>
                     <TimerDisplay
                       timerEndAt={state.timerEndAt}
                       timerPausedRemainingMs={state.timerPausedRemainingMs}
@@ -414,14 +415,14 @@ const Room = () => {
                   </div>
                 )}
 
-                <div className="participants-results-row">
+                <div className={s.participantsResultsRow}>
                   {state.anonymousVoting && (
-                    <div className="anonymous-badge">
+                    <div className={s.anonymousBadge}>
                       🕵️ {t('room.anonymousMode')}
                     </div>
                   )}
                   {autoReveal && isAdmin && (
-                    <div className="anonymous-badge">
+                    <div className={s.anonymousBadge}>
                       ⏱ {t('room.autoRevealMode')}
                     </div>
                   )}
@@ -436,20 +437,20 @@ const Room = () => {
                   />
 
                   {/* Right panel: voting cards or results */}
-                  <div className={`results-panel ${isAdmin && !sidebarCollapsed ? 'hidden' : ''}`}>
-                    <span className="sidebar-section-title">{t('room.votingOn')}</span>
-                    <span className="results-panel-task-title">
+                  <div className={`${s.resultsPanel} ${isAdmin && !sidebarCollapsed ? s.hidden : ''}`}>
+                    <span className={s.sidebarSectionTitle}>{t('room.votingOn')}</span>
+                    <span className={s.resultsPanelTaskTitle}>
                       {currentTask ? currentTask.name : t('admin.adhocVote')}
                     </span>
                     {isRevealed ? (
                       <>
-                        <span className="sidebar-section-title">📊 {t('room.results')}</span>
+                        <span className={s.sidebarSectionTitle}>📊 {t('room.results')}</span>
                         <AggregationResult participants={state.participants} deck={state.deck} roundVotes={state.anonymousVoting && currentRound?.revealed ? currentRound.votes : undefined} />
                       </>
                     ) : !isAdmin ? (
-                      <div className="results-panel-voting">
-                        <span className="sidebar-section-title">🎴 {t('room.pickACard')}</span>
-                        <div className="results-panel-cards">
+                      <div className={s.resultsPanelVoting}>
+                        <span className={s.sidebarSectionTitle}>🎴 {t('room.pickACard')}</span>
+                        <div className={s.resultsPanelCards}>
                           {(state.deck || []).map((card) => (
                             <PokerCard
                               key={card}
@@ -467,20 +468,20 @@ const Room = () => {
 
                 {/* Mobile-only: task title and results */}
                 {isRevealed && (
-                  <div className="mobile-results-section animate-fade-in">
-                    <span className="sidebar-section-title">{t('room.votingOn')}</span>
-                    <span className="results-panel-task-title">{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
-                    <span className="sidebar-section-title">📊 {t('room.results')}</span>
+                  <div className={`${s.mobileResultsSection} animate-fade-in`}>
+                    <span className={s.sidebarSectionTitle}>{t('room.votingOn')}</span>
+                    <span className={s.resultsPanelTaskTitle}>{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
+                    <span className={s.sidebarSectionTitle}>📊 {t('room.results')}</span>
                     <AggregationResult participants={state.participants} deck={state.deck} roundVotes={state.anonymousVoting && currentRound?.revealed ? currentRound.votes : undefined} />
                   </div>
                 )}
 
                 {/* Mobile-only: voting cards sticky bottom (non-admin) */}
                 {!isRevealed && !isAdmin && (
-                  <div className="voting-section glass mobile-voting">
-                    <span className="voting-subtitle">{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
-                    <span className="voting-title">{t('room.pickACard')}</span>
-                    <div className="voting-cards">
+                  <div className={`${s.votingSection} glass ${s.mobileVoting}`}>
+                    <span className={s.votingSubtitle}>{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
+                    <span className={s.votingTitle}>{t('room.pickACard')}</span>
+                    <div className={s.votingCards}>
                       {(state.deck || []).map((card) => (
                         <PokerCard
                           key={card}
@@ -495,13 +496,13 @@ const Room = () => {
 
                 {/* Mobile-only: admin bottom bar with expand */}
                 {isAdmin && actions && (
-                  <div className={`mobile-admin-bar ${mobileAdminOpen ? 'expanded' : ''}`}>
+                  <div className={`${s.mobileAdminBar} ${mobileAdminOpen ? s.expanded : ''}`}>
                     {/* Vote cards for admin — hidden when panel is expanded */}
                     {!isRevealed && !mobileAdminOpen && (
-                      <div className="mobile-admin-vote-section">
-                        <span className="mobile-admin-vote-subtitle">{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
-                        <span className="mobile-admin-vote-title">{t('room.pickACard')}</span>
-                        <div className="mobile-admin-vote-cards">
+                      <div className={s.mobileAdminVoteSection}>
+                        <span className={s.mobileAdminVoteSubtitle}>{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
+                        <span className={s.mobileAdminVoteTitle}>{t('room.pickACard')}</span>
+                        <div className={s.mobileAdminVoteCards}>
                           {(state.deck || []).map((card) => (
                             <PokerCard
                               key={card}
@@ -516,47 +517,47 @@ const Room = () => {
                     )}
 
                     {/* Quick actions: reveal, reset, timer — hidden when panel is expanded */}
-                    <div className="mobile-admin-bar-header">
+                    <div className={s.mobileAdminBarHeader}>
                       {!mobileAdminOpen && (
-                        <div className="mobile-admin-bar-actions">
+                        <div className={s.mobileAdminBarActions}>
                           {isRevealed ? (
-                            <button onClick={handleReset} className="premium-button">
+                            <Button onClick={handleReset}>
                               <RotateCcw size={15} /> {t('room.newVote')}
-                            </button>
+                            </Button>
                           ) : (
                             <>
                               {state.timerPausedRemainingMs !== null ? (
                                 <>
-                                  <button onClick={() => actions.adminResumeTimer()} className="premium-button secondary" title={t('admin.resume')}>
+                                  <Button onClick={() => actions.adminResumeTimer()} variant="secondary" title={t('admin.resume')}>
                                     ▶
-                                  </button>
-                                  <button onClick={() => actions.adminSetTimer(null)} className="premium-button secondary" title={t('admin.timer')}>
+                                  </Button>
+                                  <Button onClick={() => actions.adminSetTimer(null)} variant="secondary" title={t('admin.timer')}>
                                     ✕
-                                  </button>
+                                  </Button>
                                 </>
                               ) : state.timerEndAt ? (
                                 <>
-                                  <button onClick={() => actions.adminPauseTimer()} className="premium-button secondary" title={t('admin.pause')}>
+                                  <Button onClick={() => actions.adminPauseTimer()} variant="secondary" title={t('admin.pause')}>
                                     ⏸
-                                  </button>
-                                  <button onClick={() => actions.adminSetTimer(null)} className="premium-button secondary" title={t('admin.timer')}>
+                                  </Button>
+                                  <Button onClick={() => actions.adminSetTimer(null)} variant="secondary" title={t('admin.timer')}>
                                     ✕
-                                  </button>
+                                  </Button>
                                 </>
                               ) : (
-                                <button onClick={() => actions.adminSetTimer(30000)} className="premium-button secondary" title={t('admin.start')}>
+                                <Button onClick={() => actions.adminSetTimer(30000)} variant="secondary" title={t('admin.start')}>
                                   ▶ ⏱ 30s
-                                </button>
+                                </Button>
                               )}
-                              <button onClick={handleReveal} disabled={!state.participants.some(p => p.vote !== null)} className="premium-button">
+                              <Button onClick={handleReveal} disabled={!state.participants.some(p => p.vote !== null)}>
                                 <Eye size={15} /> {t('room.reveal')}
-                              </button>
+                              </Button>
                             </>
                           )}
                         </div>
                       )}
                       <button
-                        className="mobile-admin-bar-toggle"
+                        className={s.mobileAdminBarToggle}
                         onClick={() => setMobileAdminOpen(!mobileAdminOpen)}
                         aria-label={mobileAdminOpen ? 'Close panel' : 'Open panel'}
                       >
@@ -566,7 +567,7 @@ const Room = () => {
 
                     {/* Expanded: full admin panel */}
                     {mobileAdminOpen && (
-                      <div className="mobile-admin-bar-content animate-fade-in">
+                      <div className={`${s.mobileAdminBarContent} animate-fade-in`}>
                         <AdminPanel
                           state={state}
                           actions={actions}
@@ -577,6 +578,7 @@ const Room = () => {
                           layout="remote"
                           autoReveal={autoReveal}
                           onAutoRevealChange={handleAutoRevealChange}
+                          hideVoteCards
                         />
                       </div>
                     )}
@@ -588,12 +590,12 @@ const Room = () => {
               {isAdmin && (
                 <aside
                   ref={sidebarRef}
-                  className={`room-sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}
+                  className={`${s.sidebar} ${sidebarCollapsed ? s.collapsed : ''}`}
                   style={!sidebarCollapsed ? { width: sidebarWidth } : undefined}
                 >
-                  <div className="sidebar-resize-handle" onMouseDown={handleResizeStart} />
+                  <div className={s.sidebarResizeHandle} onMouseDown={handleResizeStart} />
                   <button
-                    className="sidebar-toggle-btn"
+                    className={s.sidebarToggleBtn}
                     onClick={() => setSidebarCollapsed((c) => !c)}
                     title={sidebarCollapsed ? t('room.expandPanel') : t('room.collapsePanel')}
                   >
@@ -631,20 +633,20 @@ const Room = () => {
                 autoFocus
               />
 
-              <div className="avatar-section">
-                <span className="avatar-label">{t('room.changeAvatar')}</span>
+              <div className={s.avatarSection}>
+                <span className={s.avatarLabel}>{t('room.changeAvatar')}</span>
                 <button
                   type="button"
-                  className="avatar-button"
+                  className={s.avatarButton}
                   onClick={() => setShowEmojiPickerSettings(!showEmojiPickerSettings)}
                 >
                   {mood}
                 </button>
               </div>
 
-              <button type="submit" className="premium-button">{t('room.updateProfile')}</button>
+              <Button type="submit">{t('room.updateProfile')}</Button>
             </form>
-            <button onClick={() => setShowUserSettings(false)} className="premium-button secondary">{t('common.cancel')}</button>
+            <Button onClick={() => setShowUserSettings(false)} variant="secondary">{t('common.cancel')}</Button>
         </Modal>
       )}
 
@@ -653,38 +655,38 @@ const Room = () => {
             <ModalTitle>{t('share.title')}</ModalTitle>
             <ModalSubtitle>{t('share.subtitle')}</ModalSubtitle>
 
-            <div className="share-content">
-              <div className="qr-wrapper animate-fade-in">
+            <div className={s.shareContent}>
+              <div className={`${s.qrWrapper} animate-fade-in`}>
                 <QRCodeSVG value={window.location.href} size={180} />
               </div>
 
-              <div className="share-field">
-                <span className="share-label">{t('share.roomId')}</span>
+              <div className={s.shareField}>
+                <span className={s.shareLabel}>{t('share.roomId')}</span>
                 <Input
                   type="text"
                   readOnly
                   value={roomId}
-                  className="share-input-mono"
+                  className={s.shareInputMono}
                 />
               </div>
 
-              <div className="share-field">
-                <span className="share-label">{t('share.inviteLink')}</span>
-                <div className="share-link-row">
+              <div className={s.shareField}>
+                <span className={s.shareLabel}>{t('share.inviteLink')}</span>
+                <div className={s.shareLinkRow}>
                   <Input
                     type="text"
                     readOnly
                     value={window.location.href}
-                    className="share-link-input"
+                    className={s.shareLinkInput}
                   />
-                  <button onClick={handleCopyLink} className={`premium-button ${copySuccess ? 'success' : 'secondary'} copy-button`}>
+                  <Button onClick={handleCopyLink} variant={copySuccess ? 'success' : 'secondary'} className={s.copyButton}>
                     {copySuccess ? <Check size={18} /> : <Copy size={18} />}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
 
-            <button onClick={() => setShowShareModal(false)} className="premium-button secondary">{t('common.close')}</button>
+            <Button onClick={() => setShowShareModal(false)} variant="secondary">{t('common.close')}</Button>
         </Modal>
       )}
 
@@ -692,33 +694,34 @@ const Room = () => {
         <Modal onClose={() => { setShowQR(false); setIsQRVisible(false); }}>
             <ModalTitle>{t('remoteModal.title')}</ModalTitle>
             <ModalSubtitle>{t('remoteModal.subtitle')}</ModalSubtitle>
-            <p className="remote-warning">{t('remoteModal.warning')}</p>
+            <p className={s.remoteWarning}>{t('remoteModal.warning')}</p>
 
-            <div className="remote-content">
-              <a
+            <div className={s.remoteContent}>
+              <LinkButton
                 href={`${window.location.origin}/room/${roomId}/remote?link=${btoa(userId).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="premium-button remote-link"
+                className={s.remoteLink}
               >
                 <Smartphone size={18} /> {t('remoteModal.openNewTab')}
-              </a>
+              </LinkButton>
 
-              <button
+              <Button
                 onClick={() => setIsQRVisible(!isQRVisible)}
-                className="premium-button secondary remote-qr-toggle"
+                variant="secondary"
+                className={s.remoteQrToggle}
               >
                 {isQRVisible ? t('remoteModal.hideQR') : t('remoteModal.showQR')}
-              </button>
+              </Button>
 
               {isQRVisible && (
-                <div className="qr-wrapper animate-fade-in">
+                <div className={`${s.qrWrapper} animate-fade-in`}>
                   <QRCodeSVG value={`${window.location.origin}/room/${roomId}/remote?link=${btoa(userId).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`} size={200} />
                 </div>
               )}
             </div>
 
-            <button onClick={() => { setShowQR(false); setIsQRVisible(false); }} className="premium-button secondary">{t('common.close')}</button>
+            <Button onClick={() => { setShowQR(false); setIsQRVisible(false); }} variant="secondary">{t('common.close')}</Button>
         </Modal>
       )}
 

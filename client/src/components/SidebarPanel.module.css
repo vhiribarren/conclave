@@ -33,16 +33,6 @@
   min-width: 0;
 }
 
-/* Contextual styles for AdminPanel sections when inside sidebar */
-.inner :global(.panel-section) {
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--surface-border);
-}
-
-.inner :global(.panel-section):last-child {
-  border-bottom: none;
-}
-
 .collapsed {
   opacity: 0;
   pointer-events: none;

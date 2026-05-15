@@ -25,6 +25,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Smartphone, Share2, Eye, Settings } from 'lucide-react';
 import { Modal, ModalTitle } from './Modal';
+import Button from './Button';
 import styles from './WelcomeModal.module.css';
 
 interface WelcomeModalProps {
@@ -55,9 +56,9 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onClose }) => {
           <p>{t('help.settingsDescription')}</p>
         </section>
       </div>
-      <button className="premium-button" onClick={onClose}>
+      <Button onClick={onClose}>
         {t('help.dismiss')}
-      </button>
+      </Button>
     </Modal>
   );
 };
