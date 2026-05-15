@@ -111,3 +111,8 @@
     gap: 0.3rem;
   }
 }
+
+.remote-admin-only-message {
+  text-align: center;
+  color: var(--text-secondary);
+}

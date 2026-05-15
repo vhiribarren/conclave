@@ -96,7 +96,7 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
 const ParticipantCard = ({ participant: p, isRevealed, myName }: { participant: Participant & { vote: string | null }, isRevealed: boolean, myName: string }) => (
   <div className={`${styles.card} glass ${p.vote ? styles.hasVoted : ''}`}>
     {p.isAdmin && <Crown size={14} className={styles.adminIcon} />}
-    <div className={styles.avatar} style={{ fontSize: '1.8rem' }}>
+    <div className={styles.avatar}>
       {p.mood || '🦊'}
     </div>
     <span className={styles.name} title={p.name}>

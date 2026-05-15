@@ -79,8 +79,8 @@ const RoomRemote = () => {
   if (connectionError) {
     return (
       <div className="page-container animate-fade-in">
-        <div className="landing-card glass" style={{ textAlign: 'center' }}>
-          <ModalTitle style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</ModalTitle>
+        <div className="landing-card glass error-card">
+          <ModalTitle style={{ color: 'var(--color-danger-text)' }}>{t('room.roomNotFound')}</ModalTitle>
           <ModalSubtitle>{connectionError}</ModalSubtitle>
           <Button onClick={() => navigate('/')}>{t('common.returnHome')}</Button>
         </div>
@@ -137,7 +137,7 @@ const RoomRemote = () => {
               </div>            )}
             {!isAdmin && (
               <div className="page-container">
-                <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <p className="remote-admin-only-message">
                   {t('room.remoteAdminOnly')}
                 </p>
               </div>

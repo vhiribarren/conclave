@@ -96,14 +96,14 @@ const Landing = () => {
           <LanguageSelector />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+        <div className={styles.profileSection}>
+          <div className={styles.profileLabel}>
             {t('landing.yourProfile')}
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <div className={styles.profileRow}>
             <button 
               type="button" 
-              style={{ fontSize: '2rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem', border: 'none', cursor: 'pointer' }}
+              className={styles.emojiButton}
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             >
               {mood}
@@ -117,7 +117,7 @@ const Landing = () => {
                 setUserNameInput(newName);
                 setUserName(newName);
               }}
-              style={{ textAlign: 'center', fontWeight: 'bold', flex: 1 }}
+              className={styles.inputCenteredBold}
             />
           </div>
 
@@ -137,7 +137,7 @@ const Landing = () => {
             </Modal>
           )}
 
-          <div className={styles.divider} style={{ margin: '0.5rem 0' }}>
+          <div className={`${styles.divider} ${styles.dividerCompact}`}>
             <div className={styles.dividerLine}></div>
           </div>
 
@@ -147,7 +147,7 @@ const Landing = () => {
               placeholder={t('landing.roomIdPlaceholder')}
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
-              style={{ textAlign: 'center' }}
+              className={styles.inputCentered}
             />
             <Button type="submit" disabled={!roomName.trim()}>
               {t('landing.joinRoom')}
@@ -181,9 +181,9 @@ const Landing = () => {
                   onClick={() => navigate(`/room/${entry.id}`)}
                 >
                   <div className={styles.historyInfo}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <div className={styles.historyNameRow}>
                       <span className={styles.historyName}>{entry.name || entry.id}</span>
-                      {entry.isAdmin && <Crown size={14} color="#f59e0b" fill="#f59e0b" style={{ opacity: 0.8 }} />}
+                      {entry.isAdmin && <Crown size={14} color="#f59e0b" fill="#f59e0b" className={styles.adminCrown} />}
                     </div>
                     <span className={styles.historyId}>{entry.id}</span>
                   </div>
@@ -209,7 +209,7 @@ const Landing = () => {
           <ModalTitle>{t('landing.createModal.title')}</ModalTitle>
           <ModalSubtitle>{t('landing.createModal.subtitle')}</ModalSubtitle>
           <form onSubmit={(e) => { e.preventDefault(); createRoom(); }}>
-            <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+            <div className={styles.profileLabel}>
               {t('landing.createModal.roomTitle')}
             </div>
             <Input
@@ -217,7 +217,7 @@ const Landing = () => {
               placeholder={t('landing.createModal.placeholder')}
               value={roomTitle}
               onChange={(e) => setRoomTitle(e.target.value)}
-              style={{ textAlign: 'center' }}
+              className={styles.inputCentered}
               autoFocus
             />
             <Button type="submit" disabled={isLoading}>

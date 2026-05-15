@@ -228,11 +228,11 @@ const Room = () => {
           autoFocus
         />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.chooseAvatar')}</span>
+        <div className="avatar-section">
+          <span className="avatar-label">{t('room.chooseAvatar')}</span>
           <button
             type="button"
-            style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem', border: 'none', cursor: 'pointer' }}
+            className="avatar-button"
             onClick={() => setShowEmojiPickerJoin(!showEmojiPickerJoin)}
           >
             {mood}
@@ -247,8 +247,8 @@ const Room = () => {
   if (connectionError) {
     return (
       <div className="page-container animate-fade-in">
-        <div className="landing-card glass" style={{ textAlign: 'center' }}>
-          <ModalTitle style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</ModalTitle>
+        <div className="landing-card glass error-card">
+          <ModalTitle style={{ color: 'var(--color-danger-text)' }}>{t('room.roomNotFound')}</ModalTitle>
           <ModalSubtitle>{connectionError}</ModalSubtitle>
           <Button onClick={() => navigate('/')}>
             {t('common.returnHome')}
@@ -268,10 +268,10 @@ const Room = () => {
             <Logo />
             <div>
               {isEditingRoomName ? (
-                <form onSubmit={handleRenameRoom} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <form onSubmit={handleRenameRoom} className="rename-form">
                   <Input
                     type="text"
-                    style={{ padding: '0.15rem 0.5rem', fontSize: '0.9rem', height: 'auto', width: '180px' }}
+                    className="rename-input"
                     value={tempRoomName}
                     onChange={(e) => setTempRoomName(e.target.value)}
                     autoFocus
@@ -288,7 +288,7 @@ const Room = () => {
                   </IconButton>
                 </form>
               ) : (
-                <div className="room-name-container" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div className="room-name-container">
                   <h1 className="header-title">{state.name || roomId}</h1>
                   {isAdmin && (
                     <IconButton onClick={startEditingRoomName} variant="subtle" className="rename-btn" title={t('room.renameRoom')}>
@@ -310,7 +310,7 @@ const Room = () => {
           <div className="header-actions">
             <div className="header-actions-desktop">
               <LanguageSelector />
-              <div className="layout-toggle-container" style={{ alignSelf: 'center' }}>
+              <div className="layout-toggle-container">
                 <button
                   id="layout-btn-circle"
                   className={`layout-toggle-btn ${layoutMode === 'auto' ? 'active' : ''}`}
@@ -406,7 +406,7 @@ const Room = () => {
               {/* ── Left column: participants ──────────────────────────── */}
               <main className="room-main">
                 {!isCircleLayout && (state.timerEndAt || state.timerPausedRemainingMs !== null) && (
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <div className="timer-wrapper">
                     <TimerDisplay
                       timerEndAt={state.timerEndAt}
                       timerPausedRemainingMs={state.timerPausedRemainingMs}
@@ -414,7 +414,7 @@ const Room = () => {
                   </div>
                 )}
 
-                <div className="participants-results-row" style={{ position: 'relative' }}>
+                <div className="participants-results-row">
                   {state.anonymousVoting && (
                     <div className="anonymous-badge">
                       🕵️ {t('room.anonymousMode')}
@@ -630,11 +630,11 @@ const Room = () => {
                 autoFocus
               />
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.changeAvatar')}</span>
+              <div className="avatar-section">
+                <span className="avatar-label">{t('room.changeAvatar')}</span>
                 <button
                   type="button"
-                  style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem', border: 'none', cursor: 'pointer' }}
+                  className="avatar-button"
                   onClick={() => setShowEmojiPickerSettings(!showEmojiPickerSettings)}
                 >
                   {mood}
@@ -652,31 +652,31 @@ const Room = () => {
             <ModalTitle>{t('share.title')}</ModalTitle>
             <ModalSubtitle>{t('share.subtitle')}</ModalSubtitle>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', margin: '1rem 0' }}>
-              <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem' }} className="animate-fade-in">
+            <div className="share-content">
+              <div className="qr-wrapper animate-fade-in">
                 <QRCodeSVG value={window.location.href} size={180} />
               </div>
 
-              <div style={{ width: '100%', textAlign: 'left' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('share.roomId')}</span>
+              <div className="share-field">
+                <span className="share-label">{t('share.roomId')}</span>
                 <Input
                   type="text"
                   readOnly
                   value={roomId}
-                  style={{ marginTop: '0.25rem', background: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.9rem' }}
+                  className="share-input-mono"
                 />
               </div>
 
-              <div style={{ width: '100%', textAlign: 'left' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('share.inviteLink')}</span>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
+              <div className="share-field">
+                <span className="share-label">{t('share.inviteLink')}</span>
+                <div className="share-link-row">
                   <Input
                     type="text"
                     readOnly
                     value={window.location.href}
-                    style={{ fontSize: '0.85rem', flex: 1 }}
+                    className="share-link-input"
                   />
-                  <button onClick={handleCopyLink} className={`premium-button ${copySuccess ? 'success' : 'secondary'}`} style={{ padding: '0.5rem 1rem', flexShrink: 0 }}>
+                  <button onClick={handleCopyLink} className={`premium-button ${copySuccess ? 'success' : 'secondary'} copy-button`}>
                     {copySuccess ? <Check size={18} /> : <Copy size={18} />}
                   </button>
                 </div>
@@ -691,29 +691,27 @@ const Room = () => {
         <Modal onClose={() => { setShowQR(false); setIsQRVisible(false); }}>
             <ModalTitle>{t('remoteModal.title')}</ModalTitle>
             <ModalSubtitle>{t('remoteModal.subtitle')}</ModalSubtitle>
-            <p style={{ color: '#e53e3e', fontSize: '0.8rem', fontWeight: 600, margin: '0.5rem 0' }}>{t('remoteModal.warning')}</p>
+            <p className="remote-warning">{t('remoteModal.warning')}</p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0' }}>
+            <div className="remote-content">
               <a
                 href={`${window.location.origin}/room/${roomId}/remote?link=${btoa(userId).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="premium-button"
-                style={{ textDecoration: 'none' }}
+                className="premium-button remote-link"
               >
                 <Smartphone size={18} /> {t('remoteModal.openNewTab')}
               </a>
 
               <button
                 onClick={() => setIsQRVisible(!isQRVisible)}
-                className="premium-button secondary"
-                style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
+                className="premium-button secondary remote-qr-toggle"
               >
                 {isQRVisible ? t('remoteModal.hideQR') : t('remoteModal.showQR')}
               </button>
 
               {isQRVisible && (
-                <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem', alignSelf: 'center' }} className="animate-fade-in">
+                <div className="qr-wrapper animate-fade-in">
                   <QRCodeSVG value={`${window.location.origin}/room/${roomId}/remote?link=${btoa(userId).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`} size={200} />
                 </div>
               )}

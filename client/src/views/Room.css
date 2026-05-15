@@ -178,6 +178,12 @@
   margin: 0 0.125rem;
 }
 
+.room-name-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .room-name-container .rename-btn {
   opacity: 0;
   pointer-events: none;
@@ -300,7 +306,7 @@
   border-radius: 0.6rem;
   background: var(--neutral-tint);
   border: 1px solid var(--surface-border);
-  align-self: flex-end;
+  align-self: center;
   margin-right: 0;
 }
 .layout-toggle-btn {
@@ -412,6 +418,7 @@
   flex: 1;
   gap: 1rem;
   min-height: 0;
+  position: relative;
 }
 
 .results-panel {
@@ -673,5 +680,130 @@
   color: var(--text-secondary);
   pointer-events: none;
 }
+
+/* ── Avatar / emoji picker section ─────────────────────────────── */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+.avatar-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.avatar-button {
+  font-size: 2.5rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+/* ── Error page ────────────────────────────────────────────────── */
+.error-card {
+  text-align: center;
+}
+
+/* ── Rename form ───────────────────────────────────────────────── */
+.rename-form {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rename-input {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.9rem;
+  height: auto;
+  width: 180px;
+}
+
+/* ── Timer wrapper ─────────────────────────────────────────────── */
+.timer-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Share modal ───────────────────────────────────────────────── */
+.share-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.qr-wrapper {
+  background: white;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.share-field {
+  width: 100%;
+  text-align: left;
+}
+
+.share-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.share-input-mono {
+  margin-top: 0.25rem;
+  background: rgba(255, 255, 255, 0.3);
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.share-link-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.share-link-input {
+  font-size: 0.85rem;
+  flex: 1;
+}
+
+.copy-button {
+  padding: 0.5rem 1rem;
+  flex-shrink: 0;
+}
+
+/* ── Remote modal ──────────────────────────────────────────────── */
+.remote-warning {
+  color: #e53e3e;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.remote-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.remote-link {
+  text-decoration: none;
+}
+
+.remote-qr-toggle {
+  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+}
+
 
 

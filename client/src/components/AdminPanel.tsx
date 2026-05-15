@@ -148,8 +148,8 @@ export const AdminPanel: React.FC<Props> = ({
       <div className="panel-section">{children}</div>
     );
 
-  const SectionTitle = ({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) => (
-    <span className="panel-section-title" style={style}>{children}</span>
+  const SectionTitle = ({ children, className: cn }: { children: React.ReactNode; className?: string }) => (
+    <span className={`panel-section-title ${cn || ''}`}>{children}</span>
   );
 
   return (
@@ -205,11 +205,11 @@ export const AdminPanel: React.FC<Props> = ({
           {isAdmin && (
             <>
               <Section glass>
-                {layout === 'remote' && <h2 className="panel-section-title" style={{ color: 'var(--accent-color)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.875rem' }}>{t('admin.actions')}</h2>}
+                {layout === 'remote' && <h2 className="panel-section-title panel-section-title-remote">{t('admin.actions')}</h2>}
                 {layout === 'sidebar' && <SectionTitle>⚡ {t('admin.actions')}</SectionTitle>}
                 <div className="panel-actions">
                   {isRevealed ? (
-                    <Button onClick={() => actions.adminReset()} style={{ flex: 1 }}>
+                    <Button onClick={() => actions.adminReset()} className="flex-grow">
                       <RotateCcw size={15} /> {t('room.newVote')}
                     </Button>
                   ) : (
@@ -237,7 +237,7 @@ export const AdminPanel: React.FC<Props> = ({
                           <Play size={15} /> <Timer size={15} /> {selectedDurationMs / 1000}s
                         </Button>
                       )}
-                      <Button onClick={() => actions.adminReveal()} disabled={!state.participants.some(p => p.vote !== null)} style={{ flex: 1 }}>
+                      <Button onClick={() => actions.adminReveal()} disabled={!state.participants.some(p => p.vote !== null)} className="flex-grow">
                         <Eye size={15} /> {t('room.reveal')}
                       </Button>
                     </>
@@ -302,7 +302,7 @@ export const AdminPanel: React.FC<Props> = ({
               {/* ── Admin secret vote (remote layout only) ──────────── */}
               {!isRevealed && layout === 'remote' && (
                 <Section glass>
-                  <SectionTitle style={{ textAlign: 'center' }}>{t('admin.yourSecretVote')}</SectionTitle>
+                  <SectionTitle className="panel-section-title-center">{t('admin.yourSecretVote')}</SectionTitle>
                   <div className="voting-cards admin-vote-cards">
                     {(state.deck || []).map((card) => (
                       <PokerCard
@@ -321,7 +321,7 @@ export const AdminPanel: React.FC<Props> = ({
         </>
       ) : (
         /* ── SETTINGS TAB ─────────────────────────────────────────── */
-        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="animate-fade-in settings-tab">
 
           {/* ── Tasks setup ─────────────────────────────────────────── */}
           {roomId && (
@@ -390,21 +390,20 @@ export const AdminPanel: React.FC<Props> = ({
             </div>
 
             {state.deckMode === 'custom' ? (
-              <div style={{ position: 'relative' }}>
+              <div className="deck-emoji-popover">
                 <form onSubmit={handleAddCard} className="deck-add-form animate-fade-in">
-                  <div style={{ display: 'flex', gap: '0.25rem', flex: 1 }}>
+                  <div className="deck-add-row">
                     <Input
                       type="text"
                       placeholder={t('settings.cardPlaceholder')}
                       value={newCardValue}
                       onChange={(e) => setNewCardValue(e.target.value)}
                       maxLength={10}
-                      style={{ flex: 1 }}
                     />
                     <Button
                       type="button"
                       variant="secondary"
-                      style={{ padding: '0 0.5rem' }}
+                      className="emoji-btn"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     >
                       <Smile size={18} />
@@ -414,7 +413,7 @@ export const AdminPanel: React.FC<Props> = ({
                 </form>
 
                 {showEmojiPicker && (
-                  <div style={{ position: 'absolute', zIndex: 100, bottom: '100%', right: 0, marginBottom: '0.5rem' }}>
+                  <div className="deck-emoji-picker">
                     <EmojiPicker
                       onEmojiClick={(emojiData) => {
                         setNewCardValue(prev => prev + emojiData.emoji);
@@ -429,20 +428,19 @@ export const AdminPanel: React.FC<Props> = ({
                 )}
               </div>
             ) : (
-              <div className="animate-fade-in" style={{ textAlign: 'center', padding: '0.5rem', background: 'rgba(0,0,0,0.03)', borderRadius: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              <div className="animate-fade-in deck-readonly-notice">
                 <span>{t('settings.readOnly')}</span>
                 <Button
                   onClick={() => setShowCustomizeConfirm(true)}
                   variant="secondary"
-                  className="sidebar-chip"
-                  style={{ marginLeft: '0.5rem', padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}
+                  className="sidebar-chip customize-btn"
                 >
                   {t('settings.customize')}
                 </Button>
               </div>
             )}
 
-            <div className="panel-actions panel-actions--wrap" style={{ marginTop: '0.75rem' }}>
+            <div className="panel-actions panel-actions--wrap deck-presets">
               <Button
                 onClick={() => updateDeck(DEFAULT_DECK, 'preset')}
                 variant={state.deckMode === 'preset' && state.deck?.[0] === '0' ? 'primary' : 'secondary'}
@@ -478,7 +476,7 @@ export const AdminPanel: React.FC<Props> = ({
           {/* ── Anonymous voting ──────────────────────────────────── */}
           <Section glass>
             <SectionTitle>🕵️ {t('settings.anonymousVoting')}</SectionTitle>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.5rem' }}>
+            <p className="setting-description">
               {t('settings.anonymousVotingDesc')}
             </p>
             <div className="vote-mode-switch" role="group" aria-label="Anonymous voting">
@@ -502,7 +500,7 @@ export const AdminPanel: React.FC<Props> = ({
           {/* ── Auto-reveal ────────────────────────────────────────── */}
           <Section glass>
             <SectionTitle>⏱ {t('settings.autoReveal')}</SectionTitle>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.5rem' }}>
+            <p className="setting-description">
               {t('settings.autoRevealDesc')}
             </p>
             <div className="vote-mode-switch" role="group" aria-label="Auto-reveal">
@@ -526,7 +524,7 @@ export const AdminPanel: React.FC<Props> = ({
           {/* ── Transfer admin ──────────────────────────────────────── */}
           <Section glass>
             <SectionTitle>👑 {t('settings.transferAdmin')}</SectionTitle>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '0 0 0.5rem' }}>
+            <p className="setting-description">
               {t('settings.transferAdminDesc')}
             </p>
             <div className="panel-actions panel-actions--wrap">
@@ -543,7 +541,7 @@ export const AdminPanel: React.FC<Props> = ({
                   </Button>
                 ))}
               {state.participants.filter(p => !p.isAdmin).length === 0 && (
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                <span className="empty-placeholder">
                   —
                 </span>
               )}
@@ -558,7 +556,7 @@ export const AdminPanel: React.FC<Props> = ({
           <ModalSubtitle>
             {t('settings.customizeModal.subtitle')}
           </ModalSubtitle>
-          <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <div className="panel-actions modal-actions">
             <Button variant="secondary" onClick={() => setShowCustomizeConfirm(false)}>{t('common.cancel')}</Button>
             <Button onClick={() => { updateDeck(state.deck || [], 'custom'); setShowCustomizeConfirm(false); }}>{t('common.confirm')}</Button>
           </div>
@@ -580,7 +578,7 @@ export const AdminPanel: React.FC<Props> = ({
           <ModalSubtitle>
             {t('settings.transferModal.subtitle', { name: transferTarget.name })}
           </ModalSubtitle>
-          <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <div className="panel-actions modal-actions">
             <Button variant="secondary" onClick={() => setTransferTarget(null)}>{t('common.cancel')}</Button>
             <Button variant="danger" onClick={() => { actions.adminTransferAdmin(transferTarget.id); setTransferTarget(null); }}>
               <Crown size={14} /> {t('settings.transferModal.confirm')}

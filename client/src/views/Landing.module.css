@@ -191,6 +191,59 @@
   white-space: nowrap;
 }
 
+.profileSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profileLabel {
+  text-align: center;
+  margin-bottom: -0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.profileRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.emojiButton {
+  font-size: 2rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.inputCentered {
+  text-align: center;
+}
+
+.inputCenteredBold {
+  text-align: center;
+  font-weight: bold;
+  flex: 1;
+}
+
+.dividerCompact {
+  margin: 0.5rem 0;
+}
+
+.historyNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.adminCrown {
+  opacity: 0.8;
+}
+
 @media (max-width: 1024px) {
   .card {
     padding: 1.5rem;
