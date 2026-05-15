@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-.about-page {
+.page {
   width: 100%;
   max-width: 70rem;
   margin: 0 auto;
   padding: 1.5rem;
 }
 
-.about-header {
+.header {
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -36,7 +36,7 @@
   margin-bottom: 1rem;
 }
 
-.about-back-link {
+.backLink {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -48,41 +48,41 @@
   transition: var(--transition);
 }
 
-.about-back-link:hover {
+.backLink:hover {
   background: var(--glass-bg-hover);
   color: var(--text-primary);
 }
 
-.about-title {
+.title {
   font-size: 2rem;
   font-weight: 800;
   color: var(--text-primary);
 }
 
-.about-subtitle {
+.subtitle {
   color: var(--text-secondary);
   font-weight: 500;
   margin-top: 0.25rem;
 }
 
-.about-content {
+.content {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
-.about-section {
+.section {
   padding: 1.5rem;
   background: var(--glass-bg-hover);
 }
 
-.about-section h2 {
+.section h2 {
   font-size: 1rem;
   color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
-.about-section-heading {
+.sectionHeading {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -90,31 +90,31 @@
   margin-bottom: 1rem;
 }
 
-.about-section-heading h2 {
+.sectionHeading h2 {
   margin-bottom: 0;
 }
 
-.about-section-heading span {
+.sectionHeading span {
   color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.about-facts {
+.facts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
-.about-facts div {
+.facts div {
   padding: 1rem;
   border-radius: 0.75rem;
   background: var(--glass-bg-subtle);
   border: 1px solid var(--surface-border);
 }
 
-.about-facts dt {
+.facts dt {
   color: var(--text-secondary);
   font-size: 0.75rem;
   font-weight: 700;
@@ -122,28 +122,28 @@
   margin-bottom: 0.35rem;
 }
 
-.about-facts dd {
+.facts dd {
   color: var(--text-primary);
   font-weight: 700;
 }
 
-.about-facts a {
+.facts a {
   color: var(--accent-color);
   text-decoration: none;
 }
 
-.about-facts a:hover {
+.facts a:hover {
   color: var(--accent-hover);
 }
 
-.about-notice-list {
+.noticeList {
   display: grid;
   gap: 0.75rem;
   color: var(--text-primary);
   line-height: 1.6;
 }
 
-.about-license-full {
+.licenseFull {
   white-space: pre-wrap;
   word-wrap: break-word;
   font-family: monospace;
@@ -156,7 +156,7 @@
   border: 1px solid var(--surface-border);
 }
 
-.license-list {
+.licenseList {
   max-height: 28rem;
   overflow: auto;
   border: 1px solid var(--surface-border);
@@ -164,7 +164,7 @@
   background: var(--glass-bg);
 }
 
-.license-row {
+.licenseRow {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 1rem;
@@ -176,15 +176,15 @@
   transition: var(--transition);
 }
 
-.license-row:last-child {
+.licenseRow:last-child {
   border-bottom: none;
 }
 
-.license-row:hover {
+.licenseRow:hover {
   background: var(--glass-bg-strong);
 }
 
-.license-row span {
+.licenseRow span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -193,43 +193,43 @@
   font-size: 0.85rem;
 }
 
-.license-row strong {
+.licenseRow strong {
   color: var(--accent-color);
   font-size: 0.8rem;
   white-space: nowrap;
 }
 
 @media (max-width: 720px) {
-  .about-page {
+  .page {
     padding: 0.75rem;
   }
 
-  .about-header {
+  .header {
     align-items: flex-start;
     flex-direction: column;
     padding: 1rem;
     gap: 1rem;
   }
 
-  .about-title {
+  .title {
     font-size: 1.5rem;
   }
 
-  .about-section {
+  .section {
     padding: 1.25rem;
   }
 
-  .about-facts {
+  .facts {
     grid-template-columns: 1fr;
   }
 
-  .license-row {
+  .licenseRow {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.35rem;
     padding: 0.6rem 0.75rem;
   }
 
-  .license-list {
+  .licenseList {
     max-height: 20rem;
   }
 }

@@ -28,9 +28,10 @@ import { useTranslation } from 'react-i18next';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
 import { getUserName, setUserName, getUserEmoji, setUserEmoji, getUserId } from '../services/user';
 import Button from '../components/Button';
+import Input from '../components/Input';
 import { LanguageSelector } from '../components/LanguageSelector';
-import { Modal } from '../components/Modal';
-import './Landing.css';
+import { Modal, ModalTitle, ModalSubtitle } from '../components/Modal';
+import styles from './Landing.module.css';
 import { getHistory, type HistoryEntry } from '../services/history';
 
 const Landing = () => {
@@ -81,37 +82,35 @@ const Landing = () => {
   return (
     <>
     <div className="page-container animate-fade-in">
-      <div className="landing-card glass">
-        <div className="landing-glow-1"></div>
-        <div className="landing-glow-2"></div>
+      <div className={`${styles.card} glass`}>
+        <div className={styles.glow1}></div>
+        <div className={styles.glow2}></div>
         
-        <div className="landing-header">
-          <h1 className="landing-title">
+        <div className={styles.header}>
+          <h1 className={styles.title}>
             Conclave
           </h1>
-          <p className="landing-subtitle">
+          <p className={styles.subtitle}>
             {t('landing.subtitle')}
           </p>
           <LanguageSelector />
         </div>
 
-        <div className="landing-form">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
             {t('landing.yourProfile')}
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <button 
               type="button" 
-              className="icon-button" 
-              style={{ fontSize: '2rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+              style={{ fontSize: '2rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem', border: 'none', cursor: 'pointer' }}
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             >
               {mood}
             </button>
-            <input
+            <Input
               type="text"
               placeholder={t('landing.namePlaceholder')}
-              className="premium-input"
               value={userName}
               onChange={(e) => {
                 const newName = e.target.value;
@@ -123,7 +122,7 @@ const Landing = () => {
           </div>
 
           {showEmojiPicker && (
-            <Modal onClose={() => setShowEmojiPicker(false)} contentClassName="modal-content-transparent">
+            <Modal onClose={() => setShowEmojiPicker(false)} transparent>
               <EmojiPicker 
                 onEmojiClick={(emojiData) => {
                   setMood(emojiData.emoji);
@@ -138,15 +137,14 @@ const Landing = () => {
             </Modal>
           )}
 
-          <div className="landing-divider" style={{ margin: '0.5rem 0' }}>
-            <div className="landing-divider-line"></div>
+          <div className={styles.divider} style={{ margin: '0.5rem 0' }}>
+            <div className={styles.dividerLine}></div>
           </div>
 
-          <form onSubmit={joinRoom} className="landing-form">
-            <input
+          <form onSubmit={joinRoom}>
+            <Input
               type="text"
               placeholder={t('landing.roomIdPlaceholder')}
-              className="premium-input"
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
               style={{ textAlign: 'center' }}
@@ -157,10 +155,10 @@ const Landing = () => {
             </Button>
           </form>
           
-          <div className="landing-divider">
-            <div className="landing-divider-line"></div>
-            <span className="landing-divider-text">{t('landing.or')}</span>
-            <div className="landing-divider-line"></div>
+          <div className={styles.divider}>
+            <div className={styles.dividerLine}></div>
+            <span className={styles.dividerText}>{t('landing.or')}</span>
+            <div className={styles.dividerLine}></div>
           </div>
 
           <Button onClick={() => setShowCreateModal(true)} disabled={isLoading} variant="secondary">
@@ -170,26 +168,26 @@ const Landing = () => {
         </div>
 
         {history.length > 0 && (
-          <div className="landing-history glass">
-            <div className="history-header">
+          <div className={`${styles.history} glass`}>
+            <div className={styles.historyHeader}>
               <History size={16} />
               <span>{t('landing.recentRooms')}</span>
             </div>
-            <div className="history-list">
+            <div className={styles.historyList}>
               {history.map(entry => (
                 <div 
                   key={entry.id} 
-                  className="history-item"
+                  className={styles.historyItem}
                   onClick={() => navigate(`/room/${entry.id}`)}
                 >
-                  <div className="history-info">
+                  <div className={styles.historyInfo}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <span className="history-name">{entry.name || entry.id}</span>
+                      <span className={styles.historyName}>{entry.name || entry.id}</span>
                       {entry.isAdmin && <Crown size={14} color="#f59e0b" fill="#f59e0b" style={{ opacity: 0.8 }} />}
                     </div>
-                    <span className="history-id">{entry.id}</span>
+                    <span className={styles.historyId}>{entry.id}</span>
                   </div>
-                  <div className="history-meta">
+                  <div className={styles.historyMeta}>
                     <Clock size={12} />
                     <span>{new Date(entry.visitedAt).toLocaleDateString()}</span>
                   </div>
@@ -199,7 +197,7 @@ const Landing = () => {
           </div>
         )}
 
-        <footer className="landing-footer">
+        <footer className={styles.footer}>
           <Link to="/about">{t('landing.footerLink')}</Link>
           <Link to="/privacy">{t('landing.privacyLink')}</Link>
         </footer>
@@ -208,16 +206,15 @@ const Landing = () => {
 
     {showCreateModal && (
       <Modal onClose={() => setShowCreateModal(false)}>
-          <h2 className="modal-title">{t('landing.createModal.title')}</h2>
-          <p className="modal-subtitle">{t('landing.createModal.subtitle')}</p>
-          <form onSubmit={(e) => { e.preventDefault(); createRoom(); }} className="landing-form">
+          <ModalTitle>{t('landing.createModal.title')}</ModalTitle>
+          <ModalSubtitle>{t('landing.createModal.subtitle')}</ModalSubtitle>
+          <form onSubmit={(e) => { e.preventDefault(); createRoom(); }}>
             <div style={{ textAlign: 'center', marginBottom: '-0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
               {t('landing.createModal.roomTitle')}
             </div>
-            <input
+            <Input
               type="text"
               placeholder={t('landing.createModal.placeholder')}
-              className="premium-input"
               value={roomTitle}
               onChange={(e) => setRoomTitle(e.target.value)}
               style={{ textAlign: 'center' }}

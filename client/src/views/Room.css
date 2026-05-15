@@ -53,19 +53,7 @@
   align-items: center;
   gap: 1rem;
 }
-.header-logo {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, var(--accent-color), #9333ea);
-  box-shadow: 0 4px 12px var(--accent-glow);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: white;
-  font-size: 1.125rem;
-}
+
 .header-title {
   font-weight: 700;
   color: var(--text-primary);
@@ -189,51 +177,7 @@
   flex-shrink: 0;
   margin: 0 0.125rem;
 }
-.icon-button {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: var(--transition);
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-}
-.icon-button:hover {
-  background: var(--neutral-tint);
-  color: var(--text-primary);
-}
-.icon-button.accent {
-  color: var(--accent-color);
-}
-.icon-button.danger {
-  color: var(--color-danger-text);
-}
-.icon-button.success {
-  color: var(--color-success);
-}
-.icon-button-subtle {
-  padding: 0.25rem;
-  border-radius: 0.25rem;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: var(--transition);
-  color: var(--text-secondary);
-  opacity: 0.6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.icon-button-subtle:hover {
-  opacity: 1;
-  background: var(--neutral-tint);
-  color: var(--accent-color);
-}
+
 .room-name-container .rename-btn {
   opacity: 0;
   pointer-events: none;
@@ -669,14 +613,6 @@
     flex: 1;
   }
 
-  .header-logo {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.9rem;
-    border-radius: 0.5rem;
-    flex-shrink: 0;
-  }
-
   .header-title {
     font-size: 0.85rem;
     white-space: nowrap;
@@ -718,12 +654,6 @@
   .header-title {
     max-width: 80px;
   }
-
-  .icon-button {
-    min-width: 38px;
-    min-height: 38px;
-    padding: 0.35rem;
-  }
 }
 
 /* ── Anonymous voting badge ────────────────────────────────────── */
@@ -744,24 +674,4 @@
   pointer-events: none;
 }
 
-/* ── Welcome modal content ────────────────────────────────────── */
-.welcome-modal-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  margin: 1rem 0;
-  text-align: left;
-}
 
-.welcome-section h3 {
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-  color: var(--text-primary);
-}
-
-.welcome-section p {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}

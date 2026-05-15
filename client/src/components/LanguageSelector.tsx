@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import { useTranslation } from 'react-i18next';
-import './LanguageSelector.css';
+import styles from './LanguageSelector.module.css';
 
 const LANGUAGES = [
   { code: 'en', flag: '🇬🇧', label: 'English' },
@@ -35,16 +35,16 @@ export const LanguageSelector = ({ variant = 'pill' }: { variant?: 'pill' | 'men
 
   if (variant === 'menu-item') {
     return (
-      <div className="language-menu-row">
+      <div className={styles.menuRow}>
         {LANGUAGES.map((lang) => (
           <button
             key={lang.code}
-            className={`language-menu-option ${currentLang === lang.code ? 'active' : ''}`}
+            className={`${styles.menuOption} ${currentLang === lang.code ? styles.active : ''}`}
             onClick={() => i18n.changeLanguage(lang.code)}
             aria-label={lang.label}
           >
-            <span className="language-menu-flag">{lang.flag}</span>
-            <span className="language-menu-label">{lang.label}</span>
+            <span className={styles.menuFlag}>{lang.flag}</span>
+            <span className={styles.menuLabel}>{lang.label}</span>
           </button>
         ))}
       </div>
@@ -52,11 +52,11 @@ export const LanguageSelector = ({ variant = 'pill' }: { variant?: 'pill' | 'men
   }
 
   return (
-    <div className="language-pill" role="radiogroup" aria-label="Language">
+    <div className={styles.pill} role="radiogroup" aria-label="Language">
       {LANGUAGES.map((lang) => (
         <button
           key={lang.code}
-          className={`language-pill-btn ${currentLang === lang.code ? 'active' : ''}`}
+          className={`${styles.pillBtn} ${currentLang === lang.code ? styles.active : ''}`}
           onClick={() => i18n.changeLanguage(lang.code)}
           aria-label={lang.label}
           role="radio"

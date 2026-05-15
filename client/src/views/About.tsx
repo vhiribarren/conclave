@@ -26,7 +26,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import licenseText from '../../../LICENSE?raw';
 import thirdPartyNotices from '../../../THIRD_PARTY_LICENSES.md?raw';
-import './About.css';
+import styles from './About.module.css';
 
 type Notice = {
   name: string;
@@ -64,22 +64,22 @@ const About = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="about-page animate-fade-in">
-      <header className="about-header glass">
-        <Link to="/" className="about-back-link">
+    <div className={`${styles.page} animate-fade-in`}>
+      <header className={`${styles.header} glass`}>
+        <Link to="/" className={styles.backLink}>
           <ArrowLeft size={18} />
           {t('about.home')}
         </Link>
         <div>
-          <h1 className="about-title">{t('about.title')}</h1>
-          <p className="about-subtitle">{t('about.subtitle')}</p>
+          <h1 className={styles.title}>{t('about.title')}</h1>
+          <p className={styles.subtitle}>{t('about.subtitle')}</p>
         </div>
       </header>
 
-      <main className="about-content">
-        <section className="about-section glass">
+      <main className={styles.content}>
+        <section className={`${styles.section} glass`}>
           <h2>{t('about.project')}</h2>
-          <dl className="about-facts">
+          <dl className={styles.facts}>
             <div>
               <dt>{t('about.author')}</dt>
               <dd>Vincent Hiribarren</dd>
@@ -99,9 +99,9 @@ const About = () => {
           </dl>
         </section>
 
-        <section className="about-section glass">
+        <section className={`${styles.section} glass`}>
           <h2>{t('about.usageTerms')}</h2>
-          <div className="about-notice-list">
+          <div className={styles.noticeList}>
             <p>{t('about.usageTerms1')}</p>
             <p>{t('about.usageTerms2')}</p>
             <p>{t('about.usageTerms3')}</p>
@@ -112,14 +112,14 @@ const About = () => {
           </div>
         </section>
 
-        <section className="about-section glass">
+        <section className={`${styles.section} glass`}>
           <h2>{t('about.licenseText')}</h2>
-          <pre className="about-license-full">{licenseText}</pre>
+          <pre className={styles.licenseFull}>{licenseText}</pre>
         </section>
 
-        <section className="about-section glass">
+        <section className={`${styles.section} glass`}>
           <h2>{t('about.dataUsage')}</h2>
-          <div className="about-notice-list">
+          <div className={styles.noticeList}>
             <p>{t('about.dataUsage1')}</p>
             <p>{t('about.dataUsage2')}</p>
             <p>{t('about.dataUsage3')}</p>
@@ -131,16 +131,16 @@ const About = () => {
           </div>
         </section>
 
-        <section className="about-section glass">
-          <div className="about-section-heading">
+        <section className={`${styles.section} glass`}>
+          <div className={styles.sectionHeading}>
             <h2>{t('about.thirdParty')}</h2>
             <span>{t('about.packages', { count: notices.length })}</span>
           </div>
-          <div className="license-list" aria-label="Third-party licenses">
+          <div className={styles.licenseList} aria-label="Third-party licenses">
             {notices.map((notice, index) => (
               <a
                 key={`${notice.name}-${index}`}
-                className="license-row"
+                className={styles.licenseRow}
                 href={notice.url}
                 target="_blank"
                 rel="noreferrer"

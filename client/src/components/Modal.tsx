@@ -23,6 +23,7 @@
  */
 import React from 'react';
 import { createPortal } from 'react-dom';
+import styles from './Modal.module.css';
 
 interface Props {
   children: React.ReactNode;
@@ -30,15 +31,17 @@ interface Props {
   onClose?: () => void;
   /** Max-width applied to the content container. */
   maxWidth?: string;
+  /** Use transparent content (e.g. for emoji picker). */
+  transparent?: boolean;
   /** Override the default content class (e.g. for custom modal layouts). */
   contentClassName?: string;
 }
 
-export const Modal: React.FC<Props> = ({ children, onClose, maxWidth, contentClassName }) =>
+export const Modal: React.FC<Props> = ({ children, onClose, maxWidth, transparent, contentClassName }) =>
   createPortal(
-    <div className="modal-overlay" onClick={onClose}>
+    <div className={styles.overlay} onClick={onClose}>
       <div
-        className={`${contentClassName ?? 'modal-content'} animate-fade-in`}
+        className={`${contentClassName ?? (transparent ? styles.contentTransparent : styles.content)} animate-fade-in`}
         onClick={(e) => e.stopPropagation()}
         style={maxWidth ? { maxWidth } : undefined}
       >
@@ -47,3 +50,13 @@ export const Modal: React.FC<Props> = ({ children, onClose, maxWidth, contentCla
     </div>,
     document.body
   );
+
+const ModalTitle: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
+  <h2 className={styles.title} style={style}>{children}</h2>
+);
+
+const ModalSubtitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <p className={styles.subtitle}>{children}</p>
+);
+
+export { ModalTitle, ModalSubtitle };

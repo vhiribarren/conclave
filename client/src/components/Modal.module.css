@@ -21,24 +21,69 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React from 'react';
-import type { ConclaveActions, RoomState } from '../services/conclave';
-import { AdminPanel } from './AdminPanel';
-import styles from './SidebarPanel.module.css';
-
-interface Props {
-  state: RoomState;
-  actions: ConclaveActions;
-  isAdmin: boolean;
-  myVote: string | null;
-  onVote: (card: string) => void;
-  roomId?: string;
-  autoReveal?: boolean;
-  onAutoRevealChange?: (enabled: boolean) => void;
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--overlay-bg);
+  animation: overlayFadeIn 0.2s ease-out;
+  will-change: opacity;
 }
 
-export const SidebarPanel: React.FC<Props> = (props) => (
-  <div className={styles.inner}>
-    <AdminPanel {...props} layout="sidebar" />
-  </div>
-);
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.content {
+  max-width: 28rem;
+  width: 100%;
+  margin: auto;
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: var(--glass-bg-solid);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+}
+
+.contentTransparent {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 1.5rem 1.25rem;
+    border-radius: 16px;
+    gap: 1.25rem;
+    margin: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .overlay {
+    padding: 0.75rem;
+  }
+}

@@ -29,11 +29,12 @@ import EmojiPicker, { Theme } from 'emoji-picker-react';
 import type { ConclaveActions, RoomState } from '../services/conclave';
 import { DEFAULT_DECK } from 'conclave-shared';
 import Button from './Button';
+import Input from './Input';
 import PokerCard from './PokerCard';
 import { AggregationResult } from './AggregationResult';
 import { TaskSelectionDialog } from './TaskSelectionDialog';
 import { settings } from '../services/settings';
-import { Modal } from './Modal';
+import { Modal, ModalTitle, ModalSubtitle } from './Modal';
 import './AdminPanel.css';
 
 interface Props {
@@ -349,9 +350,9 @@ export const AdminPanel: React.FC<Props> = ({
             </div>
             <div className="timer-custom-row">
               <div className="timer-input-wrapper">
-                <input
+                <Input
                   type="number"
-                  className={`premium-input ${![15, 30, 45, 60].includes(selectedDurationMs / 1000) ? 'active' : ''}`}
+                  active={![15, 30, 45, 60].includes(selectedDurationMs / 1000)}
                   value={customTimerValue}
                   onChange={(e) => {
                     setCustomTimerValue(e.target.value);
@@ -392,9 +393,8 @@ export const AdminPanel: React.FC<Props> = ({
               <div style={{ position: 'relative' }}>
                 <form onSubmit={handleAddCard} className="deck-add-form animate-fade-in">
                   <div style={{ display: 'flex', gap: '0.25rem', flex: 1 }}>
-                    <input
+                    <Input
                       type="text"
-                      className="premium-input"
                       placeholder={t('settings.cardPlaceholder')}
                       value={newCardValue}
                       onChange={(e) => setNewCardValue(e.target.value)}
@@ -554,10 +554,10 @@ export const AdminPanel: React.FC<Props> = ({
 
       {showCustomizeConfirm && (
         <Modal onClose={() => setShowCustomizeConfirm(false)} maxWidth="24rem">
-          <h2 className="modal-title">{t('settings.customizeModal.title')}</h2>
-          <p className="modal-subtitle">
+          <ModalTitle>{t('settings.customizeModal.title')}</ModalTitle>
+          <ModalSubtitle>
             {t('settings.customizeModal.subtitle')}
-          </p>
+          </ModalSubtitle>
           <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
             <Button variant="secondary" onClick={() => setShowCustomizeConfirm(false)}>{t('common.cancel')}</Button>
             <Button onClick={() => { updateDeck(state.deck || [], 'custom'); setShowCustomizeConfirm(false); }}>{t('common.confirm')}</Button>
@@ -576,10 +576,10 @@ export const AdminPanel: React.FC<Props> = ({
 
       {transferTarget && (
         <Modal onClose={() => setTransferTarget(null)} maxWidth="24rem">
-          <h2 className="modal-title">{t('settings.transferModal.title')}</h2>
-          <p className="modal-subtitle">
+          <ModalTitle>{t('settings.transferModal.title')}</ModalTitle>
+          <ModalSubtitle>
             {t('settings.transferModal.subtitle', { name: transferTarget.name })}
-          </p>
+          </ModalSubtitle>
           <div className="panel-actions" style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
             <Button variant="secondary" onClick={() => setTransferTarget(null)}>{t('common.cancel')}</Button>
             <Button variant="danger" onClick={() => { actions.adminTransferAdmin(transferTarget.id); setTransferTarget(null); }}>

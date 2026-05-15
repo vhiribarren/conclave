@@ -26,10 +26,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
+import IconButton from '../components/IconButton';
+import Input from '../components/Input';
+import Logo from '../components/Logo';
 import { AdminPanel } from '../components/AdminPanel';
 import PokerCard from '../components/PokerCard';
 import { LanguageSelector } from '../components/LanguageSelector';
-import { Modal } from '../components/Modal';
+import { Modal, ModalTitle, ModalSubtitle } from '../components/Modal';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import './Room.css';
 import './RoomRemote.css';
@@ -77,8 +80,8 @@ const RoomRemote = () => {
     return (
       <div className="page-container animate-fade-in">
         <div className="landing-card glass" style={{ textAlign: 'center' }}>
-          <h2 className="modal-title" style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</h2>
-          <p className="modal-subtitle">{connectionError}</p>
+          <ModalTitle style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</ModalTitle>
+          <ModalSubtitle>{connectionError}</ModalSubtitle>
           <Button onClick={() => navigate('/')}>{t('common.returnHome')}</Button>
         </div>
       </div>
@@ -89,13 +92,12 @@ const RoomRemote = () => {
     <>
       {!isJoined && (
         <Modal>
-          <h2 className="modal-title">{t('room.joinTitle')}</h2>
-          <p className="modal-subtitle">{t('room.joinSubtitleRemote')}</p>
-          <form onSubmit={handleJoin} className="landing-form">
-            <input
+          <ModalTitle>{t('room.joinTitle')}</ModalTitle>
+          <ModalSubtitle>{t('room.joinSubtitleRemote')}</ModalSubtitle>
+          <form onSubmit={handleJoin}>
+            <Input
               type="text"
               placeholder={t('room.yourName')}
-              className="premium-input"
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
@@ -107,7 +109,7 @@ const RoomRemote = () => {
       <div className={`room-container ${!isJoined ? 'blurred' : ''}`}>
         <header className="header glass">
           <div className="header-left">
-            <div className="header-logo">C</div>
+            <Logo />
             <div>
               <h1 className="header-title">{state.name || roomId}</h1>
               <div className="header-subtitle">
@@ -121,9 +123,9 @@ const RoomRemote = () => {
           </div>
           <div className="header-actions">
             <LanguageSelector />
-            <button onClick={() => navigate(`/room/${roomId}`)} className="icon-button danger" title={t('room.leaveRemote')}>
+            <IconButton onClick={() => navigate(`/room/${roomId}`)} variant="danger" title={t('room.leaveRemote')}>
               <LogOut size={18} />
-            </button>
+            </IconButton>
           </div>
         </header>
 

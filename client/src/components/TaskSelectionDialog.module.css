@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-.task-selector-modal {
+.modal {
   width: min(100% - 2rem, 54rem);
   max-height: min(86vh, 46rem);
   padding: 1rem;
@@ -35,36 +35,36 @@
   box-shadow: var(--shadow-lg);
 }
 
-.task-selector-header {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
 }
 
-.task-selector-header h3 {
+.header h3 {
   font-size: 1.25rem;
 }
 
-.task-selector-header p,
-.task-selector-item small,
-.task-selector-empty {
+.header p,
+.item small,
+.empty {
   color: var(--text-secondary);
 }
 
-.task-selector-header p {
+.header p {
   margin-top: 0.2rem;
   font-size: 0.9rem;
 }
 
-.task-selector-list {
+.list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   overflow-y: auto;
 }
 
-.task-selector-item {
+.item {
   width: 100%;
   padding: 0.85rem;
   border: 1px solid var(--surface-border);
@@ -80,13 +80,13 @@
   transition: var(--transition);
 }
 
-.task-selector-item:hover,
-.task-selector-item.active {
+.item:hover,
+.item.active {
   border-color: var(--accent-border-medium);
   background: var(--glass-bg-heavy);
 }
 
-.task-selector-item span {
+.item span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -94,24 +94,24 @@
   font-weight: 700;
 }
 
-.task-selector-item small {
+.item small {
   flex-shrink: 0;
   font-size: 0.78rem;
 }
 
-.task-selector-empty {
+.empty {
   padding: 1rem;
   text-align: center;
 }
 
 @media (max-width: 520px) {
-  .task-selector-modal {
+  .modal {
     width: calc(100% - 1rem);
     max-height: 86vh;
     padding: 0.8rem;
   }
 
-  .task-selector-item {
+  .item {
     align-items: flex-start;
     flex-direction: column;
     gap: 0.25rem;

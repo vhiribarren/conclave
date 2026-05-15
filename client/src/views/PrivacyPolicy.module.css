@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-.privacy-page {
+.page {
   width: 100%;
   max-width: 70rem;
   margin: 0 auto;
   padding: 1.5rem;
 }
 
-.privacy-header {
+.header {
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -36,7 +36,7 @@
   margin-bottom: 1rem;
 }
 
-.privacy-back-link {
+.backLink {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -48,76 +48,76 @@
   transition: var(--transition);
 }
 
-.privacy-back-link:hover {
+.backLink:hover {
   background: var(--glass-bg-hover);
   color: var(--text-primary);
 }
 
-.privacy-title {
+.title {
   font-size: 2rem;
   font-weight: 800;
   color: var(--text-primary);
 }
 
-.privacy-updated {
+.updated {
   color: var(--text-secondary);
   font-weight: 500;
   margin-top: 0.25rem;
 }
 
-.privacy-content {
+.content {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
-.privacy-section {
+.section {
   padding: 1.5rem;
   background: var(--glass-bg-hover);
 }
 
-.privacy-section h2 {
+.section h2 {
   font-size: 1rem;
   color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
-.privacy-section p {
+.section p {
   color: var(--text-primary);
   line-height: 1.6;
   margin-bottom: 0.75rem;
 }
 
-.privacy-section p:last-child {
+.section p:last-child {
   margin-bottom: 0;
 }
 
-.privacy-section a {
+.section a {
   color: var(--accent-color);
   text-decoration: none;
 }
 
-.privacy-section a:hover {
+.section a:hover {
   color: var(--accent-hover);
 }
 
 @media (max-width: 720px) {
-  .privacy-page {
+  .page {
     padding: 0.75rem;
   }
 
-  .privacy-header {
+  .header {
     align-items: flex-start;
     flex-direction: column;
     padding: 1rem;
     gap: 1rem;
   }
 
-  .privacy-title {
+  .title {
     font-size: 1.5rem;
   }
 
-  .privacy-section {
+  .section {
     padding: 1.25rem;
   }
 }

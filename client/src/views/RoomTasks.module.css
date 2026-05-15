@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-.tasks-page {
+.page {
   min-height: 100vh;
   min-height: 100dvh;
   padding: 1rem;
@@ -30,13 +30,13 @@
   gap: 1rem;
 }
 
-.tasks-page.blurred {
+.page.blurred {
   filter: blur(12px);
   transform: scale(0.98);
   opacity: 0.7;
 }
 
-.tasks-header {
+.header {
   padding: 1rem;
   display: flex;
   align-items: center;
@@ -45,19 +45,19 @@
   border-radius: 1rem;
 }
 
-.tasks-header-title {
+.headerTitle {
   display: flex;
   align-items: center;
   gap: 1rem;
   min-width: 0;
 }
 
-.tasks-header h1 {
+.header h1 {
   font-size: 1.25rem;
   line-height: 1.1;
 }
 
-.tasks-header p {
+.header p {
   color: var(--text-secondary);
   font-size: 0.85rem;
   overflow: hidden;
@@ -65,11 +65,11 @@
   white-space: nowrap;
 }
 
-.tasks-header-actions {
+.headerActions {
   flex-shrink: 0;
 }
 
-.tasks-layout {
+.layout {
   display: grid;
   grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
   gap: 1rem;
@@ -77,35 +77,35 @@
   flex: 1;
 }
 
-.tasks-list-panel,
-.tasks-detail-panel {
+.listPanel,
+.detailPanel {
   border-radius: 1rem;
   padding: 1rem;
   min-width: 0;
 }
 
-.tasks-list-panel {
+.listPanel {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.tasks-detail-panel {
+.detailPanel {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.tasks-panel-heading,
-.tasks-detail-header,
-.tasks-round-card-header {
+.panelHeading,
+.detailHeader,
+.roundCardHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
 }
 
-.tasks-kicker {
+.kicker {
   color: var(--text-secondary);
   font-size: 0.72rem;
   font-weight: 700;
@@ -113,28 +113,28 @@
   letter-spacing: 0.08em;
 }
 
-.tasks-add-form,
-.tasks-rename-form {
+.addForm,
+.renameForm {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.tasks-add-form .premium-button {
+.addForm .premium-button {
   align-self: stretch;
   min-width: 3rem;
   padding-left: 0.8rem;
   padding-right: 0.8rem;
 }
 
-.tasks-list {
+.list {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   overflow-y: auto;
 }
 
-.tasks-list-item {
+.listItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -147,35 +147,35 @@
   transition: var(--transition);
 }
 
-.tasks-list-item:hover,
-.tasks-list-item.selected {
+.listItem:hover,
+.listItem.selected {
   border-color: var(--accent-border-medium);
   background: var(--glass-bg-strong);
 }
 
-.tasks-list-main {
+.listMain {
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
 
-.tasks-list-name {
+.listName {
   font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.tasks-list-meta,
-.tasks-current-badge,
-.tasks-round-card-header span,
-.tasks-result-meta {
+.listMeta,
+.currentBadge,
+.roundCardHeader span,
+.resultMeta {
   color: var(--text-secondary);
   font-size: 0.78rem;
 }
 
-.tasks-current-badge {
+.currentBadge {
   color: var(--accent-hover);
   background: var(--accent-tint);
   border-radius: 999px;
@@ -184,53 +184,53 @@
   flex-shrink: 0;
 }
 
-.tasks-detail-header h2 {
+.detailHeader h2 {
   font-size: 1.65rem;
   line-height: 1.1;
   overflow-wrap: anywhere;
 }
 
-.tasks-detail-actions {
+.detailActions {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   flex-shrink: 0;
 }
 
-.tasks-round-card,
-.tasks-history-item {
+.roundCard,
+.historyItem {
   padding: 1rem;
   border: 1px solid var(--surface-border);
   border-radius: 0.85rem;
   background: var(--glass-bg-subtle);
 }
 
-.tasks-round-card h3,
-.tasks-history h3 {
+.roundCard h3,
+.history h3 {
   font-size: 1rem;
 }
 
-.tasks-history {
+.history {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.tasks-results-list {
+.resultsList {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
   margin-top: 1rem;
 }
 
-.tasks-result-row {
+.resultRow {
   display: grid;
   grid-template-columns: minmax(2.8rem, auto) minmax(80px, 1fr) 4.5rem;
   align-items: center;
   gap: 0.75rem;
 }
 
-.tasks-vote-value {
+.voteValue {
   min-width: 2.6rem;
   padding: 0.45rem 0.6rem;
   border-radius: 0.65rem;
@@ -240,26 +240,26 @@
   text-align: center;
 }
 
-.tasks-result-bar {
+.resultBar {
   height: 0.55rem;
   overflow: hidden;
   border-radius: 999px;
   background: var(--bar-track);
 }
 
-.tasks-result-bar span {
+.resultBar span {
   display: block;
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--accent-color), #0ea5e9);
 }
 
-.tasks-result-meta {
+.resultMeta {
   text-align: right;
   font-weight: 700;
 }
 
-.tasks-round-state {
+.roundState {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -267,12 +267,12 @@
   color: var(--text-secondary);
 }
 
-.tasks-round-state strong {
+.roundState strong {
   color: var(--text-primary);
   margin-left: auto;
 }
 
-.tasks-status-dot {
+.statusDot {
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 50%;
@@ -280,17 +280,17 @@
   box-shadow: 0 0 8px var(--color-success-dot-glow);
 }
 
-.tasks-empty,
-.tasks-empty-state,
-.tasks-error {
+.empty,
+.emptyState,
+.error {
   color: var(--text-secondary);
 }
 
-.tasks-empty {
+.empty {
   padding-top: 0.75rem;
 }
 
-.tasks-empty-state {
+.emptyState {
   min-height: 10rem;
   display: flex;
   flex-direction: column;
@@ -302,11 +302,11 @@
   border-radius: 0.85rem;
 }
 
-.tasks-empty-state--large {
+.emptyStateLarge {
   min-height: 22rem;
 }
 
-.tasks-error {
+.error {
   width: min(100%, 28rem);
   padding: 2rem;
   display: flex;
@@ -316,83 +316,83 @@
 }
 
 @media (max-width: 860px) {
-  .tasks-page {
+  .page {
     padding: 0.75rem;
   }
 
-  .tasks-header {
+  .header {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .tasks-header-actions {
+  .headerActions {
     display: flex;
     gap: 0.5rem;
   }
 
-  .tasks-header-actions .premium-button {
+  .headerActions .premium-button {
     width: 100%;
   }
 
-  .tasks-layout {
+  .layout {
     grid-template-columns: 1fr;
   }
 
-  .tasks-list {
+  .list {
     max-height: 42vh;
   }
 
-  .tasks-detail-header {
+  .detailHeader {
     flex-direction: column;
   }
 
-  .tasks-detail-actions {
+  .detailActions {
     width: 100%;
     justify-content: flex-start;
     flex-wrap: wrap;
   }
 
-  .tasks-detail-actions .premium-button {
+  .detailActions .premium-button {
     flex: 1;
   }
 }
 
 @media (max-width: 520px) {
-  .tasks-page {
+  .page {
     padding: 0.5rem;
     gap: 0.75rem;
   }
 
-  .tasks-list-panel,
-  .tasks-detail-panel {
+  .listPanel,
+  .detailPanel {
     padding: 0.8rem;
     border-radius: 0.75rem;
   }
 
-  .tasks-header {
+  .header {
     padding: 0.75rem;
     border-radius: 0.75rem;
   }
 
-  .tasks-header h1 {
+  .header h1 {
     font-size: 1.1rem;
   }
 
-  .tasks-add-form,
-  .tasks-rename-form {
+  .addForm,
+  .renameForm {
     align-items: stretch;
   }
 
-  .tasks-result-row {
+  .resultRow {
     grid-template-columns: minmax(2.6rem, auto) 1fr;
   }
 
-  .tasks-result-bar {
+  .resultBar {
     grid-column: 1 / -1;
     order: 3;
   }
 
-  .tasks-list-item {
+  .listItem {
     padding: 0.7rem;
   }
 }

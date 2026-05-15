@@ -21,24 +21,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React from 'react';
-import type { ConclaveActions, RoomState } from '../services/conclave';
-import { AdminPanel } from './AdminPanel';
-import styles from './SidebarPanel.module.css';
-
-interface Props {
-  state: RoomState;
-  actions: ConclaveActions;
-  isAdmin: boolean;
-  myVote: string | null;
-  onVote: (card: string) => void;
-  roomId?: string;
-  autoReveal?: boolean;
-  onAutoRevealChange?: (enabled: boolean) => void;
+.button {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 
-export const SidebarPanel: React.FC<Props> = (props) => (
-  <div className={styles.inner}>
-    <AdminPanel {...props} layout="sidebar" />
-  </div>
-);
+.button:hover {
+  background: var(--neutral-tint);
+  color: var(--text-primary);
+}
+
+.accent {
+  color: var(--accent-color);
+}
+
+.danger {
+  color: var(--color-danger-text);
+}
+
+.success {
+  color: var(--color-success);
+}
+
+@media (max-width: 380px) {
+  .button {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 0.35rem;
+  }
+}
+
+.subtle {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  min-width: auto;
+  min-height: auto;
+  opacity: 0.6;
+}
+
+.subtle:hover {
+  opacity: 1;
+  background: var(--neutral-tint);
+  color: var(--accent-color);
+}

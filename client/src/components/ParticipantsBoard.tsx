@@ -25,7 +25,7 @@ import React from 'react';
 import { Crown, Check } from 'lucide-react';
 import type { Participant } from 'conclave-shared';
 import { TimerDisplay } from './TimerDisplay';
-import './ParticipantsBoard.css';
+import styles from './ParticipantsBoard.module.css';
 
 export type LayoutMode = 'auto' | 'grid';
 
@@ -45,10 +45,10 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
 
   if (!useCircle) {
     return (
-      <div className="participants-grid-wrapper">
-        <div className="participants-grid">
+      <div className={styles.gridWrapper}>
+        <div className={styles.grid}>
           {participants.length === 0 && (
-            <div className="empty-state">No participants yet.</div>
+            <div className={styles.emptyState}>No participants yet.</div>
           )}
           {participants.map((p) => (
             <ParticipantCard key={p.id} participant={p} isRevealed={isRevealed} myName={myName} />
@@ -61,13 +61,13 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
   const angleStep = (2 * Math.PI) / participants.length;
 
   return (
-    <div className="circle-container">
-      <div className="circle-wrapper">
-        <div className="circle-table">
+    <div className={styles.circleContainer}>
+      <div className={styles.circleWrapper}>
+        <div className={styles.circleTable}>
            {(timerEndAt || timerPausedRemainingMs !== null) ? (
              <TimerDisplay timerEndAt={timerEndAt} timerPausedRemainingMs={timerPausedRemainingMs} />
            ) : (
-             <span className="circle-table-text">
+             <span className={styles.circleTableText}>
                {currentTaskName || "Quick Vote"}
              </span>
            )}
@@ -81,7 +81,7 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
           return (
             <div 
               key={p.id}
-              className="circle-item"
+              className={styles.circleItem}
               style={{ top: `${yPct}%`, left: `${xPct}%`, transform: 'translate(-50%, -50%)' }}
             >
               <ParticipantCard participant={p} isRevealed={isRevealed} myName={myName} />
@@ -94,16 +94,16 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
 };
 
 const ParticipantCard = ({ participant: p, isRevealed, myName }: { participant: Participant & { vote: string | null }, isRevealed: boolean, myName: string }) => (
-  <div className={`participant-card glass ${p.vote ? 'has-voted' : ''}`}>
-    {p.isAdmin && <Crown size={14} className="participant-admin-icon" />}
-    <div className="participant-avatar" style={{ fontSize: '1.8rem' }}>
+  <div className={`${styles.card} glass ${p.vote ? styles.hasVoted : ''}`}>
+    {p.isAdmin && <Crown size={14} className={styles.adminIcon} />}
+    <div className={styles.avatar} style={{ fontSize: '1.8rem' }}>
       {p.mood || '🦊'}
     </div>
-    <span className="participant-name" title={p.name}>
+    <span className={styles.name} title={p.name}>
       {p.name} {p.name === myName ? '(You)' : ''}
     </span>
     
-    <div className={`participant-vote-box ${p.vote ? 'voted' : ''}`}>
+    <div className={`${styles.voteBox} ${p.vote ? styles.voted : ''}`}>
       {isRevealed ? p.vote : (p.vote ? <Check size={18} /> : '')}
     </div>
   </div>

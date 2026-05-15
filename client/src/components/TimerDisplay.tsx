@@ -23,7 +23,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Timer } from 'lucide-react';
-import './TimerDisplay.css';
+import styles from './TimerDisplay.module.css';
 
 interface Props {
   timerEndAt: number | null;
@@ -67,8 +67,8 @@ export const TimerDisplay: React.FC<Props> = ({ timerEndAt, timerPausedRemaining
   const isFinished = timeLeft === 0;
 
   return (
-    <div className={`timer-display ${isFinished ? 'finished' : isUrgent ? 'urgent' : ''}`}>
-      <Timer size={20} className={isFinished || isUrgent ? 'timer-icon-bounce' : ''} />
+    <div className={`${styles.display} ${isFinished ? styles.finished : isUrgent ? styles.urgent : ''}`}>
+      <Timer size={20} className={isFinished || isUrgent ? styles.iconBounce : ''} />
       <span>{formattedTime}</span>
     </div>
   );

@@ -24,7 +24,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Smartphone, Share2, Eye, Settings } from 'lucide-react';
-import { Modal } from './Modal';
+import { Modal, ModalTitle } from './Modal';
+import styles from './WelcomeModal.module.css';
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -35,22 +36,22 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onClose }) => {
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="modal-title">{t('help.title')}</h2>
-      <div className="welcome-modal-content">
-        <section className="welcome-section">
-          <h3><Share2 size={16} className="welcome-section-icon" /> {t('help.shareTitle')}</h3>
+      <ModalTitle>{t('help.title')}</ModalTitle>
+      <div className={styles.content}>
+        <section className={styles.section}>
+          <h3><Share2 size={16} className={styles.sectionIcon} /> {t('help.shareTitle')}</h3>
           <p>{t('help.shareDescription')}</p>
         </section>
-        <section className="welcome-section">
-          <h3><Smartphone size={16} className="welcome-section-icon" /> {t('help.remoteTitle')}</h3>
+        <section className={styles.section}>
+          <h3><Smartphone size={16} className={styles.sectionIcon} /> {t('help.remoteTitle')}</h3>
           <p>{t('help.remoteDescription')}</p>
         </section>
-        <section className="welcome-section">
-          <h3><Eye size={16} className="welcome-section-icon" /> {t('help.votingTitle')}</h3>
+        <section className={styles.section}>
+          <h3><Eye size={16} className={styles.sectionIcon} /> {t('help.votingTitle')}</h3>
           <p>{t('help.votingDescription')}</p>
         </section>
-        <section className="welcome-section">
-          <h3><Settings size={16} className="welcome-section-icon" /> {t('help.settingsTitle')}</h3>
+        <section className={styles.section}>
+          <h3><Settings size={16} className={styles.sectionIcon} /> {t('help.settingsTitle')}</h3>
           <p>{t('help.settingsDescription')}</p>
         </section>
       </div>

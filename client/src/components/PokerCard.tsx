@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import React from 'react';
-import './PokerCard.css';
+import styles from './PokerCard.module.css';
 
 interface PokerCardProps {
   value: string;
@@ -39,7 +39,7 @@ const PokerCard: React.FC<PokerCardProps> = ({
   onClick,
   className = ''
 }) => {
-  const cardClass = `poker-card ${selected ? 'selected' : ''} ${small ? 'small' : ''} ${className}`.trim();
+  const cardClass = `${styles.card} ${selected ? styles.selected : ''} ${small ? styles.small : ''} ${className}`.trim();
 
   return (
     <div className={cardClass} onClick={onClick}>

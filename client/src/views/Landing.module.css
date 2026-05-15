@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- .landing-card {
+.card {
   max-width: 28rem;
   width: 100%;
   padding: 2.5rem;
@@ -33,8 +33,9 @@
   z-index: 10;
   overflow: hidden;
 }
-.landing-glow-1,
-.landing-glow-2 {
+
+.glow1,
+.glow2 {
   position: absolute;
   width: 12rem;
   height: 12rem;
@@ -42,17 +43,20 @@
   filter: blur(48px);
   z-index: -1;
 }
-.landing-glow-1 {
+
+.glow1 {
   top: -6rem;
   right: -6rem;
   background: var(--glow-accent);
 }
-.landing-glow-2 {
+
+.glow2 {
   bottom: -6rem;
   left: -6rem;
   background: var(--glow-purple);
 }
-.landing-header {
+
+.header {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,62 +64,67 @@
   position: relative;
   z-index: 10;
 }
-.landing-title {
+
+.title {
   font-size: 2.5rem;
   font-weight: 800;
   background: linear-gradient(to right, var(--accent-color), #9333ea);
   -webkit-background-clip: text;
   color: transparent;
 }
-.landing-subtitle {
+
+.subtitle {
   color: var(--text-secondary);
   font-weight: 500;
 }
-.landing-divider {
+
+.divider {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   color: var(--text-secondary);
   margin: 0.5rem 0;
 }
-.landing-divider-line {
+
+.dividerLine {
   flex: 1;
   height: 1px;
   background: var(--surface-border);
 }
-.landing-divider-text {
+
+.dividerText {
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.landing-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.landing-footer {
+
+.footer {
   color: var(--text-secondary);
   font-size: 0.85rem;
   display: flex;
   justify-content: center;
   gap: 1.5rem;
 }
-.landing-footer a {
+
+.footer a {
   color: var(--text-secondary);
   font-weight: 700;
   text-decoration: none;
   transition: var(--transition);
 }
-.landing-footer a:hover {
+
+.footer a:hover {
   color: var(--accent-color);
 }
-.landing-history {
+
+.history {
   margin-top: 1.5rem;
   padding: 1.25rem;
   width: 100%;
 }
-.history-header {
+
+.historyHeader {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -124,12 +133,14 @@
   color: var(--text-secondary);
   margin-bottom: 1rem;
 }
-.history-list {
+
+.historyList {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
-.history-item {
+
+.historyItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -140,18 +151,21 @@
   transition: all 0.2s ease;
   border: 1px solid transparent;
 }
-.history-item:hover {
+
+.historyItem:hover {
   background: var(--glass-bg-strong);
   border-color: var(--accent-color);
   transform: translateX(4px);
 }
-.history-info {
+
+.historyInfo {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   min-width: 0;
 }
-.history-name {
+
+.historyName {
   font-weight: 600;
   color: var(--text-primary);
   font-size: 0.95rem;
@@ -159,13 +173,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.history-id {
+
+.historyId {
   font-size: 0.75rem;
   color: var(--text-secondary);
   font-family: monospace;
   opacity: 0.7;
 }
-.history-meta {
+
+.historyMeta {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -174,37 +190,38 @@
   opacity: 0.8;
   white-space: nowrap;
 }
+
 @media (max-width: 1024px) {
-  .landing-card {
+  .card {
     padding: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
-  .landing-card {
+  .card {
     padding: 1.25rem;
     gap: 1.5rem;
     border-radius: 16px;
   }
 
-  .landing-title {
+  .title {
     font-size: 2rem;
   }
 
-  .landing-subtitle {
+  .subtitle {
     font-size: 0.9rem;
   }
 
-  .landing-history {
+  .history {
     margin-top: 1rem;
     padding: 1rem;
   }
 
-  .history-item {
+  .historyItem {
     padding: 0.6rem 0.75rem;
   }
 
-  .history-name {
+  .historyName {
     font-size: 0.85rem;
   }
 }

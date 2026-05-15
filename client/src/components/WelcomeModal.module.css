@@ -21,24 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React from 'react';
-import type { ConclaveActions, RoomState } from '../services/conclave';
-import { AdminPanel } from './AdminPanel';
-import styles from './SidebarPanel.module.css';
-
-interface Props {
-  state: RoomState;
-  actions: ConclaveActions;
-  isAdmin: boolean;
-  myVote: string | null;
-  onVote: (card: string) => void;
-  roomId?: string;
-  autoReveal?: boolean;
-  onAutoRevealChange?: (enabled: boolean) => void;
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 1rem 0;
+  text-align: left;
 }
 
-export const SidebarPanel: React.FC<Props> = (props) => (
-  <div className={styles.inner}>
-    <AdminPanel {...props} layout="sidebar" />
-  </div>
-);
+.section h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.section p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.sectionIcon {
+  vertical-align: middle;
+}

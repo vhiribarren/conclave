@@ -21,10 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-.sidebar-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  height: 100%;
-  overflow-y: auto;
+import React from 'react';
+import styles from './IconButton.module.css';
+
+interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'accent' | 'danger' | 'success' | 'subtle';
+  children: React.ReactNode;
 }
+
+const IconButton: React.FC<IconButtonProps> = ({
+  variant = 'default',
+  className = '',
+  children,
+  ...props
+}) => {
+  const variantClass = variant !== 'default' ? styles[variant] : '';
+  const buttonClass = `${styles.button} ${variantClass} ${className}`.trim();
+
+  return (
+    <button className={buttonClass} {...props}>
+      {children}
+    </button>
+  );
+};
+
+export default IconButton;

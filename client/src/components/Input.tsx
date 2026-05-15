@@ -21,41 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- .timer-display {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: monospace;
-  font-size: 1.25rem;
-  font-weight: bold;
-  padding: 0.5rem 1rem;
-  border-radius: 0.75rem;
-  transition: var(--transition);
-  box-shadow: var(--shadow-sm);
-  background: var(--glass-bg-strong);
-  color: var(--text-primary);
-  border: 1px solid var(--surface-border);
-  white-space: nowrap;
+import React from 'react';
+import styles from './Input.module.css';
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** Visually highlight the input as active/selected. */
+  active?: boolean;
 }
-.timer-display.urgent {
-  background: var(--color-timer-urgent-bg);
-  color: var(--color-timer-urgent-text);
-  border-color: var(--color-timer-urgent-border);
-}
-.timer-display.finished {
-  background: var(--color-timer-finished-bg);
-  color: var(--color-timer-finished-text);
-  border-color: var(--color-timer-finished-border);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .5; }
-}
-.timer-icon-bounce {
-  animation: bounce 1s infinite;
-}
-@keyframes bounce {
-  0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
-  50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
-}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ active = false, className = '', ...props }, ref) => {
+    const inputClass = `${styles.input} ${active ? styles.active : ''} ${className}`.trim();
+    return <input ref={ref} className={inputClass} {...props} />;
+  }
+);
+
+Input.displayName = 'Input';
+
+export default Input;

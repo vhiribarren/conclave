@@ -24,7 +24,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import './PrivacyPolicy.css';
+import styles from './PrivacyPolicy.module.css';
 
 const PrivacyPolicy = () => {
   const { t } = useTranslation();
@@ -33,39 +33,39 @@ const PrivacyPolicy = () => {
     text.split('\n').map((paragraph, index) => <p key={index}>{paragraph}</p>);
 
   return (
-    <div className="privacy-page animate-fade-in">
-      <header className="privacy-header glass">
-        <Link to="/" className="privacy-back-link">
+    <div className={`${styles.page} animate-fade-in`}>
+      <header className={`${styles.header} glass`}>
+        <Link to="/" className={styles.backLink}>
           <ArrowLeft size={18} />
           {t('privacy.home')}
         </Link>
         <div>
-          <h1 className="privacy-title">{t('privacy.title')}</h1>
-          <p className="privacy-updated">{t('privacy.lastUpdated')}</p>
+          <h1 className={styles.title}>{t('privacy.title')}</h1>
+          <p className={styles.updated}>{t('privacy.lastUpdated')}</p>
         </div>
       </header>
 
-      <main className="privacy-content">
-        <section className="privacy-section glass">
+      <main className={styles.content}>
+        <section className={`${styles.section} glass`}>
           <p>{t('privacy.intro')}</p>
         </section>
 
-        <section className="privacy-section glass">
+        <section className={`${styles.section} glass`}>
           <h2>{t('privacy.hostingTitle')}</h2>
           {renderParagraphs(t('privacy.hostingBody'))}
         </section>
 
-        <section className="privacy-section glass">
+        <section className={`${styles.section} glass`}>
           <h2>{t('privacy.analyticsTitle')}</h2>
           <p>{t('privacy.analyticsBody')}</p>
         </section>
 
-        <section className="privacy-section glass">
+        <section className={`${styles.section} glass`}>
           <h2>{t('privacy.cookiesTitle')}</h2>
           {renderParagraphs(t('privacy.cookiesBody'))}
         </section>
 
-        <section className="privacy-section glass">
+        <section className={`${styles.section} glass`}>
           <h2>{t('privacy.rightsTitle')}</h2>
           {renderParagraphs(t('privacy.rightsBody'))}
         </section>

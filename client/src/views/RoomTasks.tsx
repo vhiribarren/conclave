@@ -27,10 +27,13 @@ import { ArrowLeft, Check, Edit2, ListChecks, Plus, Trash2, X } from 'lucide-rea
 import { useTranslation } from 'react-i18next';
 import type { Round, Task } from 'conclave-shared';
 import Button from '../components/Button';
-import { Modal } from '../components/Modal';
+import IconButton from '../components/IconButton';
+import Input from '../components/Input';
+import Logo from '../components/Logo';
+import { Modal, ModalTitle, ModalSubtitle } from '../components/Modal';
 import { setUserEmoji, setUserName } from '../services/user';
 import { useCurrentRoomSession } from './RoomSessionLayout';
-import './RoomTasks.css';
+import styles from './RoomTasks.module.css';
 
 const summarizeVotes = (round: Round | undefined, deck: string[]) => {
   const counts: Record<string, number> = {};
@@ -115,13 +118,13 @@ const RoomTasks = () => {
     const totalVotes = Object.keys(round?.votes || {}).length;
 
     if (!round) {
-      return <p className="tasks-empty">{emptyLabel}</p>;
+      return <p className={styles.empty}>{emptyLabel}</p>;
     }
 
     if (!round.revealed) {
       return (
-        <div className="tasks-round-state">
-          <span className="tasks-status-dot" />
+        <div className={styles.roundState}>
+          <span className={styles.statusDot} />
           {t('tasks.votingInProgress')}
           <strong>{totalVotes}</strong>
         </div>
@@ -129,20 +132,20 @@ const RoomTasks = () => {
     }
 
     if (summary.length === 0) {
-      return <p className="tasks-empty">{t('tasks.noVotesCast')}</p>;
+      return <p className={styles.empty}>{t('tasks.noVotesCast')}</p>;
     }
 
     return (
-      <div className="tasks-results-list">
+      <div className={styles.resultsList}>
         {summary.map(([vote, count]) => {
           const percent = Math.round((count / totalVotes) * 100);
           return (
-            <div key={vote} className="tasks-result-row">
-              <span className="tasks-vote-value">{vote}</span>
-              <div className="tasks-result-bar">
+            <div key={vote} className={styles.resultRow}>
+              <span className={styles.voteValue}>{vote}</span>
+              <div className={styles.resultBar}>
                 <span style={{ width: `${percent}%` }} />
               </div>
-              <span className="tasks-result-meta">{count} / {totalVotes}</span>
+              <span className={styles.resultMeta}>{count} / {totalVotes}</span>
             </div>
           );
         })}
@@ -153,7 +156,7 @@ const RoomTasks = () => {
   if (connectionError) {
     return (
       <div className="page-container animate-fade-in">
-        <div className="tasks-error glass">
+        <div className={`${styles.error} glass`}>
           <h2>{t('room.roomNotFound')}</h2>
           <p>{connectionError}</p>
           <Button onClick={() => navigate('/')}>{t('common.returnHome')}</Button>
@@ -166,21 +169,19 @@ const RoomTasks = () => {
     <>
       {!isJoined && (
         <Modal>
-          <h2 className="modal-title">{t('room.joinTitle')}</h2>
-          <p className="modal-subtitle">{t('room.joinSubtitleTasks')}</p>
-          <form onSubmit={handleJoin} className="landing-form">
-            <input
+          <ModalTitle>{t('room.joinTitle')}</ModalTitle>
+          <ModalSubtitle>{t('room.joinSubtitleTasks')}</ModalSubtitle>
+          <form onSubmit={handleJoin}>
+            <Input
               type="text"
               placeholder={t('room.yourName')}
-              className="premium-input"
               value={name}
               onChange={(event) => setName(event.target.value)}
               autoFocus
             />
-            <input
+            <Input
               type="text"
               aria-label="Avatar"
-              className="premium-input"
               value={mood}
               onChange={(event) => setMood(event.target.value)}
               maxLength={4}
@@ -190,39 +191,38 @@ const RoomTasks = () => {
         </Modal>
       )}
 
-      <div className={`tasks-page ${!isJoined ? 'blurred' : ''}`}>
-        <header className="tasks-header glass">
-          <div className="tasks-header-title">
-            <div className="header-logo">C</div>
+      <div className={`${styles.page} ${!isJoined ? styles.blurred : ''}`}>
+        <header className={`${styles.header} glass`}>
+          <div className={styles.headerTitle}>
+            <Logo />
             <div>
               <h1>{t('tasks.title')}</h1>
               <p>{state.name || roomId}</p>
             </div>
           </div>
-          <div className="tasks-header-actions">
+          <div className={styles.headerActions}>
             <button onClick={() => navigate(`/room/${roomId}`)} className="premium-button secondary">
               <ArrowLeft size={16} /> {t('tasks.backToRoom')}
             </button>
           </div>
         </header>
 
-        <main className="tasks-layout">
-          <section className="tasks-list-panel glass">
-            <div className="tasks-panel-heading">
+        <main className={styles.layout}>
+          <section className={`${styles.listPanel} glass`}>
+            <div className={styles.panelHeading}>
               <div>
-                <span className="tasks-kicker">{isAdmin ? t('tasks.roomBacklog') : t('tasks.roomTasks')}</span>
+                <span className={styles.kicker}>{isAdmin ? t('tasks.roomBacklog') : t('tasks.roomTasks')}</span>
                 <h2>{t('tasks.taskCount', { count: state.tasks.length })}</h2>
               </div>
             </div>
 
             {isAdmin && (
-              <form onSubmit={handleAddTask} className="tasks-add-form">
-                <input
+              <form onSubmit={handleAddTask} className={styles.addForm}>
+                <Input
                   type="text"
                   value={newTaskName}
                   onChange={(event) => setNewTaskName(event.target.value)}
                   placeholder={t('tasks.addPlaceholder')}
-                  className="premium-input"
                 />
                 <button type="submit" className="premium-button" disabled={!newTaskName.trim()}>
                   <Plus size={16} />
@@ -230,7 +230,7 @@ const RoomTasks = () => {
               </form>
             )}
 
-            <div className="tasks-list">
+            <div className={styles.list}>
               {state.tasks.map((task) => {
                 const isSelected = selectedTask?.id === task.id;
                 const isCurrent = state.currentTaskId === task.id;
@@ -239,23 +239,23 @@ const RoomTasks = () => {
                 return (
                   <article
                     key={task.id}
-                    className={`tasks-list-item ${isSelected ? 'selected' : ''}`}
+                    className={`${styles.listItem} ${isSelected ? styles.selected : ''}`}
                     onClick={() => setSelectedTaskId(task.id)}
                   >
-                    <div className="tasks-list-main">
-                      <span className="tasks-list-name">{task.name}</span>
-                      <span className="tasks-list-meta">
+                    <div className={styles.listMain}>
+                      <span className={styles.listName}>{task.name}</span>
+                      <span className={styles.listMeta}>
                         {t('tasks.round', { count: task.rounds.length })}
                         {lastRound?.revealed ? ` · ${t('tasks.revealed').toLowerCase()}` : ` · ${t('tasks.open').toLowerCase()}`}
                       </span>
                     </div>
-                    {isCurrent && <span className="tasks-current-badge">{t('tasks.current')}</span>}
+                    {isCurrent && <span className={styles.currentBadge}>{t('tasks.current')}</span>}
                   </article>
                 );
               })}
 
               {state.tasks.length === 0 && (
-                <div className="tasks-empty-state">
+                <div className={styles.emptyState}>
                   <ListChecks size={28} />
                   <p>{t('tasks.noTaskYet')}</p>
                 </div>
@@ -263,64 +263,63 @@ const RoomTasks = () => {
             </div>
           </section>
 
-          <section className="tasks-detail-panel glass">
+          <section className={`${styles.detailPanel} glass`}>
             {selectedTask ? (
               <>
-                <div className="tasks-detail-header">
+                <div className={styles.detailHeader}>
                   <div>
-                    <span className="tasks-kicker">{t('tasks.selectedTask')}</span>
+                    <span className={styles.kicker}>{t('tasks.selectedTask')}</span>
                     {editingTaskId === selectedTask.id ? (
-                      <form onSubmit={saveRename} className="tasks-rename-form">
-                        <input
+                      <form onSubmit={saveRename} className={styles.renameForm}>
+                        <Input
                           type="text"
                           value={editingName}
                           onChange={(event) => setEditingName(event.target.value)}
-                          className="premium-input"
                           autoFocus
                         />
-                        <button type="submit" className="icon-button success" title="Save">
+                        <IconButton type="submit" variant="success" title="Save">
                           <Check size={16} />
-                        </button>
-                        <button type="button" className="icon-button danger" onClick={() => setEditingTaskId(null)} title="Cancel">
+                        </IconButton>
+                        <IconButton type="button" variant="danger" onClick={() => setEditingTaskId(null)} title="Cancel">
                           <X size={16} />
-                        </button>
+                        </IconButton>
                       </form>
                     ) : (
                       <h2>{selectedTask.name}</h2>
                     )}
                   </div>
                   {isAdmin && (
-                    <div className="tasks-detail-actions">
+                    <div className={styles.detailActions}>
                       <button
                         onClick={() => actions?.adminSetTask(state.currentTaskId === selectedTask.id ? null : selectedTask.id)}
                         className="premium-button"
                       >
                         {state.currentTaskId === selectedTask.id ? t('tasks.unselect') : t('tasks.select')}
                       </button>
-                      <button onClick={() => startRename(selectedTask)} className="icon-button" title={t('tasks.renameTask')}>
+                      <IconButton onClick={() => startRename(selectedTask)} title={t('tasks.renameTask')}>
                         <Edit2 size={16} />
-                      </button>
-                      <button onClick={() => actions?.adminDeleteTask(selectedTask.id)} className="icon-button danger" title={t('tasks.deleteTask')}>
+                      </IconButton>
+                      <IconButton onClick={() => actions?.adminDeleteTask(selectedTask.id)} variant="danger" title={t('tasks.deleteTask')}>
                         <Trash2 size={16} />
-                      </button>
+                      </IconButton>
                     </div>
                   )}
                 </div>
 
-                <div className="tasks-round-card">
-                  <div className="tasks-round-card-header">
+                <div className={styles.roundCard}>
+                  <div className={styles.roundCardHeader}>
                     <h3>{t('tasks.latestRound')}</h3>
                     <span>{latestRound ? getRoundLabel(selectedTask, latestRound) : t('tasks.noRound')}</span>
                   </div>
                   {renderRoundSummary(latestRound, t('tasks.noRoundYet'))}
                 </div>
 
-                <div className="tasks-history">
+                <div className={styles.history}>
                   <h3>{t('tasks.previousRounds')}</h3>
                   {previousRounds.length > 0 ? (
                     previousRounds.map(round => (
-                      <div key={round.id} className="tasks-history-item">
-                        <div className="tasks-round-card-header">
+                      <div key={round.id} className={styles.historyItem}>
+                        <div className={styles.roundCardHeader}>
                           <span>{getRoundLabel(selectedTask, round)}</span>
                           <span>{round.revealed ? t('tasks.revealed') : t('tasks.open')}</span>
                         </div>
@@ -328,12 +327,12 @@ const RoomTasks = () => {
                       </div>
                     ))
                   ) : (
-                    <p className="tasks-empty">{t('tasks.noPreviousRound')}</p>
+                    <p className={styles.empty}>{t('tasks.noPreviousRound')}</p>
                   )}
                 </div>
               </>
             ) : (
-              <div className="tasks-empty-state tasks-empty-state--large">
+              <div className={`${styles.emptyState} ${styles.emptyStateLarge}`}>
                 <ListChecks size={36} />
                 <p>{t('tasks.selectOrCreate')}</p>
               </div>

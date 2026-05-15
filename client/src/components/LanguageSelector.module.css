@@ -1,5 +1,5 @@
 /* ── Pill variant (header) ─────────────────────────────────── */
-.language-pill {
+.pill {
   display: flex;
   align-items: center;
   gap: 0.125rem;
@@ -9,7 +9,7 @@
   border: 1px solid var(--surface-border);
 }
 
-.language-pill-btn {
+.pillBtn {
   border: none;
   background: transparent;
   font-size: 1.05rem;
@@ -22,13 +22,13 @@
   filter: grayscale(0.5);
 }
 
-.language-pill-btn:hover:not(.active) {
+.pillBtn:hover:not(.active) {
   opacity: 0.7;
   filter: grayscale(0.2);
   background: var(--glass-bg-hover);
 }
 
-.language-pill-btn.active {
+.pillBtn.active {
   opacity: 1;
   filter: none;
   background: var(--glass-bg-strong);
@@ -36,14 +36,14 @@
 }
 
 /* ── Menu-item variant (mobile overflow menu) ─────────────── */
-.language-menu-row {
+.menuRow {
   display: flex;
   gap: 0.25rem;
   padding: 0.4rem 0.5rem;
   justify-content: center;
 }
 
-.language-menu-option {
+.menuOption {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -60,21 +60,21 @@
   justify-content: center;
 }
 
-.language-menu-option:hover {
+.menuOption:hover {
   background: var(--neutral-tint);
 }
 
-.language-menu-option.active {
+.menuOption.active {
   background: var(--accent-tint);
   color: var(--accent-color);
   font-weight: 600;
 }
 
-.language-menu-flag {
+.menuFlag {
   font-size: 1.1rem;
   line-height: 1;
 }
 
-.language-menu-label {
+.menuLabel {
   white-space: nowrap;
 }

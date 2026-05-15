@@ -27,6 +27,9 @@ import { Share2, LogOut, Smartphone, UserCog, ChevronRight, ChevronUp, CircleDot
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
+import IconButton from '../components/IconButton';
+import Input from '../components/Input';
+import Logo from '../components/Logo';
 import PokerCard from '../components/PokerCard';
 import './Room.css';
 import EmojiPicker, { Theme } from 'emoji-picker-react';
@@ -39,7 +42,7 @@ import { AdminPanel } from '../components/AdminPanel';
 import { TimerDisplay } from '../components/TimerDisplay';
 import { SidebarPanel } from '../components/SidebarPanel';
 import { LanguageSelector } from '../components/LanguageSelector';
-import { Modal } from '../components/Modal';
+import { Modal, ModalTitle, ModalSubtitle } from '../components/Modal';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import { useWelcomeModal } from '../hooks/useWelcomeModal';
 import WelcomeModal from '../components/WelcomeModal';
@@ -214,13 +217,12 @@ const Room = () => {
 
   const renderOnboardingModal = () => (
     <Modal>
-      <h2 className="modal-title">{t('room.joinTitle')}</h2>
-      <p className="modal-subtitle">{t('room.joinSubtitle')}</p>
-      <form onSubmit={handleJoin} className="landing-form">
-        <input
+      <ModalTitle>{t('room.joinTitle')}</ModalTitle>
+      <ModalSubtitle>{t('room.joinSubtitle')}</ModalSubtitle>
+      <form onSubmit={handleJoin}>
+        <Input
           type="text"
           placeholder={t('room.yourName')}
-          className="premium-input"
           value={name}
           onChange={(e) => setName(e.target.value)}
           autoFocus
@@ -230,8 +232,7 @@ const Room = () => {
           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.chooseAvatar')}</span>
           <button
             type="button"
-            className="icon-button"
-            style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+            style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem', border: 'none', cursor: 'pointer' }}
             onClick={() => setShowEmojiPickerJoin(!showEmojiPickerJoin)}
           >
             {mood}
@@ -247,8 +248,8 @@ const Room = () => {
     return (
       <div className="page-container animate-fade-in">
         <div className="landing-card glass" style={{ textAlign: 'center' }}>
-          <h2 className="modal-title" style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</h2>
-          <p className="modal-subtitle">{connectionError}</p>
+          <ModalTitle style={{ color: 'var(--danger-color)' }}>{t('room.roomNotFound')}</ModalTitle>
+          <ModalSubtitle>{connectionError}</ModalSubtitle>
           <Button onClick={() => navigate('/')}>
             {t('common.returnHome')}
           </Button>
@@ -264,13 +265,12 @@ const Room = () => {
         {/* Header */}
         <header className="header glass">
           <div className="header-left">
-            <div className="header-logo">C</div>
+            <Logo />
             <div>
               {isEditingRoomName ? (
                 <form onSubmit={handleRenameRoom} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <input
+                  <Input
                     type="text"
-                    className="premium-input"
                     style={{ padding: '0.15rem 0.5rem', fontSize: '0.9rem', height: 'auto', width: '180px' }}
                     value={tempRoomName}
                     onChange={(e) => setTempRoomName(e.target.value)}
@@ -280,20 +280,20 @@ const Room = () => {
                       setTimeout(() => setIsEditingRoomName(false), 200);
                     }}
                   />
-                  <button type="submit" className="icon-button success" title="Save">
+                  <IconButton type="submit" variant="success" title="Save">
                     <Check size={14} />
-                  </button>
-                  <button type="button" className="icon-button danger" onClick={() => setIsEditingRoomName(false)} title="Cancel">
+                  </IconButton>
+                  <IconButton type="button" variant="danger" onClick={() => setIsEditingRoomName(false)} title="Cancel">
                     <X size={14} />
-                  </button>
+                  </IconButton>
                 </form>
               ) : (
                 <div className="room-name-container" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <h1 className="header-title">{state.name || roomId}</h1>
                   {isAdmin && (
-                    <button onClick={startEditingRoomName} className="icon-button-subtle rename-btn" title={t('room.renameRoom')}>
+                    <IconButton onClick={startEditingRoomName} variant="subtle" className="rename-btn" title={t('room.renameRoom')}>
                       <Edit2 size={12} />
-                    </button>
+                    </IconButton>
                   )}
                 </div>
               )}
@@ -330,45 +330,45 @@ const Room = () => {
                 </button>
               </div>
               <div className="header-separator" />
-              <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
+              <IconButton onClick={() => setShowShareModal(true)} title={t('room.shareRoom')}>
                 <Share2 size={18} />
-              </button>
+              </IconButton>
               {isAdmin && (
-                <button onClick={() => setShowQR(true)} className="icon-button accent" title={t('room.remoteControl')}>
+                <IconButton onClick={() => setShowQR(true)} variant="accent" title={t('room.remoteControl')}>
                   <Smartphone size={18} />
-                </button>
+                </IconButton>
               )}
-              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
+              <IconButton onClick={() => navigate(`/room/${roomId}/tasks`)} variant="accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
                 <ListChecks size={18} />
-              </button>
-              <button onClick={() => setShowUserSettings(true)} className="icon-button" title={t('room.userSettings')}>
+              </IconButton>
+              <IconButton onClick={() => setShowUserSettings(true)} title={t('room.userSettings')}>
                 <UserCog size={18} />
-              </button>
-              <button onClick={() => window.open('/about', '_blank')} className="icon-button" title={t('room.about')}>
+              </IconButton>
+              <IconButton onClick={() => window.open('/about', '_blank')} title={t('room.about')}>
                 <Info size={18} />
-              </button>
+              </IconButton>
               {isAdmin && (
-                <button onClick={openWelcomeModal} className="icon-button" title={t('help.tooltip')}>
+                <IconButton onClick={openWelcomeModal} title={t('help.tooltip')}>
                   <HelpCircle size={18} />
-                </button>
+                </IconButton>
               )}
-              <button onClick={() => navigate('/')} className="icon-button danger" title={t('room.leave')}>
+              <IconButton onClick={() => navigate('/')} variant="danger" title={t('room.leave')}>
                 <LogOut size={18} />
-              </button>
+              </IconButton>
             </div>
 
             {/* Mobile: share + tasks always visible, rest in overflow */}
             <div className="header-actions-mobile">
-              <button onClick={() => setShowShareModal(true)} className="icon-button" title={t('room.shareRoom')}>
+              <IconButton onClick={() => setShowShareModal(true)} title={t('room.shareRoom')}>
                 <Share2 size={18} />
-              </button>
-              <button onClick={() => navigate(`/room/${roomId}/tasks`)} className="icon-button accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
+              </IconButton>
+              <IconButton onClick={() => navigate(`/room/${roomId}/tasks`)} variant="accent" title={isAdmin ? t('room.manageTasks') : t('room.viewTasks')}>
                 <ListChecks size={18} />
-              </button>
+              </IconButton>
               <div className="mobile-menu-wrapper" ref={mobileMenuRef}>
-                <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="icon-button" title="Menu">
+                <IconButton onClick={() => setShowMobileMenu(!showMobileMenu)} title="Menu">
                   <MoreVertical size={18} />
-                </button>
+                </IconButton>
                 {showMobileMenu && (
                   <div className="mobile-menu glass animate-fade-in">
                     <button onClick={() => { setShowUserSettings(true); setShowMobileMenu(false); }}>
@@ -620,12 +620,11 @@ const Room = () => {
 
       {showUserSettings && (
         <Modal onClose={() => setShowUserSettings(false)}>
-            <h3 className="modal-title">{t('room.userSettings')}</h3>
-            <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }} className="landing-form">
-              <input
+            <ModalTitle>{t('room.userSettings')}</ModalTitle>
+            <form onSubmit={(e) => { e.preventDefault(); handleJoin(e); setShowUserSettings(false); }}>
+              <Input
                 type="text"
                 placeholder={t('room.yourName')}
-                className="premium-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoFocus
@@ -635,8 +634,7 @@ const Room = () => {
                 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{t('room.changeAvatar')}</span>
                 <button
                   type="button"
-                  className="icon-button"
-                  style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem' }}
+                  style={{ fontSize: '2.5rem', padding: '0.5rem', background: 'rgba(255,255,255,0.4)', borderRadius: '1rem', border: 'none', cursor: 'pointer' }}
                   onClick={() => setShowEmojiPickerSettings(!showEmojiPickerSettings)}
                 >
                   {mood}
@@ -651,8 +649,8 @@ const Room = () => {
 
       {showShareModal && (
         <Modal onClose={() => setShowShareModal(false)}>
-            <h3 className="modal-title">{t('share.title')}</h3>
-            <p className="modal-subtitle">{t('share.subtitle')}</p>
+            <ModalTitle>{t('share.title')}</ModalTitle>
+            <ModalSubtitle>{t('share.subtitle')}</ModalSubtitle>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', margin: '1rem 0' }}>
               <div style={{ background: 'white', padding: '1rem', borderRadius: '1rem' }} className="animate-fade-in">
@@ -661,19 +659,21 @@ const Room = () => {
 
               <div style={{ width: '100%', textAlign: 'left' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('share.roomId')}</span>
-                <div className="premium-input" style={{ marginTop: '0.25rem', background: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                  {roomId}
-                </div>
+                <Input
+                  type="text"
+                  readOnly
+                  value={roomId}
+                  style={{ marginTop: '0.25rem', background: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.9rem' }}
+                />
               </div>
 
               <div style={{ width: '100%', textAlign: 'left' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t('share.inviteLink')}</span>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-                  <input
+                  <Input
                     type="text"
                     readOnly
                     value={window.location.href}
-                    className="premium-input"
                     style={{ fontSize: '0.85rem', flex: 1 }}
                   />
                   <button onClick={handleCopyLink} className={`premium-button ${copySuccess ? 'success' : 'secondary'}`} style={{ padding: '0.5rem 1rem', flexShrink: 0 }}>
@@ -689,8 +689,8 @@ const Room = () => {
 
       {showQR && (
         <Modal onClose={() => { setShowQR(false); setIsQRVisible(false); }}>
-            <h3 className="modal-title">{t('remoteModal.title')}</h3>
-            <p className="modal-subtitle">{t('remoteModal.subtitle')}</p>
+            <ModalTitle>{t('remoteModal.title')}</ModalTitle>
+            <ModalSubtitle>{t('remoteModal.subtitle')}</ModalSubtitle>
             <p style={{ color: '#e53e3e', fontSize: '0.8rem', fontWeight: 600, margin: '0.5rem 0' }}>{t('remoteModal.warning')}</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0' }}>
@@ -724,7 +724,7 @@ const Room = () => {
       )}
 
       {showEmojiPickerJoin && (
-        <Modal onClose={() => setShowEmojiPickerJoin(false)} contentClassName="modal-content-transparent">
+        <Modal onClose={() => setShowEmojiPickerJoin(false)} transparent>
           <EmojiPicker
             onEmojiClick={(emojiData) => {
               setMood(emojiData.emoji);
@@ -741,7 +741,7 @@ const Room = () => {
       )}
 
       {showEmojiPickerSettings && (
-        <Modal onClose={() => setShowEmojiPickerSettings(false)} contentClassName="modal-content-transparent">
+        <Modal onClose={() => setShowEmojiPickerSettings(false)} transparent>
           <EmojiPicker
             onEmojiClick={(emojiData) => {
               setMood(emojiData.emoji);

@@ -22,23 +22,10 @@
  * SOFTWARE.
  */
 import React from 'react';
-import type { ConclaveActions, RoomState } from '../services/conclave';
-import { AdminPanel } from './AdminPanel';
-import styles from './SidebarPanel.module.css';
+import styles from './Logo.module.css';
 
-interface Props {
-  state: RoomState;
-  actions: ConclaveActions;
-  isAdmin: boolean;
-  myVote: string | null;
-  onVote: (card: string) => void;
-  roomId?: string;
-  autoReveal?: boolean;
-  onAutoRevealChange?: (enabled: boolean) => void;
-}
-
-export const SidebarPanel: React.FC<Props> = (props) => (
-  <div className={styles.inner}>
-    <AdminPanel {...props} layout="sidebar" />
-  </div>
+const Logo: React.FC = () => (
+  <div className={styles.logo}>C</div>
 );
+
+export default Logo;

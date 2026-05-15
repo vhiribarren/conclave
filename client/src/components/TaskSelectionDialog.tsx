@@ -26,7 +26,8 @@ import { X } from 'lucide-react';
 import type { Task } from 'conclave-shared';
 import type { ConclaveActions } from '../services/conclave';
 import { Modal } from './Modal';
-import './TaskSelectionDialog.css';
+import IconButton from './IconButton';
+import styles from './TaskSelectionDialog.module.css';
 
 interface Props {
   actions: ConclaveActions;
@@ -42,30 +43,30 @@ export const TaskSelectionDialog: React.FC<Props> = ({ actions, currentTaskId, o
   };
 
   return (
-    <Modal onClose={onClose} contentClassName="task-selector-modal">
-      <div className="task-selector-header">
+    <Modal onClose={onClose} contentClassName={styles.modal}>
+      <div className={styles.header}>
         <div>
           <h3>Select task</h3>
           <p>Choose what the room votes on next.</p>
         </div>
-        <button className="icon-button" onClick={onClose} title="Close">
+        <IconButton onClick={onClose} title="Close">
           <X size={18} />
-        </button>
+        </IconButton>
       </div>
 
       <button
-        className={`task-selector-item ${currentTaskId === null ? 'active' : ''}`}
+        className={`${styles.item} ${currentTaskId === null ? styles.active : ''}`}
         onClick={() => selectTask(null)}
       >
         <span>Adhoc vote</span>
         <small>No task selected</small>
       </button>
 
-      <div className="task-selector-list">
+      <div className={styles.list}>
         {tasks.map(task => (
           <button
             key={task.id}
-            className={`task-selector-item ${currentTaskId === task.id ? 'active' : ''}`}
+            className={`${styles.item} ${currentTaskId === task.id ? styles.active : ''}`}
             onClick={() => selectTask(task.id)}
           >
             <span>{task.name}</span>
@@ -75,7 +76,7 @@ export const TaskSelectionDialog: React.FC<Props> = ({ actions, currentTaskId, o
       </div>
 
       {tasks.length === 0 && (
-        <p className="task-selector-empty">No tasks yet.</p>
+        <p className={styles.empty}>No tasks yet.</p>
       )}
     </Modal>
   );

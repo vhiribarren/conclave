@@ -24,7 +24,7 @@
 import React from 'react';
 import type { Participant } from 'conclave-shared';
 import { Trophy } from 'lucide-react';
-import './AggregationResult.css';
+import styles from './AggregationResult.module.css';
 
 interface Props {
   participants: (Participant & { vote: string | null })[];
@@ -63,29 +63,29 @@ export const AggregationResult: React.FC<Props> = ({ participants, deck = [], ro
   });
 
   return (
-    <div className="aggregation-result animate-fade-in">
-      <div className="aggregation-list">
+    <div className={`${styles.result} animate-fade-in`}>
+      <div className={styles.list}>
         {sortedVotes.map(([vote, count]) => {
           const percentage = Math.round((count / totalVotes) * 100);
           const isWinner = count === maxVotes && totalVotes > 0;
           
           return (
-            <div key={vote} className={`stat-row ${isWinner ? 'winner' : ''}`}>
-              <div className="stat-card-value">
+            <div key={vote} className={`${styles.row} ${isWinner ? styles.winner : ''}`}>
+              <div className={styles.cardValue}>
                 {vote}
-                {isWinner && <Trophy size={14} className="winner-icon" />}
+                {isWinner && <Trophy size={14} className={styles.winnerIcon} />}
               </div>
               
-              <div className="stat-bar-container">
+              <div className={styles.barContainer}>
                 <div 
-                  className="stat-bar-fill" 
+                  className={styles.barFill} 
                   style={{ width: `${percentage}%` }}
                 />
               </div>
               
-              <div className="stat-meta">
-                <span className="stat-count">{count} {count === 1 ? 'vote' : 'votes'}</span>
-                <span className="stat-percent">{percentage}%</span>
+              <div className={styles.meta}>
+                <span className={styles.count}>{count} {count === 1 ? 'vote' : 'votes'}</span>
+                <span className={styles.percent}>{percentage}%</span>
               </div>
             </div>
           );
