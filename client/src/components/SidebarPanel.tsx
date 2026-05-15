@@ -35,10 +35,11 @@ interface Props {
   roomId?: string;
   autoReveal?: boolean;
   onAutoRevealChange?: (enabled: boolean) => void;
+  collapsed?: boolean;
 }
 
-export const SidebarPanel: React.FC<Props> = (props) => (
-  <div className={styles.inner}>
+export const SidebarPanel: React.FC<Props> = ({ collapsed = false, ...props }) => (
+  <div className={`${styles.inner} ${collapsed ? styles.collapsed : ''}`}>
     <AdminPanel {...props} layout="sidebar" />
   </div>
 );

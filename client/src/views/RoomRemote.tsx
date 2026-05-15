@@ -79,11 +79,11 @@ const RoomRemote = () => {
   if (connectionError) {
     return (
       <div className="page-container animate-fade-in">
-        <div className="landing-card glass error-card">
+        <Modal>
           <ModalTitle style={{ color: 'var(--color-danger-text)' }}>{t('room.roomNotFound')}</ModalTitle>
           <ModalSubtitle>{connectionError}</ModalSubtitle>
           <Button onClick={() => navigate('/')}>{t('common.returnHome')}</Button>
-        </div>
+        </Modal>
       </div>
     );
   }

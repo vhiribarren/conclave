@@ -350,6 +350,16 @@ export const AdminPanel: React.FC<Props> = ({
             </div>
             <div className="timer-custom-row">
               <div className="timer-input-wrapper">
+                <button
+                  type="button"
+                  className="timer-spin-btn"
+                  onClick={() => {
+                    const val = Math.max(1, parseInt(customTimerValue) - 5);
+                    setCustomTimerValue(String(val));
+                    setSelectedDurationMs(val * 1000);
+                    actions.adminSetTimerDuration(val * 1000);
+                  }}
+                >−</button>
                 <Input
                   type="number"
                   active={![15, 30, 45, 60].includes(selectedDurationMs / 1000)}
@@ -362,6 +372,16 @@ export const AdminPanel: React.FC<Props> = ({
                   placeholder="Custom"
                 />
                 <span className="timer-input-unit">s</span>
+                <button
+                  type="button"
+                  className="timer-spin-btn"
+                  onClick={() => {
+                    const val = parseInt(customTimerValue) + 5;
+                    setCustomTimerValue(String(val));
+                    setSelectedDurationMs(val * 1000);
+                    actions.adminSetTimerDuration(val * 1000);
+                  }}
+                >+</button>
               </div>
             </div>
           </Section>

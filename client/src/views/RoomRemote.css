@@ -10,6 +10,14 @@
   padding-bottom: 10rem; /* space for sticky vote bar */
 }
 
+.remote-container .panel-section {
+  padding: 1rem;
+}
+
+.remote-container .admin-panel {
+  gap: 1.5rem;
+}
+
 /* ── Sticky vote bar ──────────────────────────────────────────── */
 .remote-vote-bar {
   position: sticky;
