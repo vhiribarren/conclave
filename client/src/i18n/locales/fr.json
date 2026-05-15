@@ -202,5 +202,20 @@
     "cookiesBody": "Ce site ne dépose pas de cookies de suivi. Cloudflare peut déposer un cookie technique strictement nécessaire (__cf_bm) à des fins de protection anti-bot, exempté de consentement selon les recommandations de la CNIL.\nCe site utilise le stockage local du navigateur (localStorage) pour mémoriser des données techniques strictement nécessaires au fonctionnement de l'application, telles que vos préférences d'utilisation et un identifiant opaque permettant d'assurer la continuité de votre session. Cet identifiant ne permet pas de vous identifier personnellement et n'est associé à aucune collecte d'informations personnelles. Ces données restent stockées localement sur votre appareil et peuvent être supprimées à tout moment via les paramètres de votre navigateur.",
     "rightsTitle": "Vos droits",
     "rightsBody": "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, d'effacement et d'opposition concernant vos données.\nPour exercer ces droits, vous pouvez me contacter via le formulaire disponible à l'adresse suivante : https://www.alea.net/contact\nVous pouvez également introduire une réclamation auprès de la CNIL (www.cnil.fr)."
+  },
+  "help": {
+    "title": "Bienvenue sur Conclave",
+    "tooltip": "Aide",
+    "remoteTitle": "Télécommande admin",
+    "remoteDescription": "Ouvrez cette salle dans une nouvelle fenêtre de navigateur ou sur votre téléphone pour obtenir une télécommande d'administration dédiée. Révélez les votes, réinitialisez les tours, gérez les minuteries et votez vous-même à distance.",
+    "shareTitle": "Inviter des participants",
+    "shareDescription": "Partagez le lien de la salle ou le code QR avec votre équipe pour qu'ils rejoignent instantanément.",
+    "tasksTitle": "Tâches vs Ad-hoc",
+    "tasksDescription": "Créez une liste de tâches pour voter séquentiellement, ou utilisez le mode ad-hoc pour des votes libres.",
+    "votingTitle": "Lancer un vote",
+    "votingDescription": "Utilisez le panneau admin (sidebar sur desktop, barre en bas sur mobile) pour révéler les votes, réinitialiser le tour ou lancer un timer.",
+    "settingsTitle": "Paramètres",
+    "settingsDescription": "Vote anonyme, auto-reveal au timer, deck personnalisé, et listes de tâches pour voter séquentiellement — configurez tout dans le panneau admin.",
+    "dismiss": "Compris"
   }
 }

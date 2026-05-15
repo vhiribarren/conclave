@@ -23,7 +23,7 @@
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Share2, LogOut, Smartphone, UserCog, ChevronRight, ChevronUp, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks, MoreVertical, Settings, Eye, RotateCcw } from 'lucide-react';
+import { Share2, LogOut, Smartphone, UserCog, ChevronRight, ChevronUp, CircleDot, LayoutGrid, Copy, Check, Edit2, X, Info, ListChecks, MoreVertical, Settings, Eye, RotateCcw, HelpCircle } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import Button from '../components/Button';
@@ -41,6 +41,8 @@ import { SidebarPanel } from '../components/SidebarPanel';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { Modal } from '../components/Modal';
 import { useCurrentRoomSession } from './RoomSessionLayout';
+import { useWelcomeModal } from '../hooks/useWelcomeModal';
+import WelcomeModal from '../components/WelcomeModal';
 
 
 const Room = () => {
@@ -65,6 +67,7 @@ const Room = () => {
     state,
     userId,
   } = useCurrentRoomSession();
+  const { showWelcomeModal, openWelcomeModal, closeWelcomeModal } = useWelcomeModal(isAdmin);
   const [myVote, setMyVote] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [isQRVisible, setIsQRVisible] = useState(false);
@@ -344,6 +347,11 @@ const Room = () => {
               <button onClick={() => window.open('/about', '_blank')} className="icon-button" title={t('room.about')}>
                 <Info size={18} />
               </button>
+              {isAdmin && (
+                <button onClick={openWelcomeModal} className="icon-button" title={t('help.tooltip')}>
+                  <HelpCircle size={18} />
+                </button>
+              )}
               <button onClick={() => navigate('/')} className="icon-button danger" title={t('room.leave')}>
                 <LogOut size={18} />
               </button>
@@ -374,6 +382,11 @@ const Room = () => {
                     <button onClick={() => { window.open('/about', '_blank'); setShowMobileMenu(false); }}>
                       <Info size={16} /> {t('room.about')}
                     </button>
+                    {isAdmin && (
+                      <button onClick={() => { openWelcomeModal(); setShowMobileMenu(false); }}>
+                        <HelpCircle size={16} /> {t('help.tooltip')}
+                      </button>
+                    )}
                     <div className="mobile-menu-separator" />
                     <LanguageSelector variant="menu-item" />
                     <div className="mobile-menu-separator" />
@@ -740,6 +753,10 @@ const Room = () => {
             width={350}
           />
         </Modal>
+      )}
+
+      {isJoined && showWelcomeModal && (
+        <WelcomeModal onClose={closeWelcomeModal} />
       )}
     </>
   );

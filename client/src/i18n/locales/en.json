@@ -202,5 +202,20 @@
     "cookiesBody": "This website does not set tracking cookies. Cloudflare may set a strictly necessary technical cookie (__cf_bm) for anti-bot protection purposes, which is exempt from consent requirements under CNIL guidelines.\nThis website uses the browser's local storage (localStorage) to store technical data strictly necessary for the proper functioning of the application, such as your user preferences and an opaque identifier used to maintain session continuity. This identifier does not allow you to be personally identified and is not associated with any collection of personal information. This data remains stored locally on your device and can be deleted at any time through your browser settings.",
     "rightsTitle": "Your rights",
     "rightsBody": "Under the General Data Protection Regulation (GDPR), you have the right to access, rectify, erase, and object to the processing of your personal data.\nTo exercise these rights, you can contact me via the form available at: https://www.alea.net/contact\nYou may also lodge a complaint with your local data protection authority (in France: CNIL, www.cnil.fr)."
+  },
+  "help": {
+    "title": "Welcome to Conclave",
+    "tooltip": "Help",
+    "remoteTitle": "Admin Remote Control",
+    "remoteDescription": "Open this room in a new browser window or on your phone to get a dedicated admin remote. Use it to reveal votes, reset rounds, manage timers, and cast your own vote from anywhere.",
+    "shareTitle": "Invite Participants",
+    "shareDescription": "Share the room link or QR code with your team so they can join instantly.",
+    "tasksTitle": "Tasks vs Ad-hoc",
+    "tasksDescription": "Create a task list to vote on items one by one, or use ad-hoc mode for quick standalone votes.",
+    "votingTitle": "Running a Vote",
+    "votingDescription": "Use the admin sidebar (or the bottom bar on mobile) to reveal votes, reset the round, or start a timer. Participants vote by picking a card.",
+    "settingsTitle": "Settings",
+    "settingsDescription": "Anonymous voting, auto-reveal on timer, custom card decks, and task lists to vote on items one by one — configure these in the admin panel.",
+    "dismiss": "Got it"
   }
 }

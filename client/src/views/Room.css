@@ -743,3 +743,25 @@
   color: var(--text-secondary);
   pointer-events: none;
 }
+
+/* ── Welcome modal content ────────────────────────────────────── */
+.welcome-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.welcome-section h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.welcome-section p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
