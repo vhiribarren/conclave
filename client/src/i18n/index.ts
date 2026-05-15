@@ -27,6 +27,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import en from './locales/en.json';
 import fr from './locales/fr.json';
+import { genKey } from '../services/settings';
 
 i18n
   .use(LanguageDetector)
@@ -44,7 +45,7 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
-      lookupLocalStorage: 'conclave-language',
+      lookupLocalStorage: genKey('language'),
     },
   });
 

@@ -24,7 +24,7 @@
 
 const PREFIX_KEY = 'conclave.';
 
-const genKey = (key: string) => `${PREFIX_KEY}${key}`;
+export const genKey = (key: string) => `${PREFIX_KEY}${key}`;
 
 const _storage = {
     get: (key: string) => localStorage.getItem(genKey(key)),
