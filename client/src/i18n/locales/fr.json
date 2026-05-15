@@ -77,7 +77,8 @@
     "subtitle": "Ouvrez la télécommande dans une nouvelle fenêtre ou scannez le QR code avec votre téléphone.",
     "openNewTab": "Ouvrir dans un nouvel onglet",
     "showQR": "Afficher le QR code",
-    "hideQR": "Masquer le QR code"
+    "hideQR": "Masquer le QR code",
+    "warning": "Ce lien est réservé à l'administrateur. Ne le partagez pas avec les participants."
   },
   "admin": {
     "control": "Contrôle",

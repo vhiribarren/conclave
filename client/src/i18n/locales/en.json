@@ -77,7 +77,8 @@
     "subtitle": "Open the remote control in a new window, or scan the QR code with your phone.",
     "openNewTab": "Open remote in new tab",
     "showQR": "Show QR code",
-    "hideQR": "Hide QR code"
+    "hideQR": "Hide QR code",
+    "warning": "This link is for the admin only. Do not share it with participants."
   },
   "admin": {
     "control": "Control",

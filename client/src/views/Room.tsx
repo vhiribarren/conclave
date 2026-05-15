@@ -691,6 +691,7 @@ const Room = () => {
         <Modal onClose={() => { setShowQR(false); setIsQRVisible(false); }}>
             <h3 className="modal-title">{t('remoteModal.title')}</h3>
             <p className="modal-subtitle">{t('remoteModal.subtitle')}</p>
+            <p style={{ color: '#e53e3e', fontSize: '0.8rem', fontWeight: 600, margin: '0.5rem 0' }}>{t('remoteModal.warning')}</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', margin: '1rem 0' }}>
               <a
