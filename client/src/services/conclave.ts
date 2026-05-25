@@ -39,6 +39,7 @@ export interface ConclaveActions {
   adminPauseTimer: () => void;
   adminResumeTimer: () => void;
   adminDeleteTask: (taskId: string) => void;
+  adminReorderTasks: (taskIds: string[]) => void;
   adminTransferAdmin: (targetUserId: string) => void;
   userUpdateProfile: (name: string, mood: string) => void;
   adminRenameRoom: (name: string) => void;
@@ -174,6 +175,7 @@ export class ConclaveSocket {
       adminPauseTimer: () => send({ type: 'ADMIN_PAUSE_TIMER' }),
       adminResumeTimer: () => send({ type: 'ADMIN_RESUME_TIMER' }),
       adminDeleteTask: (taskId) => send({ type: 'ADMIN_DELETE_TASK', taskId }),
+      adminReorderTasks: (taskIds) => send({ type: 'ADMIN_REORDER_TASKS', taskIds }),
       adminTransferAdmin: (targetUserId) => send({ type: 'ADMIN_TRANSFER_ADMIN', targetUserId }),
       userUpdateProfile: (name, mood) => send({ type: 'USER_UPDATE_PROFILE', name, mood }),
       adminRenameRoom: (name) => send({ type: 'ADMIN_RENAME_ROOM', name }),

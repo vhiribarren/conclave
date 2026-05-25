@@ -343,6 +343,27 @@ export class ConclaveRoom extends DurableObject {
         this.broadcastState();
         break;
 
+      case "ADMIN_REORDER_TASKS":
+        if (!this.assertAdmin(senderPublicId, "ADMIN_REORDER_TASKS")) return;
+        if (!Array.isArray(data.taskIds)) {
+          this.log.warn(`ADMIN_REORDER_TASKS: Invalid taskIds format`);
+          return;
+        }
+        {
+          const reordered: Task[] = [];
+          for (const id of data.taskIds) {
+            const task = this.state.tasks.find(t => t.id === id);
+            if (task) reordered.push(task);
+          }
+          // Keep any tasks not in the list at the end (safety)
+          for (const task of this.state.tasks) {
+            if (!reordered.includes(task)) reordered.push(task);
+          }
+          this.state.tasks = reordered;
+        }
+        this.broadcastState();
+        break;
+
       case "ADMIN_SET_DECK":
         if (!this.assertAdmin(senderPublicId, "ADMIN_SET_DECK")) return;
         if (!Array.isArray(data.deck)) {

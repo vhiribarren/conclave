@@ -160,7 +160,12 @@
     "round_one": "{{count}} round",
     "round_other": "{{count}} rounds",
     "current": "Current",
-    "selectOrCreate": "Select or create a task to see its rounds."
+    "selectOrCreate": "Select or create a task to see its rounds.",
+    "taskName": "Task",
+    "rounds": "Rounds",
+    "startVote": "Start vote",
+    "clickToEdit": "Click to edit",
+    "confirmDelete": "Click again to confirm"
   },
   "about": {
     "home": "Home",

@@ -160,7 +160,12 @@
     "round_one": "{{count}} tour",
     "round_other": "{{count}} tours",
     "current": "En cours",
-    "selectOrCreate": "Sélectionnez ou créez une tâche pour en voir les tours."
+    "selectOrCreate": "Sélectionnez ou créez une tâche pour en voir les tours.",
+    "taskName": "Tâche",
+    "rounds": "Tours",
+    "startVote": "Lancer un vote",
+    "clickToEdit": "Cliquer pour éditer",
+    "confirmDelete": "Cliquer à nouveau pour confirmer"
   },
   "about": {
     "home": "Accueil",

@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, Edit2, ListChecks, Plus, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, ChevronRight, GripVertical, ListChecks, Play, Plus, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Round, Task } from 'conclave-shared';
 import Button from '../components/Button';
@@ -56,6 +56,121 @@ const getRoundLabel = (task: Task, round: Round) => {
   return index === -1 ? 'Round' : `Round ${index + 1}`;
 };
 
+/** Returns the vote value(s) with the highest count */
+const getMajorityVotes = (round: Round | undefined, deck: string[]): string[] => {
+  const summary = summarizeVotes(round, deck);
+  if (summary.length === 0) return [];
+  const maxCount = Math.max(...summary.map(([, count]) => count));
+  return summary.filter(([, count]) => count === maxCount).map(([vote]) => vote);
+};
+
+/** Collapsible round result component */
+const CollapsibleRound: React.FC<{
+  round: Round | undefined;
+  emptyLabel: string;
+  label: string;
+  sublabel?: string;
+  deck: string[];
+  defaultOpen?: boolean;
+  alwaysOpen?: boolean;
+}> = ({ round, emptyLabel, label, sublabel, deck, defaultOpen = false, alwaysOpen = false }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen || alwaysOpen);
+  const { t } = useTranslation();
+  const summary = summarizeVotes(round, deck);
+  const totalVotes = Object.keys(round?.votes || {}).length;
+  const majorityVotes = getMajorityVotes(round, deck);
+  const expanded = alwaysOpen || isOpen;
+
+  if (!round) {
+    return (
+      <div className={styles.roundCard}>
+        <div className={styles.roundCardHeader}>
+          <span className={styles.roundLabel}>{label}</span>
+          {sublabel && <span className={styles.roundSublabel}>{sublabel}</span>}
+        </div>
+        <p className={styles.empty}>{emptyLabel}</p>
+      </div>
+    );
+  }
+
+  if (!round.revealed) {
+    return (
+      <div className={styles.roundCard}>
+        <div className={styles.roundCardHeader}>
+          <span className={styles.roundLabel}>{label}</span>
+        </div>
+        <div className={styles.roundState}>
+          <span className={styles.statusDot} />
+          {t('tasks.votingInProgress')}
+        </div>
+      </div>
+    );
+  }
+
+  if (summary.length === 0) {
+    return (
+      <div className={styles.roundCard}>
+        <div className={styles.roundCardHeader}>
+          <span className={styles.roundLabel}>{label}</span>
+          {sublabel && <span className={styles.roundSublabel}>{sublabel}</span>}
+        </div>
+        <p className={styles.empty}>{t('tasks.noVotesCast')}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.roundCard}>
+      {alwaysOpen ? (
+        <div className={styles.roundCardHeader}>
+          <span className={styles.roundLabel}>{label}</span>
+          {sublabel && <span className={styles.roundSublabel}>{sublabel}</span>}
+          <span className={styles.majoritySummary}>
+            {majorityVotes.map(vote => (
+              <span key={vote} className={styles.majorityChip}>{vote}</span>
+            ))}
+          </span>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={styles.collapseToggle}
+          onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={expanded}
+        >
+          <span className={styles.collapseIcon}>
+            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </span>
+          <span className={styles.roundLabel}>{label}</span>
+          {sublabel && <span className={styles.roundSublabel}>{sublabel}</span>}
+          <span className={styles.majoritySummary}>
+            {majorityVotes.map(vote => (
+              <span key={vote} className={styles.majorityChip}>{vote}</span>
+            ))}
+          </span>
+        </button>
+      )}
+
+      {expanded && (
+        <div className={styles.resultsList}>
+          {summary.map(([vote, count]) => {
+            const percent = Math.round((count / totalVotes) * 100);
+            return (
+              <div key={vote} className={styles.resultRow}>
+                <span className={styles.voteValue}>{vote}</span>
+                <div className={styles.resultBar}>
+                  <span style={{ width: `${percent}%` }} />
+                </div>
+                <span className={styles.resultMeta}>{count} / {totalVotes}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const RoomTasks = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
@@ -76,6 +191,13 @@ const RoomTasks = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  // Drag and drop state
+  const dragSourceIdx = useRef<number | null>(null);
+  const dragOverIdx = useRef<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const dragImageRef = useRef<HTMLDivElement | null>(null);
 
   const selectedTask = useMemo(() => {
     return state.tasks.find(task => task.id === (selectedTaskId || state.currentTaskId)) || state.tasks[0] || null;
@@ -105,53 +227,87 @@ const RoomTasks = () => {
     setEditingName(task.name);
   };
 
-  const saveRename = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!actions || !editingTaskId || !editingName.trim()) return;
-    actions.adminRenameTask(editingTaskId, editingName.trim());
+  const saveRename = (taskId: string) => {
+    if (!actions || !editingName.trim()) return;
+    actions.adminRenameTask(taskId, editingName.trim());
     setEditingTaskId(null);
     setEditingName('');
   };
 
-  const renderRoundSummary = (round: Round | undefined, emptyLabel: string) => {
-    const summary = summarizeVotes(round, state.deck);
-    const totalVotes = Object.keys(round?.votes || {}).length;
-
-    if (!round) {
-      return <p className={styles.empty}>{emptyLabel}</p>;
-    }
-
-    if (!round.revealed) {
-      return (
-        <div className={styles.roundState}>
-          <span className={styles.statusDot} />
-          {t('tasks.votingInProgress')}
-          <strong>{totalVotes}</strong>
-        </div>
-      );
-    }
-
-    if (summary.length === 0) {
-      return <p className={styles.empty}>{t('tasks.noVotesCast')}</p>;
-    }
-
-    return (
-      <div className={styles.resultsList}>
-        {summary.map(([vote, count]) => {
-          const percent = Math.round((count / totalVotes) * 100);
-          return (
-            <div key={vote} className={styles.resultRow}>
-              <span className={styles.voteValue}>{vote}</span>
-              <div className={styles.resultBar}>
-                <span style={{ width: `${percent}%` }} />
-              </div>
-              <span className={styles.resultMeta}>{count} / {totalVotes}</span>
-            </div>
-          );
-        })}
-      </div>
-    );
+  const cancelRename = () => {
+    setEditingTaskId(null);
+    setEditingName('');
   };
+
+  const handleNameKeyDown = (event: React.KeyboardEvent, taskId: string) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      saveRename(taskId);
+    } else if (event.key === 'Escape') {
+      cancelRename();
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (event: React.DragEvent, idx: number) => {
+    dragSourceIdx.current = idx;
+    dragOverIdx.current = idx;
+    event.dataTransfer.effectAllowed = 'move';
+    // Use a transparent drag image to avoid the default ghost saccade
+    if (!dragImageRef.current) {
+      const el = document.createElement('div');
+      el.style.position = 'absolute';
+      el.style.top = '-9999px';
+      el.style.left = '-9999px';
+      el.style.width = '1px';
+      el.style.height = '1px';
+      document.body.appendChild(el);
+      dragImageRef.current = el;
+    }
+    event.dataTransfer.setDragImage(dragImageRef.current, 0, 0);
+    setDragOverIndex(idx);
+  };
+
+  const handleDragOver = useCallback((event: React.DragEvent, idx: number) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    if (dragOverIdx.current !== idx) {
+      dragOverIdx.current = idx;
+      setDragOverIndex(idx);
+    }
+  }, []);
+
+  const handleDragEnd = () => {
+    const from = dragSourceIdx.current;
+    const to = dragOverIdx.current;
+    if (from !== null && to !== null && from !== to && actions) {
+      const taskIds = state.tasks.map(t => t.id);
+      const [moved] = taskIds.splice(from, 1);
+      taskIds.splice(to, 0, moved!);
+      actions.adminReorderTasks(taskIds);
+    }
+    dragSourceIdx.current = null;
+    dragOverIdx.current = null;
+    setDragOverIndex(null);
+  };
+
+  const handleStartVote = (taskId: string) => {
+    if (!actions) return;
+    actions.adminSetTask(taskId);
+    navigate(`/room/${roomId}`);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    if (confirmDeleteId === taskId) {
+      actions?.adminDeleteTask(taskId);
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(taskId);
+      // Auto-reset after 3s if not confirmed
+      setTimeout(() => setConfirmDeleteId((current) => current === taskId ? null : current), 3000);
+    }
+  };
+
 
   if (connectionError) {
     return (
@@ -230,29 +386,107 @@ const RoomTasks = () => {
               </form>
             )}
 
-            <div className={styles.list}>
-              {state.tasks.map((task) => {
-                const isSelected = selectedTask?.id === task.id;
-                const isCurrent = state.currentTaskId === task.id;
-                const lastRound = task.rounds[task.rounds.length - 1];
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th className={styles.thName}>{t('tasks.taskName')}</th>
+                    <th className={styles.thRounds}>{t('tasks.rounds')}</th>
+                    {isAdmin && <th className={styles.thActions}></th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {state.tasks.map((task, idx) => {
+                    const isSelected = selectedTask?.id === task.id;
+                    const isCurrent = state.currentTaskId === task.id;
+                    const isEditing = editingTaskId === task.id;
+                    const isDragOver = dragOverIndex === idx && dragSourceIdx.current !== idx;
 
-                return (
-                  <article
-                    key={task.id}
-                    className={`${styles.listItem} ${isSelected ? styles.selected : ''}`}
-                    onClick={() => setSelectedTaskId(task.id)}
-                  >
-                    <div className={styles.listMain}>
-                      <span className={styles.listName}>{task.name}</span>
-                      <span className={styles.listMeta}>
-                        {t('tasks.round', { count: task.rounds.length })}
-                        {lastRound?.revealed ? ` · ${t('tasks.revealed').toLowerCase()}` : ` · ${t('tasks.open').toLowerCase()}`}
-                      </span>
-                    </div>
-                    {isCurrent && <span className={styles.currentBadge}>{t('tasks.current')}</span>}
-                  </article>
-                );
-              })}
+                    return (
+                      <tr
+                        key={task.id}
+                        className={`${styles.tableRow} ${isSelected ? styles.selected : ''} ${isDragOver ? styles.dragOver : ''}`}
+                        onClick={() => setSelectedTaskId(task.id)}
+                        draggable={isAdmin && !isEditing}
+                        onDragStart={(e) => handleDragStart(e, idx)}
+                        onDragOver={(e) => handleDragOver(e, idx)}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <td className={styles.cellName}>
+                          {isAdmin && !isEditing && (
+                            <GripVertical size={14} className={styles.gripIcon} />
+                          )}
+                          {isEditing ? (
+                            <div className={styles.inlineEdit}>
+                              <input
+                                type="text"
+                                className={styles.inlineInput}
+                                value={editingName}
+                                onChange={(e) => setEditingName(e.target.value)}
+                                onKeyDown={(e) => handleNameKeyDown(e, task.id)}
+                                onBlur={() => saveRename(task.id)}
+                                autoFocus
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <IconButton
+                                type="button"
+                                variant="success"
+                                title="Save"
+                                onClick={(e) => { e.stopPropagation(); saveRename(task.id); }}
+                              >
+                                <Check size={14} />
+                              </IconButton>
+                              <IconButton
+                                type="button"
+                                variant="danger"
+                                title="Cancel"
+                                onClick={(e) => { e.stopPropagation(); cancelRename(); }}
+                              >
+                                <X size={14} />
+                              </IconButton>
+                            </div>
+                          ) : (
+                            <span
+                              className={`${styles.taskName} ${isAdmin ? styles.taskNameEditable : ''}`}
+                              onDoubleClick={(e) => {
+                                if (isAdmin) {
+                                  e.stopPropagation();
+                                  startRename(task);
+                                }
+                              }}
+                              title={isAdmin ? t('tasks.clickToEdit') : undefined}
+                            >
+                              {task.name}
+                            </span>
+                          )}
+                        </td>
+                        <td className={styles.cellRounds}>
+                          {task.rounds.length}
+                        </td>
+                        {isAdmin && (
+                          <td className={styles.cellActions} onClick={(e) => e.stopPropagation()}>
+                            <IconButton
+                              onClick={() => handleStartVote(task.id)}
+                              title={t('tasks.startVote')}
+                              className={`${styles.voteBtn} ${isCurrent ? styles.voteBtnActive : ''}`}
+                            >
+                              <Play size={14} />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleDeleteTask(task.id)}
+                              variant={confirmDeleteId === task.id ? 'danger' : 'default'}
+                              title={confirmDeleteId === task.id ? t('tasks.confirmDelete') : t('tasks.deleteTask')}
+                              className={confirmDeleteId === task.id ? styles.confirmDeleteBtn : ''}
+                            >
+                              <Trash2 size={14} />
+                            </IconButton>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
 
               {state.tasks.length === 0 && (
                 <div className={styles.emptyState}>
@@ -269,66 +503,39 @@ const RoomTasks = () => {
                 <div className={styles.detailHeader}>
                   <div>
                     <span className={styles.kicker}>{t('tasks.selectedTask')}</span>
-                    {editingTaskId === selectedTask.id ? (
-                      <form onSubmit={saveRename} className={styles.renameForm}>
-                        <Input
-                          type="text"
-                          value={editingName}
-                          onChange={(event) => setEditingName(event.target.value)}
-                          autoFocus
-                        />
-                        <IconButton type="submit" variant="success" title="Save">
-                          <Check size={16} />
-                        </IconButton>
-                        <IconButton type="button" variant="danger" onClick={() => setEditingTaskId(null)} title="Cancel">
-                          <X size={16} />
-                        </IconButton>
-                      </form>
-                    ) : (
-                      <h2>{selectedTask.name}</h2>
-                    )}
+                    <h2>{selectedTask.name}</h2>
                   </div>
-                  {isAdmin && (
-                    <div className={styles.detailActions}>
-                      <Button
-                        onClick={() => actions?.adminSetTask(state.currentTaskId === selectedTask.id ? null : selectedTask.id)}
-                      >
-                        {state.currentTaskId === selectedTask.id ? t('tasks.unselect') : t('tasks.select')}
-                      </Button>
-                      <IconButton onClick={() => startRename(selectedTask)} title={t('tasks.renameTask')}>
-                        <Edit2 size={16} />
-                      </IconButton>
-                      <IconButton onClick={() => actions?.adminDeleteTask(selectedTask.id)} variant="danger" title={t('tasks.deleteTask')}>
-                        <Trash2 size={16} />
-                      </IconButton>
-                    </div>
-                  )}
                 </div>
 
-                <div className={styles.roundCard}>
-                  <div className={styles.roundCardHeader}>
-                    <h3>{t('tasks.latestRound')}</h3>
-                    <span>{latestRound ? getRoundLabel(selectedTask, latestRound) : t('tasks.noRound')}</span>
-                  </div>
-                  {renderRoundSummary(latestRound, t('tasks.noRoundYet'))}
-                </div>
+                <CollapsibleRound
+                  key={latestRound?.id ?? selectedTask.id}
+                  round={latestRound}
+                  emptyLabel={t('tasks.noRoundYet')}
+                  label={t('tasks.latestRound')}
+                  sublabel={latestRound ? getRoundLabel(selectedTask, latestRound) : t('tasks.noRound')}
+                  deck={state.deck}
+                  alwaysOpen={true}
+                />
 
-                <div className={styles.history}>
-                  <h3>{t('tasks.previousRounds')}</h3>
-                  {previousRounds.length > 0 ? (
-                    previousRounds.map(round => (
-                      <div key={round.id} className={styles.historyItem}>
-                        <div className={styles.roundCardHeader}>
-                          <span>{getRoundLabel(selectedTask, round)}</span>
-                          <span>{round.revealed ? t('tasks.revealed') : t('tasks.open')}</span>
-                        </div>
-                        {renderRoundSummary(round, t('tasks.noVotes'))}
-                      </div>
-                    ))
-                  ) : (
-                    <p className={styles.empty}>{t('tasks.noPreviousRound')}</p>
-                  )}
-                </div>
+                {previousRounds.length > 0 && (
+                  <div className={styles.history}>
+                    <h3>{t('tasks.previousRounds')}</h3>
+                    {previousRounds.map(round => (
+                      <CollapsibleRound
+                        key={round.id}
+                        round={round}
+                        emptyLabel={t('tasks.noVotes')}
+                        label={getRoundLabel(selectedTask, round)}
+                        sublabel={round.revealed ? t('tasks.revealed') : t('tasks.open')}
+                        deck={state.deck}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {previousRounds.length === 0 && (
+                  <p className={styles.empty}>{t('tasks.noPreviousRound')}</p>
+                )}
               </>
             ) : (
               <div className={`${styles.emptyState} ${styles.emptyStateLarge}`}>
