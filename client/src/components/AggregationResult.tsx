@@ -48,17 +48,14 @@ export const AggregationResult: React.FC<Props> = ({ participants, deck = [], ro
   const totalVotes = votes.length;
   const maxVotes = Math.max(...Object.values(counts));
 
-  // Sort by inverse deck order. If not in deck, put at the end.
-  const sortedVotes = Object.entries(counts).sort(([valA], [valB]) => {
+  // Sort by vote count descending, then by deck order descending for ties
+  const sortedVotes = Object.entries(counts).sort(([valA, countA], [valB, countB]) => {
+    if (countA !== countB) return countB - countA;
     const idxA = deck.indexOf(valA);
     const idxB = deck.indexOf(valB);
-    
-    // If both in deck, sort by index descending
     if (idxA !== -1 && idxB !== -1) return idxB - idxA;
-    // If only one in deck, the one in deck comes first
     if (idxA !== -1) return -1;
     if (idxB !== -1) return 1;
-    // Otherwise sort alphabetically
     return valA.localeCompare(valB);
   });
 
