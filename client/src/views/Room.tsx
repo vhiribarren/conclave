@@ -472,8 +472,10 @@ const Room = () => {
                 {/* Mobile-only: task title and results */}
                 {isRevealed && (
                   <div className={`${s.mobileResultsSection} animate-fade-in`}>
-                    <span className={s.sidebarSectionTitle}>{t('room.votingOn')}</span>
                     <span className={s.resultsPanelTaskTitle}>{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
+                    <span className={s.voteProgress}>
+                      🗳️ {state.participants.filter(p => p.vote !== null).length}/{state.participants.length}
+                    </span>
                     <span className={s.sidebarSectionTitle}>📊 {t('room.results')}</span>
                     <AggregationResult participants={state.participants} deck={state.deck} roundVotes={state.anonymousVoting && currentRound?.revealed ? currentRound.votes : undefined} />
                   </div>
@@ -483,6 +485,9 @@ const Room = () => {
                 {!isRevealed && !isAdmin && (
                   <div className={`${s.votingSection} glass ${s.mobileVoting}`}>
                     <span className={s.votingSubtitle}>{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
+                    <span className={s.voteProgress}>
+                      🗳️ {state.participants.filter(p => p.vote !== null).length}/{state.participants.length}
+                    </span>
                     <span className={s.votingTitle}>{t('room.pickACard')}</span>
                     <div className={s.votingCards}>
                       {(state.deck || []).map((card) => (
@@ -504,6 +509,9 @@ const Room = () => {
                     {!isRevealed && !mobileAdminOpen && (
                       <div className={s.mobileAdminVoteSection}>
                         <span className={s.mobileAdminVoteSubtitle}>{currentTask ? currentTask.name : t('admin.adhocVote')}</span>
+                        <span className={s.voteProgress}>
+                          🗳️ {state.participants.filter(p => p.vote !== null).length}/{state.participants.length}
+                        </span>
                         <span className={s.mobileAdminVoteTitle}>{t('room.pickACard')}</span>
                         <div className={s.mobileAdminVoteCards}>
                           {(state.deck || []).map((card) => (
