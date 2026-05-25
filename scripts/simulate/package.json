@@ -1,5 +1,5 @@
 {
-  "name": "conclave-simulate-users",
+  "name": "conclave-simulate",
   "version": "1.0.0",
   "private": true,
   "type": "module",
