@@ -23,6 +23,6 @@
     "react-i18next": "^17.0.7"
   },
   "devDependencies": {
-    "wrangler": "^4.90.0"
+    "wrangler": "^4.94.0"
   }
 }
