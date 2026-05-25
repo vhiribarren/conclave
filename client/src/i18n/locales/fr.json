@@ -146,6 +146,8 @@
     "select": "Sélectionner",
     "renameTask": "Renommer la tâche",
     "deleteTask": "Supprimer la tâche",
+    "confirmDeleteTitle": "Supprimer la tâche",
+    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer « {{name}} » ? Cette action est irréversible.",
     "latestRound": "Dernier tour",
     "noRound": "Aucun tour",
     "noRoundYet": "Aucun tour de vote pour cette tâche.",
@@ -163,9 +165,9 @@
     "selectOrCreate": "Sélectionnez ou créez une tâche pour en voir les tours.",
     "taskName": "Tâche",
     "rounds": "Tours",
+    "result": "Résultat",
     "startVote": "Lancer un vote",
-    "clickToEdit": "Cliquer pour éditer",
-    "confirmDelete": "Cliquer à nouveau pour confirmer"
+    "clickToEdit": "Cliquer pour éditer"
   },
   "about": {
     "home": "Accueil",

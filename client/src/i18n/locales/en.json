@@ -146,6 +146,8 @@
     "select": "Select",
     "renameTask": "Rename task",
     "deleteTask": "Delete task",
+    "confirmDeleteTitle": "Delete task",
+    "confirmDeleteMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
     "latestRound": "Latest round",
     "noRound": "No round",
     "noRoundYet": "This task has no rounds yet.",
@@ -163,9 +165,9 @@
     "selectOrCreate": "Select or create a task to see its rounds.",
     "taskName": "Task",
     "rounds": "Rounds",
+    "result": "Result",
     "startVote": "Start vote",
-    "clickToEdit": "Click to edit",
-    "confirmDelete": "Click again to confirm"
+    "clickToEdit": "Click to edit"
   },
   "about": {
     "home": "Home",

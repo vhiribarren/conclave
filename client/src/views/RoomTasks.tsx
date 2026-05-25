@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, ChevronDown, ChevronRight, GripVertical, ListChecks, Play, Plus, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +34,19 @@ import { Modal, ModalTitle, ModalSubtitle } from '../components/Modal';
 import { setUserEmoji, setUserName } from '../services/user';
 import { useCurrentRoomSession } from './RoomSessionLayout';
 import styles from './RoomTasks.module.css';
+
+const MOBILE_BREAKPOINT = 860;
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= MOBILE_BREAKPOINT);
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+  return isMobile;
+};
 
 const summarizeVotes = (round: Round | undefined, deck: string[]) => {
   const counts: Record<string, number> = {};
@@ -175,6 +188,7 @@ const RoomTasks = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const {
     actions,
     connectionError,
@@ -189,9 +203,14 @@ const RoomTasks = () => {
   } = useCurrentRoomSession();
   const [newTaskName, setNewTaskName] = useState('');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [mobileDetailTaskId, setMobileDetailTaskId] = useState<string | null>(null);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const confirmDeleteTask = useMemo(() => {
+    if (!confirmDeleteId) return null;
+    return state.tasks.find(t => t.id === confirmDeleteId) || null;
+  }, [confirmDeleteId, state.tasks]);
 
   // Drag and drop state
   const dragSourceIdx = useRef<number | null>(null);
@@ -202,6 +221,11 @@ const RoomTasks = () => {
   const selectedTask = useMemo(() => {
     return state.tasks.find(task => task.id === (selectedTaskId || state.currentTaskId)) || state.tasks[0] || null;
   }, [selectedTaskId, state.currentTaskId, state.tasks]);
+
+  const mobileDetailTask = useMemo(() => {
+    if (!mobileDetailTaskId) return null;
+    return state.tasks.find(task => task.id === mobileDetailTaskId) || null;
+  }, [mobileDetailTaskId, state.tasks]);
 
   const latestRound = selectedTask?.rounds[selectedTask.rounds.length - 1];
   const previousRounds = selectedTask?.rounds.slice(0, -1).reverse() || [];
@@ -298,13 +322,13 @@ const RoomTasks = () => {
   };
 
   const handleDeleteTask = (taskId: string) => {
-    if (confirmDeleteId === taskId) {
-      actions?.adminDeleteTask(taskId);
+    setConfirmDeleteId(taskId);
+  };
+
+  const confirmDelete = () => {
+    if (confirmDeleteId) {
+      actions?.adminDeleteTask(confirmDeleteId);
       setConfirmDeleteId(null);
-    } else {
-      setConfirmDeleteId(taskId);
-      // Auto-reset after 3s if not confirmed
-      setTimeout(() => setConfirmDeleteId((current) => current === taskId ? null : current), 3000);
     }
   };
 
@@ -391,7 +415,7 @@ const RoomTasks = () => {
                 <thead>
                   <tr>
                     <th className={styles.thName}>{t('tasks.taskName')}</th>
-                    <th className={styles.thRounds}>{t('tasks.rounds')}</th>
+                    <th className={styles.thResult}>{t('tasks.result')}</th>
                     {isAdmin && <th className={styles.thActions}></th>}
                   </tr>
                 </thead>
@@ -406,7 +430,13 @@ const RoomTasks = () => {
                       <tr
                         key={task.id}
                         className={`${styles.tableRow} ${isSelected ? styles.selected : ''} ${isDragOver ? styles.dragOver : ''}`}
-                        onClick={() => setSelectedTaskId(task.id)}
+                        onClick={() => {
+                          if (isMobile) {
+                            setMobileDetailTaskId(task.id);
+                          } else {
+                            setSelectedTaskId(task.id);
+                          }
+                        }}
                         draggable={isAdmin && !isEditing}
                         onDragStart={(e) => handleDragStart(e, idx)}
                         onDragOver={(e) => handleDragOver(e, idx)}
@@ -460,8 +490,17 @@ const RoomTasks = () => {
                             </span>
                           )}
                         </td>
-                        <td className={styles.cellRounds}>
-                          {task.rounds.length}
+                        <td className={styles.cellResult}>
+                          {(() => {
+                            const lastRevealedRound = [...task.rounds].reverse().find(r => r.revealed);
+                            if (!lastRevealedRound) {
+                              return <span className={styles.noResult}>—</span>;
+                            }
+                            const majority = getMajorityVotes(lastRevealedRound, state.deck);
+                            return majority.map(vote => (
+                              <span key={vote} className={styles.majorityChip}>{vote}</span>
+                            ));
+                          })()}
                         </td>
                         {isAdmin && (
                           <td className={styles.cellActions} onClick={(e) => e.stopPropagation()}>
@@ -474,9 +513,8 @@ const RoomTasks = () => {
                             </IconButton>
                             <IconButton
                               onClick={() => handleDeleteTask(task.id)}
-                              variant={confirmDeleteId === task.id ? 'danger' : 'default'}
-                              title={confirmDeleteId === task.id ? t('tasks.confirmDelete') : t('tasks.deleteTask')}
-                              className={confirmDeleteId === task.id ? styles.confirmDeleteBtn : ''}
+                              variant="danger"
+                              title={t('tasks.deleteTask')}
                             >
                               <Trash2 size={14} />
                             </IconButton>
@@ -497,55 +535,117 @@ const RoomTasks = () => {
             </div>
           </section>
 
-          <section className={`${styles.detailPanel} glass`}>
-            {selectedTask ? (
-              <>
-                <div className={styles.detailHeader}>
-                  <div>
-                    <span className={styles.kicker}>{t('tasks.selectedTask')}</span>
-                    <h2>{selectedTask.name}</h2>
+          {!isMobile && (
+            <section className={`${styles.detailPanel} glass`}>
+              {selectedTask ? (
+                <>
+                  <div className={styles.detailHeader}>
+                    <div>
+                      <span className={styles.kicker}>{t('tasks.selectedTask')}</span>
+                      <h2>{selectedTask.name}</h2>
+                    </div>
                   </div>
+
+                  <CollapsibleRound
+                    key={latestRound?.id ?? selectedTask.id}
+                    round={latestRound}
+                    emptyLabel={t('tasks.noRoundYet')}
+                    label={t('tasks.latestRound')}
+                    sublabel={latestRound ? getRoundLabel(selectedTask, latestRound) : t('tasks.noRound')}
+                    deck={state.deck}
+                    alwaysOpen={true}
+                  />
+
+                  {previousRounds.length > 0 && (
+                    <div className={styles.history}>
+                      <h3>{t('tasks.previousRounds')}</h3>
+                      {previousRounds.map(round => (
+                        <CollapsibleRound
+                          key={round.id}
+                          round={round}
+                          emptyLabel={t('tasks.noVotes')}
+                          label={getRoundLabel(selectedTask, round)}
+                          sublabel={round.revealed ? t('tasks.revealed') : t('tasks.open')}
+                          deck={state.deck}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {previousRounds.length === 0 && (
+                    <p className={styles.empty}>{t('tasks.noPreviousRound')}</p>
+                  )}
+                </>
+              ) : (
+                <div className={`${styles.emptyState} ${styles.emptyStateLarge}`}>
+                  <ListChecks size={36} />
+                  <p>{t('tasks.selectOrCreate')}</p>
                 </div>
-
-                <CollapsibleRound
-                  key={latestRound?.id ?? selectedTask.id}
-                  round={latestRound}
-                  emptyLabel={t('tasks.noRoundYet')}
-                  label={t('tasks.latestRound')}
-                  sublabel={latestRound ? getRoundLabel(selectedTask, latestRound) : t('tasks.noRound')}
-                  deck={state.deck}
-                  alwaysOpen={true}
-                />
-
-                {previousRounds.length > 0 && (
-                  <div className={styles.history}>
-                    <h3>{t('tasks.previousRounds')}</h3>
-                    {previousRounds.map(round => (
-                      <CollapsibleRound
-                        key={round.id}
-                        round={round}
-                        emptyLabel={t('tasks.noVotes')}
-                        label={getRoundLabel(selectedTask, round)}
-                        sublabel={round.revealed ? t('tasks.revealed') : t('tasks.open')}
-                        deck={state.deck}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {previousRounds.length === 0 && (
-                  <p className={styles.empty}>{t('tasks.noPreviousRound')}</p>
-                )}
-              </>
-            ) : (
-              <div className={`${styles.emptyState} ${styles.emptyStateLarge}`}>
-                <ListChecks size={36} />
-                <p>{t('tasks.selectOrCreate')}</p>
-              </div>
-            )}
-          </section>
+              )}
+            </section>
+          )}
         </main>
       </div>
+
+      {isMobile && mobileDetailTask && (() => {
+        const mLatestRound = mobileDetailTask.rounds[mobileDetailTask.rounds.length - 1];
+        const mPreviousRounds = mobileDetailTask.rounds.slice(0, -1).reverse();
+        return (
+          <Modal onClose={() => setMobileDetailTaskId(null)} maxWidth="95vw">
+            <div className={styles.mobileDetail}>
+              <div className={styles.mobileDetailHeader}>
+                <h2>{mobileDetailTask.name}</h2>
+                <IconButton onClick={() => setMobileDetailTaskId(null)} title={t('common.close')}>
+                  <X size={18} />
+                </IconButton>
+              </div>
+
+              <CollapsibleRound
+                key={mLatestRound?.id ?? mobileDetailTask.id}
+                round={mLatestRound}
+                emptyLabel={t('tasks.noRoundYet')}
+                label={t('tasks.latestRound')}
+                sublabel={mLatestRound ? getRoundLabel(mobileDetailTask, mLatestRound) : t('tasks.noRound')}
+                deck={state.deck}
+                alwaysOpen={true}
+              />
+
+              {mPreviousRounds.length > 0 && (
+                <div className={styles.history}>
+                  <h3>{t('tasks.previousRounds')}</h3>
+                  {mPreviousRounds.map(round => (
+                    <CollapsibleRound
+                      key={round.id}
+                      round={round}
+                      emptyLabel={t('tasks.noVotes')}
+                      label={getRoundLabel(mobileDetailTask, round)}
+                      sublabel={round.revealed ? t('tasks.revealed') : t('tasks.open')}
+                      deck={state.deck}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </Modal>
+        );
+      })()}
+
+      {confirmDeleteTask && (
+        <Modal onClose={() => setConfirmDeleteId(null)} maxWidth="24rem">
+          <div className={styles.confirmModal}>
+            <h3>{t('tasks.confirmDeleteTitle')}</h3>
+            <p>{t('tasks.confirmDeleteMessage', { name: confirmDeleteTask.name })}</p>
+            <div className={styles.confirmActions}>
+              <Button variant="secondary" onClick={() => setConfirmDeleteId(null)}>
+                {t('common.cancel')}
+              </Button>
+              <Button variant="danger" onClick={confirmDelete}>
+                {t('tasks.deleteTask')}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };

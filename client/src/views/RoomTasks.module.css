@@ -162,7 +162,7 @@
   min-width: 10rem;
 }
 
-.thRounds {
+.thResult {
   width: 5rem;
   text-align: center;
 }
@@ -268,8 +268,16 @@
   box-shadow: 0 0 0 2px var(--accent-tint);
 }
 
-.cellRounds {
+.cellResult {
   text-align: center;
+  white-space: nowrap;
+}
+
+.cellResult .majorityChip {
+  margin: 0 0.15rem;
+}
+
+.noResult {
   color: var(--text-secondary);
   font-size: 0.82rem;
 }
@@ -290,15 +298,6 @@
   color: var(--color-success-dot);
   background: var(--accent-tint);
   border-radius: 0.4rem;
-}
-
-.confirmDeleteBtn {
-  animation: pulse-danger 0.6s ease-in-out infinite alternate;
-}
-
-@keyframes pulse-danger {
-  from { opacity: 1; }
-  to { opacity: 0.6; }
 }
 
 /* Detail panel */
@@ -517,13 +516,60 @@
     grid-template-columns: 1fr;
   }
 
-  .tableWrapper {
-    max-height: 50vh;
+  .detailPanel {
+    display: none;
   }
 
-  .detailHeader {
-    flex-direction: column;
+  .tableWrapper {
+    max-height: none;
   }
+}
+
+/* Mobile detail modal */
+.mobileDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.mobileDetailHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mobileDetailHeader h2 {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* Confirm delete modal */
+.confirmModal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.confirmModal h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.confirmModal p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.confirmActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 520px) {
@@ -554,11 +600,6 @@
   .table th,
   .tableRow td {
     padding: 0.5rem;
-  }
-
-  .thRounds,
-  .cellRounds {
-    display: none;
   }
 
   .resultRow {
