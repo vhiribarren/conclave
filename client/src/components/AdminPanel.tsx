@@ -243,6 +243,12 @@ export const AdminPanel: React.FC<Props> = ({
                     </>
                   )}
                 </div>
+                <span className={styles.votingOnTask}>
+                  {currentTask ? currentTask.name : t('admin.adhocVote')}
+                </span>
+                <div className={styles.voteProgress}>
+                  🗳️ {state.participants.filter(p => p.vote !== null).length}/{state.participants.length}
+                </div>
               </Section>
 
               {/* ── Results (revealed) ──────────────────────────────── */}
