@@ -1,0 +1,15 @@
+{
+  "name": "conclave-simulate-users",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Simulate multiple users in a Conclave room for interactive GUI testing",
+  "scripts": {
+    "start": "node simulate.js"
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1",
+    "unique-names-generator": "^4.7.1",
+    "ws": "^8.18.0"
+  }
+}

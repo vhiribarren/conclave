@@ -5,7 +5,8 @@
   "workspaces": [
     "client",
     "server-cloudflare",
-    "shared"
+    "shared",
+    "scripts/simulate"
   ],
   "scripts": {
     "dev": "npm run dev -w conclave-client",
