@@ -446,6 +446,12 @@
   margin-bottom: 1rem;
 }
 
+.voteProgress {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
 .resultsPanelVoting {
   display: flex;
   flex-direction: column;

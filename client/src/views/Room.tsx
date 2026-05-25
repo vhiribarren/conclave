@@ -442,6 +442,9 @@ const Room = () => {
                     <span className={s.resultsPanelTaskTitle}>
                       {currentTask ? currentTask.name : t('admin.adhocVote')}
                     </span>
+                    <span className={s.voteProgress}>
+                      🗳️ {state.participants.filter(p => p.vote !== null).length}/{state.participants.length}
+                    </span>
                     {isRevealed ? (
                       <>
                         <span className={s.sidebarSectionTitle}>📊 {t('room.results')}</span>
