@@ -431,6 +431,7 @@ const RoomTasks = () => {
                         key={task.id}
                         className={`${styles.tableRow} ${isSelected ? styles.selected : ''} ${isDragOver ? styles.dragOver : ''}`}
                         onClick={() => {
+                          if (isEditing) return;
                           if (isMobile) {
                             setMobileDetailTaskId(task.id);
                           } else {
@@ -479,10 +480,26 @@ const RoomTasks = () => {
                             <span
                               className={`${styles.taskName} ${isAdmin ? styles.taskNameEditable : ''}`}
                               onDoubleClick={(e) => {
-                                if (isAdmin) {
+                                if (isAdmin && !isMobile) {
                                   e.stopPropagation();
                                   startRename(task);
                                 }
+                              }}
+                              onTouchStart={(e) => {
+                                if (!isAdmin) return;
+                                const timer = setTimeout(() => {
+                                  e.preventDefault();
+                                  startRename(task);
+                                }, 500);
+                                (e.currentTarget as HTMLElement).dataset.longPressTimer = String(timer);
+                              }}
+                              onTouchEnd={(e) => {
+                                const timer = (e.currentTarget as HTMLElement).dataset.longPressTimer;
+                                if (timer) clearTimeout(Number(timer));
+                              }}
+                              onTouchMove={(e) => {
+                                const timer = (e.currentTarget as HTMLElement).dataset.longPressTimer;
+                                if (timer) clearTimeout(Number(timer));
                               }}
                               title={isAdmin ? t('tasks.clickToEdit') : undefined}
                             >
