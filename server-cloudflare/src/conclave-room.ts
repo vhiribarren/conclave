@@ -28,6 +28,7 @@ import { SqlKvStorage, SqlKvStore } from "./kv-storage";
 import { RoomLogger } from "./logger";
 
 const INACTIVITY_ALARM_MS = 48 * 60 * 60 * 1000 // 48H
+const DEFAULT_DISCONNECT_GRACE_PERIOD_MS = 10_000 // 10s before removing a disconnected participant
 const KV_STATE = "state";
 const KV_USER_ID_MAPPING = "userIdMapping";
 
@@ -40,6 +41,7 @@ type UserIdMapping = Record<string, string>; // userId -> publicId
 export class ConclaveRoom extends DurableObject {
   private store: SqlKvStore | null = null;
   private readonly log: RoomLogger;
+  private readonly disconnectGracePeriodMs: number;
 
   // State uses publicIds everywhere: participants[].id, adminId, round votes keys
   private state: RoomState = {
@@ -63,6 +65,9 @@ export class ConclaveRoom extends DurableObject {
     super(ctx, env);
     const roomId = this.ctx.id.name ?? this.ctx.id.toString().slice(0, 8);
     this.log = new RoomLogger(roomId);
+    this.disconnectGracePeriodMs = env.DISCONNECT_GRACE_PERIOD_MS
+      ? parseInt(env.DISCONNECT_GRACE_PERIOD_MS, 10)
+      : DEFAULT_DISCONNECT_GRACE_PERIOD_MS;
     this.ctx.blockConcurrencyWhile(async () => {
       const kvStorage = new SqlKvStorage(this.ctx.storage.sql);
       if (!kvStorage.isInitialized()) return;
@@ -145,10 +150,25 @@ export class ConclaveRoom extends DurableObject {
         return otherAttachment?.publicId === attachment.publicId;
       });
       if (!hasOtherConnection) {
-        this.log.info(`Participant disconnected: ${attachment.publicId}`);
-        this.state.participants = this.state.participants.filter((p) => p.id !== attachment.publicId);
+        const publicId = attachment.publicId;
+        const participant = this.state.participants.find((p) => p.id === publicId);
+        if (!participant) return;
+
+        this.log.info(`Participant disconnected (grace period): ${publicId}`);
+        participant.disconnectedAt = Date.now();
         this.broadcastState();
         this.store!.put(KV_STATE, this.state);
+
+        // Remove participant after grace period if still disconnected
+        setTimeout(() => {
+          const p = this.state.participants.find((p) => p.id === publicId);
+          if (p && p.disconnectedAt !== null && p.disconnectedAt !== undefined) {
+            this.log.info(`Participant removed after grace period: ${publicId}`);
+            this.state.participants = this.state.participants.filter((p) => p.id !== publicId);
+            this.broadcastState();
+            this.store!.put(KV_STATE, this.state);
+          }
+        }, this.disconnectGracePeriodMs);
       }
     }
   }
@@ -194,14 +214,22 @@ export class ConclaveRoom extends DurableObject {
           // Multi-device (e.g. desktop + remote) — keep existing participant as-is
         } else {
           // Single device reconnect or first join — update participant entry
-          this.state.participants = this.state.participants.filter((p) => p.id !== publicId);
-          this.state.participants.push({
-            id: publicId,
-            name: data.name || "Anonymous",
-            mood: data.mood || "🦊",
-            vote: null,
-            isAdmin: publicId === this.state.adminId,
-          });
+          const existing = this.state.participants.find((p) => p.id === publicId);
+          if (existing) {
+            // Reconnect: clear disconnected state and update profile
+            existing.disconnectedAt = null;
+            existing.name = data.name || existing.name;
+            existing.mood = data.mood || existing.mood;
+          } else {
+            this.state.participants.push({
+              id: publicId,
+              name: data.name || "Anonymous",
+              mood: data.mood || "🦊",
+              vote: null,
+              isAdmin: publicId === this.state.adminId,
+              disconnectedAt: null,
+            });
+          }
         }
         ws.send(JSON.stringify({ type: "JOINED", publicId } satisfies ServerMessage));
         this.log.info(`User joined: ${publicId} (${data.name || "Anonymous"})`);

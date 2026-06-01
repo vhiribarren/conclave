@@ -27,6 +27,7 @@ export interface Participant {
   mood: string;
   vote: string | null;
   isAdmin: boolean;
+  disconnectedAt?: number | null;
 }
 
 export interface Round {

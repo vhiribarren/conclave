@@ -3,6 +3,9 @@ main = "./src/index.ts"
 compatibility_date = "2026-05-10"
 preview_urls = true
 
+[vars]
+DISCONNECT_GRACE_PERIOD_MS = "10000"
+
 [observability]
 enabled = true
 head_sampling_rate = 1

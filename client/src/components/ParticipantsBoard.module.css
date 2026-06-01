@@ -122,6 +122,21 @@
   color: var(--color-warning);
 }
 
+.disconnectedIcon {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  color: var(--color-warning);
+  filter: drop-shadow(0 0 3px var(--color-warning));
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.card.disconnected .avatar,
+.card.disconnected .name,
+.card.disconnected .voteBox {
+  opacity: 0.5;
+}
+
 .avatar {
   width: calc(3rem * var(--size-ratio, 1));
   height: calc(3rem * var(--size-ratio, 1));
@@ -164,6 +179,11 @@
   background: var(--accent-highlight-bg);
   color: var(--accent-color);
   box-shadow: var(--shadow-sm);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* ── Mobile responsive ──────────────────────────────────────────── */

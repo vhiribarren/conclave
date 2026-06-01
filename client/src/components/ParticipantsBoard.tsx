@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 import React, { useRef, useEffect, useState } from 'react';
-import { Crown, Check } from 'lucide-react';
+import { Crown, Check, WifiOff } from 'lucide-react';
 import type { Participant } from 'conclave-shared';
 import { TimerDisplay } from './TimerDisplay';
 import styles from './ParticipantsBoard.module.css';
@@ -185,8 +185,9 @@ export const ParticipantsBoard: React.FC<Props> = ({ participants, isRevealed, c
 };
 
 const ParticipantCard = ({ participant: p, isRevealed, myName }: { participant: Participant & { vote: string | null }, isRevealed: boolean, myName: string }) => (
-  <div className={`${styles.card} glass ${p.vote ? styles.hasVoted : ''}`}>
+  <div className={`${styles.card} glass ${p.vote ? styles.hasVoted : ''} ${p.disconnectedAt ? styles.disconnected : ''}`}>
     {p.isAdmin && <Crown size={14} className={styles.adminIcon} />}
+    {p.disconnectedAt && <WifiOff size={13} className={styles.disconnectedIcon} />}
     <div className={styles.avatar}>
       {p.mood || '🦊'}
     </div>

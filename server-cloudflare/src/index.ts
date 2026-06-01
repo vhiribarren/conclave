@@ -27,6 +27,7 @@ import { generateRoomId } from "conclave-shared";
 export { ConclaveRoom };
 export interface Env {
   CONCLAVE_ROOM: DurableObjectNamespace<ConclaveRoom>;
+  DISCONNECT_GRACE_PERIOD_MS?: string;
 }
 
 export default {
